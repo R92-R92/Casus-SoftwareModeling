@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:StudioManager"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="Milo's Document and Media Assistant / Milo's Digital Management App" Height="450" Width="800">
     <Grid>
 
     </Grid>
