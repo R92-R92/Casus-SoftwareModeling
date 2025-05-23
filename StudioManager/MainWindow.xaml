@@ -8,7 +8,7 @@
         xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
         mc:Ignorable="d"
         Title="Milo's Document and Media Assistant / Milo's Digital Management App"
-        Height="550" Width="930" WindowStartupLocation="CenterScreen">
+        Height="670" Width="930" WindowStartupLocation="CenterScreen">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="220"/>
@@ -63,7 +63,6 @@
                                 </StackPanel>
                             </StackPanel>
                         </Border>
-
 
                         <!-- PROGRESS -->
                         <Border Background="#E0E0E0" CornerRadius="5" Padding="10" Margin="5,0,0,0" Grid.Column="1">
@@ -138,8 +137,7 @@
                                     </Grid.RowDefinitions>
 
                                     <TextBlock Text="My Location" FontWeight="Bold" FontSize="14" HorizontalAlignment="Center" Margin="0,0,0,5"/>
-                                    <wv2:WebView2 x:Name="MapBrowser"
-                                        Grid.Row="1"
+                                    <wv2:WebView2 x:Name="MapBrowser" Grid.Row="1"
                                         Source="https://www.openstreetmap.org/export/embed.html?bbox=5.3258%2C50.9250%2C5.3498%2C50.9360&amp;layer=mapnik&amp;marker=50.9307%2C5.3378"
                                         Margin="0"/>
                                 </Grid>
@@ -155,29 +153,410 @@
 
                 <!-- PROJECTS -->
                 <Grid x:Name="ProjectsView" Visibility="Collapsed">
-                    <TextBlock Text="Projects View" FontSize="20" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="2*"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Search Field (left) + New Project Button (right) -->
+                    <Grid Grid.Row="0" Margin="0,0,0,5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Search Field with Placeholder Simulation -->
+                        <Grid Grid.Column="0" Width="200" Height="25" Margin="0,0,10,0" HorizontalAlignment="Left" VerticalAlignment="Center">
+                            <TextBox x:Name="ProjectsSearchTextBox" VerticalContentAlignment="Center" Padding="2,0,0,0" TextChanged="SearchBox_Projects"/>
+                            <TextBlock x:Name="SearchPlaceholder" Text="Search projects..." Foreground="Gray" Margin="5,0,0,0" VerticalAlignment="Center" IsHitTestVisible="False" Visibility="Visible"/>
+                        </Grid>
+
+                        <!-- New Project Button -->
+                        <Button Grid.Column="1" Content="New Project" Width="100" HorizontalAlignment="Right"/>
+                    </Grid>
+
+                    <!-- Project Overview Label -->
+                    <TextBlock Grid.Row="1" Text="Project Overview" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center" Margin="0,0,0,5"/>
+
+                    <!-- Project Overview Table -->
+                    <DataGrid x:Name="ProjectsDataGrid" Grid.Row="2" AutoGenerateColumns="False" CanUserAddRows="False" Margin="0,0,0,10">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*"/>
+                            <DataGridTextColumn Header="Deadline" Binding="{Binding Description}" Width="2*"/>
+                            <DataGridTextColumn Header="Concept" Binding="{Binding Concept}" Width="*"/>
+                            <DataGridTemplateColumn Header="Edit" Width="Auto">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Content="Edit" Width="50" Margin="2"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn Header="Del" Width="Auto">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Content="Delete" Width="60" Margin="2"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                    <!-- Project Details Label -->
+                    <TextBlock Grid.Row="3" Text="Project Details" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center" Margin="0,0,0,5"/>
+
+                    <!-- Project Details -->
+                    <Border Grid.Row="4" BorderThickness="1" BorderBrush="Gray" Padding="10" Margin="0,0,0,10">
+                        <StackPanel>
+                            <TextBlock Text="- Name: [Project Name]"/>
+                            <TextBlock Text="- Deadline: [Date]"/>
+                            <TextBlock Text="- Linked Concepts: [Concept A, Concept B]"/>
+                            <TextBlock Text="- Description: [Detailed description]"/>
+                            <TextBlock Text="- Notes: [Notes about the project]"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Save / Cancel Buttons -->
+                    <Grid Grid.Row="5" Margin="0,0,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Button Content="Save" Width="100" HorizontalAlignment="Left" Grid.Column="0" Margin="100,0"/>
+                        <Button Content="Cancel" Width="100" HorizontalAlignment="Right" Grid.Column="1" Margin="100,0"/>
+                    </Grid>
                 </Grid>
 
                 <!-- SHOOTS -->
                 <Grid x:Name="ShootsView" Visibility="Collapsed">
-                    <TextBlock Text="Shoots View" FontSize="20" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="2*"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Search Field (left) + New Shoot Button (right) -->
+                    <Grid Grid.Row="0" Margin="0,0,0,5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Search Field with Placeholder Simulation -->
+                        <Grid Grid.Column="0" Width="200" Height="25" Margin="0,0,10,0" HorizontalAlignment="Left" VerticalAlignment="Center">
+                            <TextBox x:Name="ShootsSearchTextBox" VerticalContentAlignment="Center" Padding="2,0,0,0" TextChanged="SearchBox_Shoots"/>
+                            <TextBlock x:Name="ShootsSearchPlaceholder" Text="Search shoots..." Foreground="Gray" Margin="5,0,0,0" VerticalAlignment="Center" IsHitTestVisible="False" Visibility="Visible"/>
+                        </Grid>
+
+                        <!-- New Shoot Button -->
+                        <Button Grid.Column="1" Content="New Shoot" Width="100" HorizontalAlignment="Right"/>
+                    </Grid>
+
+                    <!-- Shoot Overview Label -->
+                    <TextBlock Grid.Row="1" Text="Shoot Overview" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center" Margin="0,0,0,5"/>
+
+                    <!-- Shoot Overview Table -->
+                    <DataGrid x:Name="ShootsDataGrid" Grid.Row="2" AutoGenerateColumns="False" CanUserAddRows="False" Margin="0,0,0,10">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Location" Binding="{Binding Location}" Width="*"/>
+                            <DataGridTextColumn Header="Date" Binding="{Binding Date}" Width="*"/>
+                            <DataGridTextColumn Header="Concepts" Binding="{Binding Concepts}" Width="2*"/>
+                            <DataGridTemplateColumn Header="Edit" Width="Auto">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Content="Edit" Width="50" Margin="2"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn Header="Del" Width="Auto">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Content="Delete" Width="60" Margin="2"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                    <!-- Shoot Details Label -->
+                    <TextBlock Grid.Row="3" Text="Shoot Details" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center" Margin="0,0,0,5"/>
+
+                    <!-- Shoot Details -->
+                    <Border Grid.Row="4" BorderThickness="1" BorderBrush="Gray" Padding="10" Margin="0,0,0,10">
+                        <StackPanel>
+                            <TextBlock Text="- Date: [Shoot Date]"/>
+                            <TextBlock Text="- Location: [Shoot Location]"/>
+                            <TextBlock Text="- Distance: [Distance in km]"/>
+                            <TextBlock Text="- Upload Contract: [Link or Filename]"/>
+                            <TextBlock Text="- Contract Signed: [Yes/No]"/>
+                            <TextBlock Text="- Linked Concepts: [Concept A, Concept B]"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Save / Cancel Buttons -->
+                    <Grid Grid.Row="5" Margin="0,0,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Button Content="Save" Width="100" HorizontalAlignment="Left" Grid.Column="0" Margin="100,0"/>
+                        <Button Content="Cancel" Width="100" HorizontalAlignment="Right" Grid.Column="1" Margin="100,0"/>
+                    </Grid>
                 </Grid>
 
                 <!-- CONCEPTS -->
                 <Grid x:Name="ConceptsView" Visibility="Collapsed">
-                    <TextBlock Text="Concepts View" FontSize="20" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="2*"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Search Field (left) + New Concept Button (right) -->
+                    <Grid Grid.Row="0" Margin="0,0,0,5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Search Field with Placeholder Simulation -->
+                        <Grid Grid.Column="0" Width="200" Height="25" Margin="0,0,10,0" HorizontalAlignment="Left" VerticalAlignment="Center">
+                            <TextBox x:Name="ConceptsSearchTextBox" VerticalContentAlignment="Center" Padding="2,0,0,0" TextChanged="SearchBox_Concepts"/>
+                            <TextBlock x:Name="ConceptsSearchPlaceholder" Text="Search concepts..." Foreground="Gray" Margin="5,0,0,0" VerticalAlignment="Center" IsHitTestVisible="False" Visibility="Visible"/>
+                        </Grid>
+
+                        <!-- New Concept Button -->
+                        <Button Grid.Column="1" Content="New Concept" Width="100" HorizontalAlignment="Right"/>
+                    </Grid>
+
+                    <!-- Concept Overview Label -->
+                    <TextBlock Grid.Row="1" Text="Concept Overview" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center" Margin="0,0,0,5"/>
+
+                    <!-- Concept Overview Table -->
+                    <DataGrid x:Name="ConceptsDataGrid" Grid.Row="2" AutoGenerateColumns="False" CanUserAddRows="False" Margin="0,0,0,10">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Model" Binding="{Binding Model}" Width="*"/>
+                            <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="2*"/>
+                            <DataGridTextColumn Header="Location" Binding="{Binding Location}" Width="*"/>
+                            <DataGridTextColumn Header="Props" Binding="{Binding Props}" Width="*"/>
+                            <DataGridTemplateColumn Header="Edit" Width="Auto">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Content="Edit" Width="50" Margin="2"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn Header="Del" Width="Auto">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Content="Delete" Width="60" Margin="2"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                    <!-- Concept Details Label -->
+                    <TextBlock Grid.Row="3" Text="Concept Details" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center" Margin="0,0,0,5"/>
+
+                    <!-- Concept Details -->
+                    <Border Grid.Row="4" BorderThickness="1" BorderBrush="Gray" Padding="10" Margin="0,0,0,10">
+                        <StackPanel>
+                            <TextBlock Text="- Description: [Description details]"/>
+                            <TextBlock Text="- Location: [Location details]"/>
+                            <TextBlock Text="- Props: [Props details]"/>
+                            <TextBlock Text="- Models: [Models details]"/>
+                            <TextBlock Text="- Upload Sketch: [Link or Filename]"/>
+                            <TextBlock Text="- Upload Picture: [Link or Filename]"/>
+                            <TextBlock Text="- View Picture: [Link or Filename]"/>
+                            <TextBlock Text="- Linked Shoots: [Shoot A, Shoot B]"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Save / Cancel Buttons -->
+                    <Grid Grid.Row="5" Margin="0,0,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Button Content="Save" Width="100" HorizontalAlignment="Left" Grid.Column="0" Margin="100,0"/>
+                        <Button Content="Cancel" Width="100" HorizontalAlignment="Right" Grid.Column="1" Margin="100,0"/>
+                    </Grid>
                 </Grid>
 
                 <!-- PROPS -->
                 <Grid x:Name="PropsView" Visibility="Collapsed">
-                    <TextBlock Text="Props View" FontSize="20" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="2*"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Search Field (left) + New Prop Button (right) -->
+                    <Grid Grid.Row="0" Margin="0,0,0,5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Search Field with Placeholder Simulation -->
+                        <Grid Grid.Column="0" Width="200" Height="25" Margin="0,0,10,0" HorizontalAlignment="Left" VerticalAlignment="Center">
+                            <TextBox x:Name="PropsSearchTextBox" VerticalContentAlignment="Center" Padding="2,0,0,0" TextChanged="SearchBox_Props"/>
+                            <TextBlock x:Name="PropsSearchPlaceholder" Text="Search props..." Foreground="Gray" Margin="5,0,0,0" VerticalAlignment="Center" IsHitTestVisible="False" Visibility="Visible"/>
+                        </Grid>
+
+                        <!-- New Prop Button -->
+                        <Button Grid.Column="1" Content="New Prop" Width="100" HorizontalAlignment="Right"/>
+                    </Grid>
+
+                    <!-- Prop Overview Label -->
+                    <TextBlock Grid.Row="1" Text="Prop Overview" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center" Margin="0,0,0,5"/>
+
+                    <!-- Prop Overview Table -->
+                    <DataGrid x:Name="PropsDataGrid" Grid.Row="2" AutoGenerateColumns="False" CanUserAddRows="False" Margin="0,0,0,10">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*"/>
+                            <DataGridCheckBoxColumn Header="Available" Binding="{Binding Available}" Width="Auto"/>
+                            <DataGridTemplateColumn Header="Edit" Width="Auto">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Content="Edit" Width="50" Margin="2"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn Header="Del" Width="Auto">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Content="Delete" Width="60" Margin="2"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                    <!-- Prop Details Label -->
+                    <TextBlock Grid.Row="3" Text="Prop Details" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center" Margin="0,0,0,5"/>
+
+                    <!-- Prop Details -->
+                    <Border Grid.Row="4" BorderThickness="1" BorderBrush="Gray" Padding="10" Margin="0,0,0,10">
+                        <StackPanel>
+                            <TextBlock Text="- Name: [Prop Name]"/>
+                            <TextBlock Text="- Description: [Description details]"/>
+                            <TextBlock Text="- Available: [Yes/No]"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Save / Cancel Buttons -->
+                    <Grid Grid.Row="5" Margin="0,0,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Button Content="Save" Width="100" HorizontalAlignment="Left" Grid.Column="0" Margin="100,0"/>
+                        <Button Content="Cancel" Width="100" HorizontalAlignment="Right" Grid.Column="1" Margin="100,0"/>
+                    </Grid>
                 </Grid>
 
                 <!-- CONTACTS -->
                 <Grid x:Name="ContactsView" Visibility="Collapsed">
-                    <TextBlock Text="Contacts View" FontSize="20" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                </Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="2*"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
 
+                    <!-- Search Field (left) + New Contact Button (right) -->
+                    <Grid Grid.Row="0" Margin="0,0,0,5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Search Field with Placeholder Simulation -->
+                        <Grid Grid.Column="0" Width="250" Height="25" Margin="0,0,10,0" HorizontalAlignment="Left" VerticalAlignment="Center">
+                            <TextBox x:Name="ContactsSearchTextBox" VerticalContentAlignment="Center" Padding="2,0,0,0" TextChanged="SearchBox_Contacts"/>
+                            <TextBlock x:Name="ContactsSearchPlaceholder" Text="Search contacts..." Foreground="Gray" Margin="5,0,0,0" VerticalAlignment="Center" IsHitTestVisible="False" Visibility="Visible"/>
+                        </Grid>
+
+                        <!-- New Contact Button -->
+                        <Button Grid.Column="1" Content="New Contact" Width="100" HorizontalAlignment="Right"/>
+                    </Grid>
+
+                    <!-- Contact Overview Label -->
+                    <TextBlock Grid.Row="1" Text="Contact Overview" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center" Margin="0,0,0,5"/>
+
+                    <!-- Contact Overview Table -->
+                    <DataGrid x:Name="ContactsDataGrid" Grid.Row="2" AutoGenerateColumns="False" CanUserAddRows="False" Margin="0,0,0,10">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*"/>
+                            <DataGridTextColumn Header="Role" Binding="{Binding Role}" Width="*"/>
+                            <DataGridTextColumn Header="Address" Binding="{Binding Address}" Width="2*"/>
+                            <DataGridTextColumn Header="Phone" Binding="{Binding Phone}" Width="*"/>
+                            <DataGridTextColumn Header="Pay" Binding="{Binding Pay}" Width="*"/>
+                            <DataGridTemplateColumn Header="Edit" Width="Auto">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Content="Edit" Width="50" Margin="2"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn Header="Del" Width="Auto">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Content="Delete" Width="60" Margin="2"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                    <!-- Contact Details Label -->
+                    <TextBlock Grid.Row="3" Text="Contact Details" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center" Margin="0,0,0,5"/>
+
+                    <!-- Contact Details -->
+                    <Border Grid.Row="4" BorderThickness="1" BorderBrush="Gray" Padding="10" Margin="0,0,0,10">
+                        <StackPanel>
+                            <TextBlock Text="- Name: [Contact Name]"/>
+                            <TextBlock Text="- Phone: [Phone Number]"/>
+                            <TextBlock Text="- Email: [Email Address]"/>
+                            <TextBlock Text="- Connection: [Connection Details]"/>
+                            <TextBlock Text="- Address: [Address Details]"/>
+                            <TextBlock Text="- Pay: [Pay Info]"/>
+                            <TextBlock Text="- Linked Shoots: [Shoot A, Shoot B]"/>
+                            <TextBlock Text="- Linked Concepts: [Concept A, Concept B]"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Save / Cancel Buttons -->
+                    <Grid Grid.Row="5" Margin="0,0,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Button Content="Save" Width="100" HorizontalAlignment="Left" Grid.Column="0" Margin="100,0"/>
+                        <Button Content="Cancel" Width="100" HorizontalAlignment="Right" Grid.Column="1" Margin="100,0"/>
+                    </Grid>
+                </Grid>
             </Grid>
         </Border>
     </Grid>
