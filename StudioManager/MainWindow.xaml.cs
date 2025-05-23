@@ -65,5 +65,40 @@ namespace StudioManager
             HidePanels();
             ContactsView.Visibility = Visibility.Visible;
         }
+
+        private void SearchBox_Projects(object sender, TextChangedEventArgs e)
+        {
+            SearchPlaceholder.Visibility = string.IsNullOrEmpty(ProjectsSearchTextBox.Text)
+                ? Visibility.Visible
+                : Visibility.Collapsed;
+        }
+
+        private void SearchBox_Shoots(object sender, TextChangedEventArgs e)
+        {
+            ShootsSearchPlaceholder.Visibility = string.IsNullOrEmpty(ShootsSearchTextBox.Text)
+                ? Visibility.Visible
+                : Visibility.Collapsed;
+        }
+
+        private void SearchBox_Concepts(object sender, TextChangedEventArgs e)
+        {
+            ConceptsSearchPlaceholder.Visibility = string.IsNullOrEmpty(ConceptsSearchTextBox.Text)
+                ? Visibility.Visible
+                : Visibility.Collapsed;
+        }
+
+        private void SearchBox_Props(object sender, TextChangedEventArgs e)
+        {
+            PropsSearchPlaceholder.Visibility = string.IsNullOrEmpty(PropsSearchTextBox.Text)
+                ? Visibility.Visible
+                : Visibility.Collapsed;
+        }
+
+        private void SearchBox_Contacts(object sender, TextChangedEventArgs e)
+        {
+            ContactsSearchPlaceholder.Visibility = string.IsNullOrEmpty(ContactsSearchTextBox.Text)
+                ? Visibility.Visible
+                : Visibility.Collapsed;
+        }
     }
 }
