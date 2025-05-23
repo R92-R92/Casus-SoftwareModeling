@@ -19,6 +19,7 @@ namespace StudioManager
         }
 
 
+        // NAVIGATION
         public void HidePanels()
         {
             DashboardView.Visibility = Visibility.Collapsed;
@@ -28,7 +29,6 @@ namespace StudioManager
             PropsView.Visibility = Visibility.Collapsed;
             ContactsView.Visibility = Visibility.Collapsed;
         }
-
 
         public void DashboardButton_Click(object sender, RoutedEventArgs e)
         {
@@ -66,6 +66,8 @@ namespace StudioManager
             ContactsView.Visibility = Visibility.Visible;
         }
 
+
+        // SEARCHBOXES
         private void SearchBox_Projects(object sender, TextChangedEventArgs e)
         {
             SearchPlaceholder.Visibility = string.IsNullOrEmpty(ProjectsSearchTextBox.Text)
