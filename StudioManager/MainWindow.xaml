@@ -4,9 +4,181 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:StudioManager"
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"
+        xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
         mc:Ignorable="d"
-        Title="Milo's Document and Media Assistant / Milo's Digital Management App" Height="450" Width="800">
+        Title="Milo's Document and Media Assistant / Milo's Digital Management App"
+        Height="550" Width="930" WindowStartupLocation="CenterScreen">
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="220"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
 
+        <!-- NAVIGATION -->
+        <Border Background="#F5F5F5" CornerRadius="10" Margin="10" Padding="10" Grid.Column="0">
+            <StackPanel VerticalAlignment="Stretch">
+                <!-- LOGO PLACEHOLDER -->
+                <Border Height="100" Background="White" CornerRadius="5" Margin="0,0,0,20">
+                    <TextBlock Text="Logo"
+                               VerticalAlignment="Center"
+                               HorizontalAlignment="Center"
+                               FontWeight="Bold"/>
+                </Border>
+
+                <Button Content="Dashboard" Margin="0,5" Padding="10" Click="DashboardButton_Click"/>
+                <Button Content="Projects" Margin="0,5" Padding="10" Click="ProjectsButton_Click"/>
+                <Button Content="Shoots" Margin="0,5" Padding="10" Click="ShootsButton_Click"/>
+                <Button Content="Concepts" Margin="0,5" Padding="10" Click="ConceptsButton_Click"/>
+                <Button Content="Props" Margin="0,5" Padding="10" Click="PropsButton_Click"/>
+                <Button Content="Contacts" Margin="0,5" Padding="10" Click="ContactsButton_Click"/>
+            </StackPanel>
+        </Border>
+
+        <!-- RIGHT SIDE -->
+        <Border Grid.Column="1" Background="#F5F5F5" CornerRadius="10" Margin="10" Padding="10">
+            <Grid>
+
+                <!-- DASHBOARD VIEW -->
+                <Grid x:Name="DashboardView" Visibility="Visible">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <Grid Grid.Row="0" Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- OVERVIEW -->
+                        <Border Background="#E0E0E0" CornerRadius="5" Padding="10" Margin="0,0,5,0">
+                            <StackPanel>
+                                <TextBlock Text="Overview" FontWeight="Bold" FontSize="14" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,0,0,10"/>
+                                <StackPanel Margin="10,0,0,0">
+                                    <TextBlock Text="• Open projects" FontSize="12" Margin="0,2"/>
+                                    <TextBlock Text="• Planned shots" FontSize="12" Margin="0,2"/>
+                                    <TextBlock Text="• Contracts not signed" FontSize="12" Margin="0,2"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+
+
+                        <!-- PROGRESS -->
+                        <Border Background="#E0E0E0" CornerRadius="5" Padding="10" Margin="5,0,0,0" Grid.Column="1">
+                            <StackPanel>
+                                <TextBlock Text="Progress" FontWeight="Bold" FontSize="14" HorizontalAlignment="Center" Margin="0,0,0,10"/>
+
+                                <!-- Project 1 -->
+                                <StackPanel Margin="0,5">
+                                    <TextBlock Text="Project 1" FontWeight="SemiBold"/>
+                                    <DockPanel LastChildFill="True">
+                                        <TextBlock Text="25%" VerticalAlignment="Center" DockPanel.Dock="Right" Margin="5,0,0,0"/>
+                                        <ProgressBar Value="25" Minimum="0" Maximum="100" Height="20" Margin="0,0,5,0"/>
+                                    </DockPanel>
+                                </StackPanel>
+
+                                <!-- Project 2 -->
+                                <StackPanel Margin="0,5">
+                                    <TextBlock Text="Project 2" FontWeight="SemiBold"/>
+                                    <DockPanel LastChildFill="True">
+                                        <TextBlock Text="50%" VerticalAlignment="Center" DockPanel.Dock="Right" Margin="5,0,0,0"/>
+                                        <ProgressBar Value="50" Minimum="0" Maximum="100" Height="20" Margin="0,0,5,0"/>
+                                    </DockPanel>
+                                </StackPanel>
+
+                                <!-- Project 3 -->
+                                <StackPanel Margin="0,5">
+                                    <TextBlock Text="Project 3" FontWeight="SemiBold"/>
+                                    <DockPanel LastChildFill="True">
+                                        <TextBlock Text="75%" VerticalAlignment="Center" DockPanel.Dock="Right" Margin="5,0,0,0"/>
+                                        <ProgressBar Value="75" Minimum="0" Maximum="100" Height="20" Margin="0,0,5,0"/>
+                                    </DockPanel>
+                                </StackPanel>
+
+                                <!-- Project 4 -->
+                                <StackPanel Margin="0,5">
+                                    <TextBlock Text="Project 4" FontWeight="SemiBold"/>
+                                    <DockPanel LastChildFill="True">
+                                        <TextBlock Text="100%" VerticalAlignment="Center" DockPanel.Dock="Right" Margin="5,0,0,0"/>
+                                        <ProgressBar Value="100" Minimum="0" Maximum="100" Height="20" Margin="0,0,5,0"/>
+                                    </DockPanel>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+
+                    <!-- AGENDA -->
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Border Background="#E0E0E0" CornerRadius="5" Padding="10" Margin="0,0,5,0">
+                            <StackPanel>
+                                <TextBlock Text="Agenda" FontWeight="Bold" FontSize="14" HorizontalAlignment="Center" Margin="0,0,0,10"/>
+                                <Calendar x:Name="AgendaCalendar" DisplayDate="{x:Static sys:DateTime.Now}" />
+                            </StackPanel>
+                        </Border>
+
+                        <!-- MY LOCATION -->
+                        <Grid Grid.Column="1" Margin="5,0,0,0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="3*"/>
+                                <RowDefinition Height="1*"/>
+                            </Grid.RowDefinitions>
+
+                            <Border Background="#E0E0E0" CornerRadius="5" Padding="10" Grid.Row="0">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="*"/>
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock Text="My Location" FontWeight="Bold" FontSize="14" HorizontalAlignment="Center" Margin="0,0,0,5"/>
+                                    <wv2:WebView2 x:Name="MapBrowser"
+                                        Grid.Row="1"
+                                        Source="https://www.openstreetmap.org/export/embed.html?bbox=5.3258%2C50.9250%2C5.3498%2C50.9360&amp;layer=mapnik&amp;marker=50.9307%2C5.3378"
+                                        Margin="0"/>
+                                </Grid>
+                            </Border>
+                            
+                            <!-- CHANGE LOCATION -->
+                            <Grid Grid.Row="1">
+                                <Button Content="Change Location" Width="130" Height="30" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                </Grid>
+
+                <!-- PROJECTS -->
+                <Grid x:Name="ProjectsView" Visibility="Collapsed">
+                    <TextBlock Text="Projects View" FontSize="20" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                </Grid>
+
+                <!-- SHOOTS -->
+                <Grid x:Name="ShootsView" Visibility="Collapsed">
+                    <TextBlock Text="Shoots View" FontSize="20" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                </Grid>
+
+                <!-- CONCEPTS -->
+                <Grid x:Name="ConceptsView" Visibility="Collapsed">
+                    <TextBlock Text="Concepts View" FontSize="20" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                </Grid>
+
+                <!-- PROPS -->
+                <Grid x:Name="PropsView" Visibility="Collapsed">
+                    <TextBlock Text="Props View" FontSize="20" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                </Grid>
+
+                <!-- CONTACTS -->
+                <Grid x:Name="ContactsView" Visibility="Collapsed">
+                    <TextBlock Text="Contacts View" FontSize="20" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                </Grid>
+
+            </Grid>
+        </Border>
     </Grid>
 </Window>
