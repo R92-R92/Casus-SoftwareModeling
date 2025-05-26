@@ -15,7 +15,6 @@ namespace StudioManager
         public string City { get; set; }
         public string Country { get; set; }
 
-
         public Address(string street, string houseNumber, string postalCode, string city, string country)
 
         {
