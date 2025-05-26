@@ -14,7 +14,6 @@ namespace StudioManager
         public string Notes { get; set; }
         public List<Concept> Concepts { get; set; }
 
-
         public Project(int id, string name, DateTime deadline, string notes, List<Concept> concepts)
         {
             Id = id;
