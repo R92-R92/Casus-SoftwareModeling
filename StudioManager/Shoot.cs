@@ -11,18 +11,14 @@ namespace StudioManager
         public int Id { get; set; }
         public DateTime Date { get; set; }
         public Address Location { get; set; }
-        public string Contract { get; set; }
-        public bool IsContractSigned { get; set; }
-        public List<Concept> Concepts { get; set; }
+        public List<Concept> Concepts { get; set; } = new List<Concept>();
+        public List<Contract> Contracts { get; set; } = new List<Contract>();
 
-        public Shoot(int id, DateTime date, Address location, string contract, bool isContractSigned, List<Concept> concepts)
+        public Shoot(int id, DateTime date, Address location)
         {
             Id = id;
             Date = date;
             Location = location;
-            Contract = contract;
-            IsContractSigned = isContractSigned;
-            Concepts = concepts;
         }
     }
 }

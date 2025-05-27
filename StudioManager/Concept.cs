@@ -15,18 +15,17 @@ namespace StudioManager
         public Address Location { get; set; }
         public string Sketch { get; set; }
         public string Picture { get; set; }
-        public Contact Model { get; set; }
+        public List<Contact> Models { get; set; } = new List<Contact>();
         public List<Prop> Props { get; set; }
-        public Shoot Shoot { get; set; }
+        public Shoot? Shoot { get; set; }
 
-        public Concept(int id, string description, Address location, string sketch, string picture, Contact model, List<Prop> props, Shoot shoot)
+        public Concept(int id, string description, Address location, string sketch, string picture, List<Prop> props, Shoot shoot)
         { 
             Id = id;
             Description = description;
             Location = location;
             Sketch = sketch;
             Picture = picture;
-            Model = model;
             Props = props;
             Shoot = shoot;
         }

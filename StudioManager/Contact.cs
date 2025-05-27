@@ -17,9 +17,9 @@ namespace StudioManager
         public bool Payment { get; set; }
         public int Role { get; set; }
         public Address Address { get; set; }
-        public List<Concept> Concepts { get; set; }
+        public List<Concept> Concepts { get; set; } = new List<Concept>();
 
-        public Contact(int id, string name, string phone, string email, string socialMedia, string picture, bool payment, int role, Address address, List<Concept> concepts)
+        public Contact(int id, string name, string phone, string email, string socialMedia, string picture, bool payment, int role, Address address)
         {
             Id = id;
             Name = name;
@@ -30,7 +30,6 @@ namespace StudioManager
             Payment = payment;
             Role = role;
             Address = address;
-            Concepts = concepts;
         }
     }
 }

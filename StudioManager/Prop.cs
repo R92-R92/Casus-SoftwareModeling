@@ -11,14 +11,20 @@ namespace StudioManager
         public int Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
-        public bool IsAvaileable { get; set; }
+        public bool IsAvailable { get; set; }
 
-        public Prop(int id, string name, string description, bool isAvaileable)
+        public Prop(int id, string name, string description, bool isAvailable)
         {
             Id = id;
             Name = name;
             Description = description;
-            IsAvaileable = isAvaileable;
+            IsAvailable = isAvailable;
+        }
+
+        public bool ToggleAvailability()
+        {
+            IsAvailable = !IsAvailable;
+            return IsAvailable;
         }
     }
 }
