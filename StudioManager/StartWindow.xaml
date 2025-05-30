@@ -1,0 +1,30 @@
+﻿<Window x:Class="StudioManager.StartWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="StartWindow" Height="350" Width="500" WindowStartupLocation="CenterScreen">
+    <Grid Background="#FFF7F7F7" Margin="20">
+        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Width="400">
+            <!-- Titel en subtitel -->
+            <TextBlock Text="Miel Document Management Application" 
+               FontSize="20" FontWeight="Bold" TextAlignment="Center" Margin="0,0,0,5"/>
+            <TextBlock Text="M.D.M.A" FontSize="14" Foreground="Gray" TextAlignment="Center" Margin="0,0,0,20"/>
+
+            <!-- Go to Dashboard knop -->
+            <Button Content="Ga naar Dashboard" 
+            Height="50" FontSize="16" Click="DashboardBtn_Click"
+            Background="#FF4078FF" Foreground="White" Margin="0,0,0,5"/>
+
+            <TextBlock Text="Open het hoofdscherm van de applicatie waar je projecten, shoots, props en meer kunt beheren." 
+               FontSize="12" TextWrapping="Wrap" TextAlignment="Center" Foreground="DarkGray" Margin="0,0,0,20"/>
+
+            <!-- Brain dump knop -->
+            <Button Content="Brain dump / Idee opslaan" 
+            Height="50" FontSize="16" Click="ConceptBtn_Click"
+            Background="#FF32C88F" Foreground="White" Margin="0,0,0,5"/>
+
+            <TextBlock Text="Gebruik dit om direct een concept aan te maken als je snel een idee hebt." 
+               FontSize="12" TextWrapping="Wrap" TextAlignment="Center" Foreground="DarkGray"/>
+        </StackPanel>
+
+    </Grid>
+</Window>

@@ -15,6 +15,14 @@ namespace StudioManager
         public string City { get; set; }
         public string Country { get; set; }
 
+        public string FullAdress
+        {
+            get
+            {
+                return $"{Street} {HouseNumber}, {PostalCode} {City}, {Country}";
+            }
+        }
+
         public Address(string street, string houseNumber, string postalCode, string city, string country)
 
         {
