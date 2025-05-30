@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace StudioManager
 {
-    class Contract
+    public class Contract
     {
         public int Id { get; set; }
         public string Body { get; set; }
