@@ -12,22 +12,25 @@ namespace StudioManager
     {
         public int Id { get; set; }
         public string Description { get; set; }
-        public Address Location { get; set; }
         public string Sketch { get; set; }
-        public string Picture { get; set; }
+        public List<string> Pictures { get; set; } = new List<string>();
         public List<Contact> Models { get; set; } = new List<Contact>();
         public List<Prop> Props { get; set; }
         public Shoot? Shoot { get; set; }
 
-        public Concept(int id, string description, Address location, string sketch, string picture, List<Prop> props, Shoot shoot)
+        public Concept(int id, string description, string sketch, List<Prop> props, Shoot shoot)
         { 
             Id = id;
             Description = description;
-            Location = location;
             Sketch = sketch;
-            Picture = picture;
             Props = props;
             Shoot = shoot;
         }
+
+        public void AddPictures(string picture)
+        {
+            Pictures.Add(picture);
+        }
     }
+
 }
