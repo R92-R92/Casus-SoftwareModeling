@@ -9,7 +9,8 @@ namespace StudioManager
     public class Contact
     {
         public int Id { get; set; }
-        public string Name { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
         public string Phone { get; set; }
         public string Email { get; set; }
         public string SocialMedia { get; set; }
@@ -19,10 +20,11 @@ namespace StudioManager
         public Address Address { get; set; }
         public List<Concept> Concepts { get; set; } = new List<Concept>();
 
-        public Contact(int id, string name, string phone, string email, string socialMedia, string picture, bool payment, int role, Address address)
+        public Contact(int id, string firstName, string lastName, string phone, string email, string socialMedia, string picture, bool payment, int role, Address address)
         {
             Id = id;
-            Name = name;
+            FirstName = firstName;
+            LastName = lastName;
             Phone = phone;
             Email = email;
             SocialMedia = socialMedia;

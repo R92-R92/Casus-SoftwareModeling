@@ -14,7 +14,6 @@ namespace StudioManager
 
         public DAL() { }
 
-
         // ADDRESS
 
         public List<Address> GetAllAddresses()
@@ -23,13 +22,14 @@ namespace StudioManager
             using SqlConnection conn = new(connectionString);
             conn.Open();
 
-            string query = "SELECT Street, HouseNumber, PostalCode, City, Country FROM Address";
+            string query = "SELECT Id, Street, HouseNumber, PostalCode, City, Country FROM Address";
             using SqlCommand cmd = new(query, conn);
             using SqlDataReader reader = cmd.ExecuteReader();
 
             while (reader.Read())
             {
                 Address address = new(
+                    id: reader.GetInt32(0),
                     street: reader["Street"].ToString(),
                     houseNumber: reader["HouseNumber"]?.ToString(),
                     postalCode: reader["PostalCode"].ToString(),
@@ -73,17 +73,14 @@ namespace StudioManager
                     concept.AddPictures(picture);
                 }
 
+                concept.Models = GetContactsByConceptId(conceptId);
                 concepts.Add(concept);
             }
 
             return concepts;
         }
 
-
-
-        // CONTACT
-
-        // CONTACT
+        // CONTACTS
 
         public List<Contact> GetAllContacts()
         {
@@ -91,23 +88,24 @@ namespace StudioManager
             using SqlConnection conn = new(connectionString);
             conn.Open();
 
-            string query = "SELECT Id, FirstName, LastName, Phone, Email, SocialMedia, Picture, Payment, Role, AddressId FROM Contact";
+            string query = "SELECT Id, FirstName, LastName, Phone, Email, SocialMedia, Picture, Role, AddressId, Payment FROM Contact";
             using SqlCommand cmd = new(query, conn);
             using SqlDataReader reader = cmd.ExecuteReader();
 
             while (reader.Read())
             {
-                int? addressId = reader.IsDBNull(9) ? null : reader.GetInt32(9);
+                int? addressId = reader.IsDBNull(8) ? null : reader.GetInt32(8); 
 
                 Contact contact = new(
                     id: reader.GetInt32(0),
-                    name: reader["FirstName"] + " " + reader["LastName"],
+                    firstName: reader["FirstName"].ToString(),
+                    lastName: reader["LastName"].ToString(),
                     phone: reader["Phone"]?.ToString(),
                     email: reader["Email"]?.ToString(),
                     socialMedia: reader["SocialMedia"]?.ToString(),
                     picture: reader["Picture"]?.ToString(),
-                    payment: (bool)reader["Payment"],
-                    role: (int)reader["Role"],
+                    payment: (bool)reader["Payment"],              
+                    role: (int)reader["Role"],                      
                     address: addressId.HasValue ? GetAddressById(addressId.Value) : null!
                 );
 
@@ -116,7 +114,6 @@ namespace StudioManager
 
             return contacts;
         }
-
 
 
         // CONTRACT
@@ -150,8 +147,6 @@ namespace StudioManager
 
             return contracts;
         }
-
-
 
         // PROJECT
 
@@ -238,6 +233,59 @@ namespace StudioManager
 
 
 
+        // READ HOME ADDRESS
+        public Address? GetHomeAddress()
+        {
+            using SqlConnection conn = new(connectionString);
+            conn.Open();
+
+            string query = "SELECT Id, Street, HouseNumber, PostalCode, City, Country FROM Address WHERE IsHome = 1";
+            using SqlCommand cmd = new(query, conn);
+            using SqlDataReader reader = cmd.ExecuteReader();
+
+            if (reader.Read())
+            {
+                return new Address(
+                    id: reader.GetInt32(0),
+                    street: reader["Street"].ToString(),
+                    houseNumber: reader["HouseNumber"]?.ToString(),
+                    postalCode: reader["PostalCode"].ToString(),
+                    city: reader["City"].ToString(),
+                    country: reader["Country"].ToString()
+                );
+            }
+
+            return null;
+        }
+
+        // UPDATE HOMEADDRESS
+        public void UpdateHomeAddress(Address updatedHome)
+        {
+            using SqlConnection conn = new(connectionString);
+            conn.Open();
+
+            string query = @"
+        UPDATE Address
+        SET Street = @Street,
+            HouseNumber = @HouseNumber,
+            PostalCode = @PostalCode,
+            City = @City,
+            Country = @Country
+        WHERE IsHome = 1";
+
+            using SqlCommand cmd = new(query, conn);
+            cmd.Parameters.AddWithValue("@Street", updatedHome.Street);
+            cmd.Parameters.AddWithValue("@HouseNumber", updatedHome.HouseNumber ?? "");
+            cmd.Parameters.AddWithValue("@PostalCode", updatedHome.PostalCode);
+            cmd.Parameters.AddWithValue("@City", updatedHome.City);
+            cmd.Parameters.AddWithValue("@Country", updatedHome.Country);
+
+            cmd.ExecuteNonQuery();
+        }
+
+
+
+
 
 
 
@@ -279,7 +327,8 @@ namespace StudioManager
 
                 return new Contact(
                     id: reader.GetInt32(0),
-                    name: reader["FirstName"] + " " + reader["LastName"],
+                    firstName: reader["FirstName"].ToString(),
+                    lastName: reader["LastName"].ToString(),
                     phone: reader["Phone"]?.ToString(),
                     email: reader["Email"]?.ToString(),
                     socialMedia: reader["SocialMedia"]?.ToString(),
@@ -288,6 +337,7 @@ namespace StudioManager
                     role: (int)reader["Role"],
                     address: addressId.HasValue ? GetAddressById(addressId.Value) : null!
                 );
+
             }
 
             return null;
@@ -320,7 +370,7 @@ namespace StudioManager
             using SqlConnection conn = new(connectionString);
             conn.Open();
 
-            string query = "SELECT Street, HouseNumber, PostalCode, City, Country FROM Address WHERE Id = @Id";
+            string query = "SELECT Id, Street, HouseNumber, PostalCode, City, Country FROM Address WHERE Id = @Id";
             using SqlCommand cmd = new(query, conn);
             cmd.Parameters.AddWithValue("@Id", id);
 
@@ -328,6 +378,7 @@ namespace StudioManager
             if (reader.Read())
             {
                 return new Address(
+                    id: reader.GetInt32(0),
                     street: reader["Street"].ToString(),
                     houseNumber: reader["HouseNumber"]?.ToString(),
                     postalCode: reader["PostalCode"].ToString(),
@@ -338,6 +389,7 @@ namespace StudioManager
 
             return null;
         }
+
 
         private Shoot? GetShootByConceptId(int conceptId)
         {
@@ -397,11 +449,47 @@ namespace StudioManager
             return props;
         }
 
+        private List<Contact> GetContactsByConceptId(int conceptId)
+        {
+            List<Contact> contacts = new();
+            using SqlConnection conn = new(connectionString);
+            conn.Open();
+
+            string query = @"
+        SELECT c.Id, c.FirstName, c.LastName, c.Phone, c.Email, c.SocialMedia, c.Picture, c.Payment, c.Role, c.AddressId
+        FROM Contact c
+        INNER JOIN ConceptContact cc ON c.Id = cc.ContactId
+        WHERE cc.ConceptId = @ConceptId";
+
+            using SqlCommand cmd = new(query, conn);
+            cmd.Parameters.AddWithValue("@ConceptId", conceptId);
+            using SqlDataReader reader = cmd.ExecuteReader();
+
+            while (reader.Read())
+            {
+                int? addressId = reader.IsDBNull(9) ? null : reader.GetInt32(9);
+
+                contacts.Add(new Contact(
+                    id: reader.GetInt32(0),
+                    firstName: reader["FirstName"].ToString(),
+                    lastName: reader["LastName"].ToString(),
+                    phone: reader["Phone"]?.ToString(),
+                    email: reader["Email"]?.ToString(),
+                    socialMedia: reader["SocialMedia"]?.ToString(),
+                    picture: reader["Picture"]?.ToString(),
+                    payment: (bool)reader["Payment"],
+                    role: (int)reader["Role"],
+                    address: addressId.HasValue ? GetAddressById(addressId.Value) : null!
+                ));
+            }
+
+            return contacts;
+        }
+
 
 
         //GetProjectsByConceptId(int conceptId)
 
-        //GetContactsByConceptId(int conceptId)
 
 
 
