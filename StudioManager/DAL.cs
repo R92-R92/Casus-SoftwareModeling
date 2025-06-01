@@ -841,8 +841,9 @@ namespace StudioManager
             conn.Open();
 
             string query = @"
-                SELECT s.Id, s.Date, s.AddressId
+                SELECT s.Id, s.Date, a.Id AS AddressId, a.Street, a.HouseNumber, a.PostalCode, a.City, a.Country
                 FROM Shoot s
+                LEFT JOIN Address a ON s.AddressId = a.Id
                 INNER JOIN Concept c ON s.Id = c.ShootId
                 WHERE c.Id = @ConceptId";
 
@@ -852,15 +853,31 @@ namespace StudioManager
             using SqlDataReader reader = cmd.ExecuteReader();
             if (reader.Read())
             {
+                Address? address = null;
+
+                // Check of het adres daadwerkelijk bestaat (a.Id is niet null)
+                if (!reader.IsDBNull(reader.GetOrdinal("AddressId")))
+                {
+                    address = new Address(
+                        id: reader.GetInt32(reader.GetOrdinal("AddressId")),
+                        street: reader["Street"]?.ToString() ?? "",
+                        houseNumber: reader["HouseNumber"]?.ToString() ?? "",
+                        postalCode: reader["PostalCode"]?.ToString() ?? "",
+                        city: reader["City"]?.ToString() ?? "",
+                        country: reader["Country"]?.ToString() ?? ""
+                    );
+                }
+
                 return new Shoot(
-                    id: reader.GetInt32(0),
-                    date: reader.IsDBNull(1) ? DateTime.MinValue : reader.GetDateTime(1),
-                    location: reader.IsDBNull(2) ? null! : GetAddressById(reader.GetInt32(2))
+                    id: reader.GetInt32(reader.GetOrdinal("Id")),
+                    date: reader.IsDBNull(reader.GetOrdinal("Date")) ? null : reader.GetDateTime(reader.GetOrdinal("Date")),
+                    location: address
                 );
             }
 
             return null;
         }
+
 
         private List<Prop> GetPropsByConceptId(int conceptId)
         {

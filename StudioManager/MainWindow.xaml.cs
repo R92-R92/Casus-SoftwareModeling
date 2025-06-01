@@ -19,6 +19,7 @@ namespace StudioManager
             RefreshConceptOverviews();
             PropSelectionListBox.ItemsSource = new DAL().GetAllProps();
             ModelSelectionListBox.ItemsSource = new DAL().GetAllContacts();
+            ShootSelectionComboBox.ItemsSource = new DAL().GetAllShoots();
 
 
 
@@ -174,7 +175,7 @@ namespace StudioManager
             DashboardButton_Click(null, null);
         }
 
-
+        // CONCEPT
         private void RefreshConceptOverviews()
         {
             List<Concept> allConcepts = new DAL().GetAllConcepts();
@@ -188,13 +189,15 @@ namespace StudioManager
 
         private void CreateNewConcept_Click(object sender, RoutedEventArgs e)
         {
+            string name = NewConceptNameTextBox.Text;
             string description = NewConceptDescriptionTextBox.Text;
             string sketch = NewConceptSketchTextBox.Text;
-            string name = NewConceptNameTextBox.Text;
+
             List<Prop> props = PropSelectionListBox.SelectedItems.Cast<Prop>().ToList();
             List<Contact> models = ModelSelectionListBox.SelectedItems.Cast<Contact>().ToList();
+            Shoot? shoot = ShootSelectionComboBox.SelectedItem as Shoot;
 
-            Concept newConcept = new Concept(0, name, description, sketch, props, null);
+            Concept newConcept = new Concept(0, name, description, sketch, props, shoot);
             newConcept.Models = models;
             newConcept.Create();
 
@@ -203,5 +206,6 @@ namespace StudioManager
             HidePanels();
             ConceptsView.Visibility = Visibility.Visible;
         }
+
     }
 }

@@ -44,7 +44,7 @@ namespace StudioManager
 
 
 
-        // EVENTUEEL ANDERE OPLOSSING - WEERGAVEN NAAM + PROPS IN CONCEPT OVERVIEW
+        // EVENTUEEL ANDERE OPLOSSING - WEERGAVEN NAAM + PROPS + ADDRESS EN SHOOT IN CONCEPT OVERVIEW
         public string PropsText
         {
             get
@@ -62,6 +62,12 @@ namespace StudioManager
                 return string.Join(", ", Models.Select(m => m.FirstName + " " + m.LastName));
             }
         }
+
+        public string ShootDateText => Shoot?.Date?.ToString("yyyy-MM-dd") ?? "–";
+
+        public string Location => Shoot?.Location != null
+            ? $"{Shoot.Location.Street} {Shoot.Location.HouseNumber}, {Shoot.Location.PostalCode} {Shoot.Location.City}"
+            : "–";
     }
 
 }
