@@ -1,4 +1,4 @@
-﻿using System;
+﻿ausing System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -348,6 +348,7 @@ namespace StudioManager
                     isSigned: (bool)reader["IsSigned"],
                     signedOn: reader.IsDBNull(3) ? null : reader.GetDateTime(3),
                     shoot: shootId.HasValue ? GetShootById(shootId.Value) : null
+                    payment: (bool)reader["Payment"]
                 );
 
                 contracts.Add(contract);
@@ -373,6 +374,8 @@ namespace StudioManager
             cmd.Parameters.AddWithValue("@SignedOn", contract.SignedOn ?? (object)DBNull.Value);
             cmd.Parameters.AddWithValue("@IsSigned", contract.IsSigned);
             cmd.Parameters.AddWithValue("@ShootId", contract.Shoot?.Id ?? (object)DBNull.Value);
+            cmd.Parameters.AddWithValue("@Payment", contract.Payment);
+
 
             int newId = Convert.ToInt32(cmd.ExecuteScalar());
             contract.Id = newId;
@@ -391,6 +394,7 @@ namespace StudioManager
                     SignedOn = @SignedOn,
                     IsSigned = @IsSigned,
                     ShootId = @ShootId
+                    Payment = @Payment
                 WHERE Id = @Id";
 
             using SqlCommand cmd = new(query, conn);
@@ -400,6 +404,8 @@ namespace StudioManager
             cmd.Parameters.AddWithValue("@SignedOn", contract.SignedOn ?? (object)DBNull.Value);
             cmd.Parameters.AddWithValue("@IsSigned", contract.IsSigned);
             cmd.Parameters.AddWithValue("@ShootId", contract.Shoot?.Id ?? (object)DBNull.Value);
+            cmd.Parameters.AddWithValue("@Payment", contract.Payment);
+
 
             cmd.ExecuteNonQuery();
         }

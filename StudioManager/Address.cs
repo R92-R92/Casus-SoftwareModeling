@@ -15,6 +15,8 @@ namespace StudioManager
         public string PostalCode { get; set; }
         public string City { get; set; }
         public string Country { get; set; }
+        DAL dal = new DAL();
+
 
         public Address(int id, string street, string houseNumber, string postalCode, string city, string country)
 
@@ -25,6 +27,11 @@ namespace StudioManager
             PostalCode = postalCode;
             City = city;
             Country = country;
+        }
+
+        public void Create()
+        {
+            dal.AddAddress(this);
         }
     }
 }

@@ -14,13 +14,12 @@ namespace StudioManager
         public string Phone { get; set; }
         public string Email { get; set; }
         public string SocialMedia { get; set; }
-        public string Picture { get; set; }
-        public bool Payment { get; set; }
-        public int Role { get; set; }
         public Address Address { get; set; }
         public List<Concept> Concepts { get; set; } = new List<Concept>();
+        new DAL dal = new DAL();
 
-        public Contact(int id, string firstName, string lastName, string phone, string email, string socialMedia, string picture, bool payment, int role, Address address)
+
+        public Contact(int id, string firstName, string lastName, string phone, string email, string socialMedia, string picture, Address address)
         {
             Id = id;
             FirstName = firstName;
@@ -28,10 +27,12 @@ namespace StudioManager
             Phone = phone;
             Email = email;
             SocialMedia = socialMedia;
-            Picture = picture;
-            Payment = payment;
-            Role = role;
             Address = address;
+        }
+
+        public void Create()
+        {
+            dal.AddContact(this);
         }
     }
 }
