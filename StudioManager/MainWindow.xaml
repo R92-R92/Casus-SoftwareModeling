@@ -20,11 +20,8 @@
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
-                    <!-- Logo -->
                     <RowDefinition Height="*"/>
-                    <!-- Navigatieknoppen -->
                     <RowDefinition Height="Auto"/>
-                    <!-- Change Location knop -->
                 </Grid.RowDefinitions>
 
                 <!-- LOGO -->
@@ -62,10 +59,64 @@
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
-                    <!-- CONCEPT OVERVIEW -->
+                    <!-- CONCEPT OVERVIEW PANE -->
                     <Border Grid.Row="0" Background="#E0E0E0" CornerRadius="5" Padding="10" Margin="0,0,0,10">
-                        <TextBlock Text="Concept Overview" FontWeight="Bold" FontSize="14" HorizontalAlignment="Center"/>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <!-- Titel -->
+                                <RowDefinition Height="Auto"/>
+                                <!-- Search + Button -->
+                                <RowDefinition Height="*"/>
+                                <!-- Tabel -->
+                            </Grid.RowDefinitions>
+
+                            <!-- Titel -->
+                            <TextBlock Grid.Row="0" Text="Concept Overview" FontWeight="Bold" FontSize="14" HorizontalAlignment="Center" Margin="0,0,0,5"/>
+
+                            <!-- Zoekveld + New Concept -->
+                            <Grid Grid.Row="1" Margin="0,0,0,5">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Zoekveld -->
+                                <Grid Grid.Column="0" Width="200" Height="25" HorizontalAlignment="Left" VerticalAlignment="Center">
+                                    <TextBox x:Name="DashboardConceptSearchTextBox" VerticalContentAlignment="Center" Padding="2,0,0,0" TextChanged="SearchBox_DashboardConcepts"/>
+                                    <TextBlock x:Name="DashboardConceptSearchPlaceholder" Text="Search concepts..." Foreground="Gray" Margin="5,0,0,0" VerticalAlignment="Center" IsHitTestVisible="False" Visibility="Visible"/>
+                                </Grid>
+
+                                <!-- Button -->
+                                <Button Grid.Column="1" Content="New Concept" Width="100" Margin="10,0,0,0" HorizontalAlignment="Right"/>
+                            </Grid>
+
+                            <!-- Tabel -->
+                            <DataGrid x:Name="DashboardConceptsDataGrid" Grid.Row="2" AutoGenerateColumns="False" CanUserAddRows="False" HeadersVisibility="Column" IsReadOnly="True">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Model" Binding="{Binding Model}" Width="*"/>
+                                    <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="2*"/>
+                                    <DataGridTextColumn Header="Location" Binding="{Binding Location}" Width="*"/>
+                                    <DataGridTextColumn Header="Props" Binding="{Binding Props}" Width="*"/>
+                                    <DataGridTemplateColumn Header="Edit" Width="Auto">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Button Content="Edit" Width="50" Margin="2"/>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                    <DataGridTemplateColumn Header="Del" Width="Auto">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Button Content="Delete" Width="60" Margin="2"/>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </Grid>
                     </Border>
+
 
                     <!-- NOTSURE -->
                     <Border Grid.Row="1" Background="#E0E0E0" CornerRadius="5" Padding="10">

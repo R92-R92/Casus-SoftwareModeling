@@ -104,6 +104,13 @@ namespace StudioManager
                 : Visibility.Collapsed;
         }
 
+        private void SearchBox_DashboardConcepts(object sender, TextChangedEventArgs e)
+        {
+            DashboardConceptSearchPlaceholder.Visibility = string.IsNullOrEmpty(DashboardConceptSearchTextBox.Text)
+                ? Visibility.Visible
+                : Visibility.Collapsed;
+        }
+
 
         // HOME LOCATION
         private void UpdateMapWithHomeAddress()
