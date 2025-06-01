@@ -97,8 +97,9 @@
                                     <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*"/>
                                     <DataGridTextColumn Header="Model" Binding="{Binding ModelText}" Width="*"/>
                                     <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="2*"/>
-                                    <DataGridTextColumn Header="Address" Binding="{Binding Location}" Width="*"/>
                                     <DataGridTextColumn Header="Props" Binding="{Binding PropsText}" Width="*"/>
+                                    <DataGridTextColumn Header="Address" Binding="{Binding Location}" Width="*"/>
+                                    <DataGridTextColumn Header="Shoot Date" Binding="{Binding ShootDateText}" Width="*"/>
                                     <DataGridTemplateColumn Header="Edit" Width="Auto">
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate>
@@ -322,10 +323,11 @@
                     <DataGrid x:Name="ConceptsDataGrid" Grid.Row="2" AutoGenerateColumns="False" CanUserAddRows="False" HeadersVisibility="Column" RowHeaderWidth="0" Margin="0,0,0,10" ScrollViewer.CanContentScroll="False">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*"/>
-                            <DataGridTextColumn Header="Model" Binding="{Binding ModelText}" Width="*"/>    
+                            <DataGridTextColumn Header="Model" Binding="{Binding ModelText}" Width="*"/>
                             <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="2*"/>
-                            <DataGridTextColumn Header="Address" Binding="{Binding Location}" Width="*"/>
                             <DataGridTextColumn Header="Props" Binding="{Binding PropsText}" Width="*"/>
+                            <DataGridTextColumn Header="Address" Binding="{Binding Location}" Width="*"/>
+                            <DataGridTextColumn Header="Shoot Date" Binding="{Binding ShootDateText}" Width="*"/>
                             <DataGridTemplateColumn Header="Edit" Width="Auto">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
@@ -635,6 +637,10 @@
                 <StackPanel Orientation="Horizontal" Margin="0,5">
                     <TextBlock Text="Select Models:" Width="100"/>
                     <ListBox x:Name="ModelSelectionListBox" SelectionMode="Multiple" DisplayMemberPath="FullName" Height="100" Width="200" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,5">
+                    <TextBlock Text="Select Shoot:" Width="100"/>
+                    <ListBox x:Name="ShootSelectionComboBox" DisplayMemberPath="Date" Height="100" Width="200"/>
                 </StackPanel>
             </StackPanel>
 
