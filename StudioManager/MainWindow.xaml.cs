@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.IO;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -13,6 +14,9 @@ namespace StudioManager
 {
     public partial class MainWindow : Window
     {
+        private List<string> selectedPicturePaths = new();
+        private string? selectedSketchPath;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -20,9 +24,6 @@ namespace StudioManager
             PropSelectionListBox.ItemsSource = new DAL().GetAllProps();
             ModelSelectionListBox.ItemsSource = new DAL().GetAllContacts();
             ShootSelectionComboBox.ItemsSource = new DAL().GetAllShoots();
-
-
-
         }
 
         // NAVIGATION
@@ -67,6 +68,13 @@ namespace StudioManager
         private void NewConceptButton_Click(object sender, RoutedEventArgs e)
         {
             HidePanels();
+            NewConceptNameTextBox.Text = "";
+            NewConceptDescriptionTextBox.Text = "";
+            PropSelectionListBox.UnselectAll();
+            ModelSelectionListBox.UnselectAll();
+            ShootSelectionComboBox.SelectedItem = null;
+            selectedPicturePaths.Clear();
+            selectedSketchPath = null;
             NewConceptForm.Visibility = Visibility.Visible;
         }
 
@@ -171,7 +179,7 @@ namespace StudioManager
             );
 
             new DAL().UpdateHomeAddress(updated);
-            MessageBox.Show("Home address updated successfully.");
+            // MessageBox.Show("Home address updated successfully.");
             DashboardButton_Click(null, null);
         }
 
@@ -184,14 +192,24 @@ namespace StudioManager
             DashboardConceptsDataGrid.ItemsSource = allConcepts;
         }
 
-
-
-
         private void CreateNewConcept_Click(object sender, RoutedEventArgs e)
         {
             string name = NewConceptNameTextBox.Text;
             string description = NewConceptDescriptionTextBox.Text;
-            string sketch = NewConceptSketchTextBox.Text;
+            string sketch = "";
+
+            // LATER WEGWERKEN
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                MessageBox.Show("Please enter a name for the concept before creating it.");
+                return;
+            }
+
+            if (new DAL().ConceptNameExists(name))
+            {
+                MessageBox.Show("A concept with this name already exists. Please choose a different name.");
+                return;
+            }
 
             List<Prop> props = PropSelectionListBox.SelectedItems.Cast<Prop>().ToList();
             List<Contact> models = ModelSelectionListBox.SelectedItems.Cast<Contact>().ToList();
@@ -199,13 +217,115 @@ namespace StudioManager
 
             Concept newConcept = new Concept(0, name, description, sketch, props, shoot);
             newConcept.Models = models;
-            newConcept.Create();
 
-            MessageBox.Show("Concept successfully created.");
+            string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+            string rootPath = Directory.GetParent(baseDir)!.Parent!.Parent!.Parent!.Parent!.FullName;
+            string conceptFolder = System.IO.Path.Combine(rootPath, "Pictures", name, "Pictures");
+            Directory.CreateDirectory(conceptFolder);
+
+            foreach (string originalPath in selectedPicturePaths)
+            {
+                string fileName = System.IO.Path.GetFileName(originalPath);
+                string destPath = System.IO.Path.Combine(conceptFolder, fileName);
+                File.Copy(originalPath, destPath, overwrite: true);
+                newConcept.AddPictures(destPath);
+            }
+
+            string sketchFolder = System.IO.Path.Combine(rootPath, "Pictures", name, "Sketch");
+            Directory.CreateDirectory(sketchFolder);
+
+            if (!string.IsNullOrEmpty(selectedSketchPath))
+            {
+                string sketchFileName = System.IO.Path.GetFileName(selectedSketchPath);
+                string sketchDestPath = System.IO.Path.Combine(sketchFolder, sketchFileName);
+                File.Copy(selectedSketchPath, sketchDestPath, overwrite: true);
+                sketch = sketchDestPath;
+            }
+
+            newConcept.Sketch = sketch;
+            newConcept.Create();
+            // MessageBox.Show("Concept successfully created.");
             RefreshConceptOverviews();
             HidePanels();
             ConceptsView.Visibility = Visibility.Visible;
         }
 
+        private void UploadPictures_Click(object sender, RoutedEventArgs e)
+        {
+            var dlg = new Microsoft.Win32.OpenFileDialog
+            {
+                Multiselect = true,
+                Filter = "Image Files|*.jpg;*.jpeg;*.png;*.bmp"
+            };
+
+            if (dlg.ShowDialog() == true)
+            {
+                selectedPicturePaths = dlg.FileNames.ToList();
+                MessageBox.Show($"{selectedPicturePaths.Count} picture(s) selected.");
+            }
+        }
+
+        private void UploadSketch_Click(object sender, RoutedEventArgs e)
+        {
+            var dlg = new Microsoft.Win32.OpenFileDialog
+            {
+                Filter = "Image Files|*.jpg;*.jpeg;*.png;*.bmp"
+            };
+
+            if (dlg.ShowDialog() == true)
+            {
+                selectedSketchPath = dlg.FileName;
+                MessageBox.Show("Sketch selected.");
+            }
+        }
+
+        private void DeleteConcept_Click(object sender, RoutedEventArgs e)
+        {
+            Concept? concept = null;
+
+            if (DashboardView.Visibility == Visibility.Visible)
+            {
+                concept = DashboardConceptsDataGrid.SelectedItem as Concept;
+            }
+            else if (ConceptsView.Visibility == Visibility.Visible)
+            {
+                concept = ConceptsDataGrid.SelectedItem as Concept;
+            }
+
+            if (concept != null)
+            {
+                MessageBoxResult result = MessageBox.Show(
+                    $"Are you sure you want to delete the concept \"{concept.Name}\"?", "Confirm Deletion", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+
+                if (result != MessageBoxResult.Yes)
+                {
+                    return;
+                }
+
+                new DAL().DeleteConcept(concept.Id);
+
+                string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+                string rootPath = Directory.GetParent(baseDir)!.Parent!.Parent!.Parent!.Parent!.FullName;
+                string conceptDirectory = System.IO.Path.Combine(rootPath, "Pictures", concept.Name);
+
+                if (Directory.Exists(conceptDirectory))
+                {
+                    try
+                    {
+                        Directory.Delete(conceptDirectory, recursive: true);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Could not delete concept files: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
+
+                RefreshConceptOverviews();
+            }
+            else
+            {
+                MessageBox.Show("Please select a concept to delete.", "No Selection", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+        }
     }
 }

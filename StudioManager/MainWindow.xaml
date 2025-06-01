@@ -110,7 +110,7 @@
                                     <DataGridTemplateColumn Header="Del" Width="Auto">
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate>
-                                                <Button Content="Delete" Width="60" Margin="2"/>
+                                                <Button Content="Delete" Width="60" Margin="2" Click="DeleteConcept_Click"/>
                                             </DataTemplate>
                                         </DataGridTemplateColumn.CellTemplate>
                                     </DataGridTemplateColumn>
@@ -338,7 +338,7 @@
                             <DataGridTemplateColumn Header="Del" Width="Auto">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <Button Content="Delete" Width="60" Margin="2"/>
+                                        <Button Content="Delete" Width="60" Margin="2" Click="DeleteConcept_Click"/>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
@@ -627,10 +627,6 @@
                     <TextBox x:Name="NewConceptDescriptionTextBox" Width="200"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="0,5">
-                    <TextBlock Text="Sketch:" Width="100"/>
-                    <TextBox x:Name="NewConceptSketchTextBox" Width="200"/>
-                </StackPanel>
-                <StackPanel Orientation="Horizontal" Margin="0,5">
                     <TextBlock Text="Select Props:" Width="100" />
                     <ListBox x:Name="PropSelectionListBox" SelectionMode="Multiple" DisplayMemberPath="Name" Height="100" Width="200"/>
                 </StackPanel>
@@ -641,6 +637,14 @@
                 <StackPanel Orientation="Horizontal" Margin="0,5">
                     <TextBlock Text="Select Shoot:" Width="100"/>
                     <ListBox x:Name="ShootSelectionComboBox" DisplayMemberPath="Date" Height="100" Width="200"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,5">
+                    <TextBlock Text="Sketch:" Width="100"/>
+                    <Button Content="Upload Sketch" Click="UploadSketch_Click" Width="200"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,5">
+                    <TextBlock Text="Pictures:" Width="100"/>
+                    <Button Content="Upload Picture(s)" Click="UploadPictures_Click" Width="200"/>
                 </StackPanel>
             </StackPanel>
 
@@ -657,6 +661,5 @@
                 Click="ConceptsButton_Click"/>
             </Grid>
         </Grid>
-
     </Grid>
 </Window>
