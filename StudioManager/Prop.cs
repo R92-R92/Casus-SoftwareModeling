@@ -12,6 +12,7 @@ namespace StudioManager
         public string Name { get; set; }
         public string? Description { get; set; }
         public bool IsAvailable { get; set; }
+        DAL dal = new DAL();
 
         public Prop(int id, string name, string? description, bool isAvailable)
         {
@@ -25,6 +26,11 @@ namespace StudioManager
         {
             IsAvailable = !IsAvailable;
             return IsAvailable;
+        }
+
+        public void Create()
+        {
+            dal.AddProp(this);
         }
     }
 }

@@ -13,12 +13,19 @@ namespace StudioManager
         public Address? Location { get; set; }
         public List<Concept> Concepts { get; set; } = new List<Concept>();
         public List<Contract> Contracts { get; set; } = new List<Contract>();
+        DAL dal = new DAL();
+
 
         public Shoot(int id, DateTime? date, Address? location)
         {
             Id = id;
             Date = date;
             Location = location;
+        }
+
+        public void Create()
+        {
+            dal.AddShoot(this);
         }
     }
 }

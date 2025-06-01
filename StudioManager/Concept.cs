@@ -17,6 +17,8 @@ namespace StudioManager
         public List<Contact> Models { get; set; } = new List<Contact>();
         public List<Prop> Props { get; set; }
         public Shoot? Shoot { get; set; }
+        new DAL dal = new DAL();
+
 
         public Concept(int id, string description, string sketch, List<Prop> props, Shoot shoot)
         { 
@@ -30,6 +32,11 @@ namespace StudioManager
         public void AddPictures(string picture)
         {
             Pictures.Add(picture);
+        }
+
+        public void Create()
+        {
+            dal.AddConcept(this);
         }
     }
 

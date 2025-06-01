@@ -18,7 +18,6 @@ namespace StudioManager
             InitializeComponent();
         }
 
-
         // NAVIGATION
         public void HidePanels()
         {
