@@ -986,6 +986,19 @@ namespace StudioManager
             return concepts;
         }
 
+        public bool ConceptNameExists(string name)
+        {
+            using SqlConnection conn = new(connectionString);
+            conn.Open();
+
+            string query = "SELECT COUNT(*) FROM Concept WHERE Name = @Name";
+            using SqlCommand cmd = new(query, conn);
+            cmd.Parameters.AddWithValue("@Name", name);
+
+            int count = (int)cmd.ExecuteScalar();
+            return count > 0;
+        }
+
         private void AddPictureToConcept(int conceptId, string picture)
         {
             using SqlConnection conn = new(connectionString);
