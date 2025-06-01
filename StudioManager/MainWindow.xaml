@@ -36,8 +36,8 @@
                 <StackPanel Grid.Row="1">
                     <Button Content="Dashboard" Margin="0,5" Padding="10" Click="DashboardButton_Click"/>
                     <Button Content="Projects" Margin="0,5" Padding="10" Click="ProjectsButton_Click"/>
-                    <Button Content="Shoots" Margin="0,5" Padding="10" Click="ShootsButton_Click"/>
                     <Button Content="Concepts" Margin="0,5" Padding="10" Click="ConceptsButton_Click"/>
+                    <Button Content="Shoots" Margin="0,5" Padding="10" Click="ShootsButton_Click"/>
                     <Button Content="Props" Margin="0,5" Padding="10" Click="PropsButton_Click"/>
                     <Button Content="Contacts" Margin="0,5" Padding="10" Click="ContactsButton_Click"/>
                 </StackPanel>
@@ -88,16 +88,17 @@
                                 </Grid>
 
                                 <!-- Button -->
-                                <Button Grid.Column="1" Content="New Concept" Width="100" Margin="10,0,0,0" HorizontalAlignment="Right"/>
+                                <Button Grid.Column="1" Content="New Concept" Width="100" Margin="10,0,0,0" HorizontalAlignment="Right" Click="NewConceptButton_Click"/>
                             </Grid>
 
                             <!-- Tabel -->
-                            <DataGrid x:Name="DashboardConceptsDataGrid" Grid.Row="2" AutoGenerateColumns="False" CanUserAddRows="False" HeadersVisibility="Column" IsReadOnly="True">
+                            <DataGrid x:Name="DashboardConceptsDataGrid" Grid.Row="2" AutoGenerateColumns="False" CanUserAddRows="False" HeadersVisibility="Column" ScrollViewer.CanContentScroll="False" >
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn Header="Model" Binding="{Binding Model}" Width="*"/>
+                                    <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*"/>
+                                    <DataGridTextColumn Header="Model" Binding="{Binding ModelText}" Width="*"/>
                                     <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="2*"/>
-                                    <DataGridTextColumn Header="Location" Binding="{Binding Location}" Width="*"/>
-                                    <DataGridTextColumn Header="Props" Binding="{Binding Props}" Width="*"/>
+                                    <DataGridTextColumn Header="Address" Binding="{Binding Location}" Width="*"/>
+                                    <DataGridTextColumn Header="Props" Binding="{Binding PropsText}" Width="*"/>
                                     <DataGridTemplateColumn Header="Edit" Width="Auto">
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate>
@@ -311,19 +312,20 @@
                         </Grid>
 
                         <!-- New Concept Button -->
-                        <Button Grid.Column="1" Content="New Concept" Width="100" HorizontalAlignment="Right"/>
+                        <Button Grid.Column="1" Content="New Concept" Width="100" HorizontalAlignment="Right" Click="NewConceptButton_Click"/>
                     </Grid>
 
                     <!-- Concept Overview Label -->
                     <TextBlock Grid.Row="1" Text="Concept Overview" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center" Margin="0,0,0,5"/>
 
                     <!-- Concept Overview Table -->
-                    <DataGrid x:Name="ConceptsDataGrid" Grid.Row="2" AutoGenerateColumns="False" CanUserAddRows="False" Margin="0,0,0,10">
+                    <DataGrid x:Name="ConceptsDataGrid" Grid.Row="2" AutoGenerateColumns="False" CanUserAddRows="False" HeadersVisibility="Column" RowHeaderWidth="0" Margin="0,0,0,10" ScrollViewer.CanContentScroll="False">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Model" Binding="{Binding Model}" Width="*"/>
+                            <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*"/>
+                            <DataGridTextColumn Header="Model" Binding="{Binding ModelText}" Width="*"/>    
                             <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="2*"/>
-                            <DataGridTextColumn Header="Location" Binding="{Binding Location}" Width="*"/>
-                            <DataGridTextColumn Header="Props" Binding="{Binding Props}" Width="*"/>
+                            <DataGridTextColumn Header="Address" Binding="{Binding Location}" Width="*"/>
+                            <DataGridTextColumn Header="Props" Binding="{Binding PropsText}" Width="*"/>
                             <DataGridTemplateColumn Header="Edit" Width="Auto">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
@@ -340,6 +342,7 @@
                             </DataGridTemplateColumn>
                         </DataGrid.Columns>
                     </DataGrid>
+
 
                     <!-- Concept Details Label -->
                     <TextBlock Grid.Row="3" Text="Concept Details" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center" Margin="0,0,0,5"/>
@@ -593,5 +596,61 @@
                 Click="DashboardButton_Click"/>
             </Grid>
         </Grid>
+
+        
+        
+        
+        
+        <!--NEW CONCEPT-->
+        <Grid x:Name="NewConceptForm" Visibility="Collapsed" Grid.Column="1" Background="#F5F5F5" Margin="10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Titel -->
+            <TextBlock Grid.Row="0" Text="Create New Concept" FontWeight="Bold" FontSize="16"
+               HorizontalAlignment="Center" Margin="0,20,0,10"/>
+
+            <!-- Formulier -->
+            <StackPanel Grid.Row="1" Margin="20">
+                <StackPanel Orientation="Horizontal" Margin="0,5">
+                    <TextBlock Text="Name:" Width="100"/>
+                    <TextBox x:Name="NewConceptNameTextBox" Width="200"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,5">
+                    <TextBlock Text="Description:" Width="100"/>
+                    <TextBox x:Name="NewConceptDescriptionTextBox" Width="200"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,5">
+                    <TextBlock Text="Sketch:" Width="100"/>
+                    <TextBox x:Name="NewConceptSketchTextBox" Width="200"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,5">
+                    <TextBlock Text="Select Props:" Width="100" />
+                    <ListBox x:Name="PropSelectionListBox" SelectionMode="Multiple" DisplayMemberPath="Name" Height="100" Width="200"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,5">
+                    <TextBlock Text="Select Models:" Width="100"/>
+                    <ListBox x:Name="ModelSelectionListBox" SelectionMode="Multiple" DisplayMemberPath="FullName" Height="100" Width="200" />
+                </StackPanel>
+            </StackPanel>
+
+            <!-- Knoppen -->
+            <Grid Grid.Row="3" Margin="0,10,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Button Content="Create" Width="100" HorizontalAlignment="Left" Grid.Column="0" Margin="110,10"
+                Click="CreateNewConcept_Click"/>
+                <Button Content="Cancel" Width="100" HorizontalAlignment="Right" Grid.Column="1" Margin="110,10"
+                Click="ConceptsButton_Click"/>
+            </Grid>
+        </Grid>
+
     </Grid>
 </Window>
