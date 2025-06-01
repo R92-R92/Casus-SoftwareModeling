@@ -1,4 +1,4 @@
-﻿ausing System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -240,8 +240,8 @@ namespace StudioManager
                     email: reader["Email"]?.ToString(),
                     socialMedia: reader["SocialMedia"]?.ToString(),
                     picture: reader["Picture"]?.ToString(),
-                    payment: (bool)reader["Payment"],
-                    role: (int)reader["Role"],
+                    //payment: (bool)reader["Payment"],
+                    //role: (int)reader["Role"],
                     address: addressId.HasValue ? GetAddressById(addressId.Value) : null!
                 );
 
@@ -269,10 +269,10 @@ namespace StudioManager
             cmd.Parameters.AddWithValue("@Phone", contact.Phone ?? "");
             cmd.Parameters.AddWithValue("@Email", contact.Email ?? "");
             cmd.Parameters.AddWithValue("@SocialMedia", contact.SocialMedia ?? "");
-            cmd.Parameters.AddWithValue("@Picture", contact.Picture ?? "");
-            cmd.Parameters.AddWithValue("@Role", contact.Role);
+            //cmd.Parameters.AddWithValue("@Picture", contact.Picture ?? "");
+            //cmd.Parameters.AddWithValue("@Role", contact.Role);
             cmd.Parameters.AddWithValue("@AddressId", contact.Address?.Id ?? (object)DBNull.Value);
-            cmd.Parameters.AddWithValue("@Payment", contact.Payment);
+            //cmd.Parameters.AddWithValue("@Payment", contact.Payment);
 
             cmd.ExecuteNonQuery();
         }
@@ -303,10 +303,10 @@ namespace StudioManager
             cmd.Parameters.AddWithValue("@Phone", contact.Phone ?? "");
             cmd.Parameters.AddWithValue("@Email", contact.Email ?? "");
             cmd.Parameters.AddWithValue("@SocialMedia", contact.SocialMedia ?? "");
-            cmd.Parameters.AddWithValue("@Picture", contact.Picture ?? "");
-            cmd.Parameters.AddWithValue("@Role", contact.Role);
+            //cmd.Parameters.AddWithValue("@Picture", contact.Picture ?? "");
+            //cmd.Parameters.AddWithValue("@Role", contact.Role);
             cmd.Parameters.AddWithValue("@AddressId", contact.Address?.Id ?? (object)DBNull.Value);
-            cmd.Parameters.AddWithValue("@Payment", contact.Payment);
+            //cmd.Parameters.AddWithValue("@Payment", contact.Payment);
 
             cmd.ExecuteNonQuery();
         }
@@ -347,7 +347,7 @@ namespace StudioManager
                     signee: signeeId.HasValue ? GetContactById(signeeId.Value) : null,
                     isSigned: (bool)reader["IsSigned"],
                     signedOn: reader.IsDBNull(3) ? null : reader.GetDateTime(3),
-                    shoot: shootId.HasValue ? GetShootById(shootId.Value) : null
+                    shoot: shootId.HasValue ? GetShootById(shootId.Value) : null,
                     payment: (bool)reader["Payment"]
                 );
 
@@ -774,8 +774,8 @@ namespace StudioManager
                     email: reader["Email"]?.ToString(),
                     socialMedia: reader["SocialMedia"]?.ToString(),
                     picture: reader["Picture"]?.ToString(),
-                    payment: (bool)reader["Payment"],
-                    role: (int)reader["Role"],
+                    //payment: (bool)reader["Payment"],
+                    //role: (int)reader["Role"],
                     address: addressId.HasValue ? GetAddressById(addressId.Value) : null!
                 );
 
@@ -917,8 +917,8 @@ namespace StudioManager
                     email: reader["Email"]?.ToString(),
                     socialMedia: reader["SocialMedia"]?.ToString(),
                     picture: reader["Picture"]?.ToString(),
-                    payment: (bool)reader["Payment"],
-                    role: (int)reader["Role"],
+                    //payment: (bool)reader["Payment"],
+                    //role: (int)reader["Role"],
                     address: addressId.HasValue ? GetAddressById(addressId.Value) : null!
                 ));
             }
