@@ -16,6 +16,12 @@ namespace StudioManager
         public MainWindow()
         {
             InitializeComponent();
+            RefreshConceptOverviews();
+            PropSelectionListBox.ItemsSource = new DAL().GetAllProps();
+            ModelSelectionListBox.ItemsSource = new DAL().GetAllContacts();
+
+
+
         }
 
         // NAVIGATION
@@ -27,11 +33,13 @@ namespace StudioManager
             ConceptsView.Visibility = Visibility.Collapsed;
             PropsView.Visibility = Visibility.Collapsed;
             ContactsView.Visibility = Visibility.Collapsed;
-            HomeAddressView.Visibility = Visibility.Collapsed; // <- Toegevoegd
+            HomeAddressView.Visibility = Visibility.Collapsed;
+            NewConceptForm.Visibility = Visibility.Collapsed;
         }
 
         public void DashboardButton_Click(object sender, RoutedEventArgs e)
         {
+            RefreshConceptOverviews();
             HidePanels();
             DashboardView.Visibility = Visibility.Visible;
         }
@@ -50,9 +58,17 @@ namespace StudioManager
 
         public void ConceptsButton_Click(object sender, RoutedEventArgs e)
         {
+            RefreshConceptOverviews();
             HidePanels();
             ConceptsView.Visibility = Visibility.Visible;
         }
+
+        private void NewConceptButton_Click(object sender, RoutedEventArgs e)
+        {
+            HidePanels();
+            NewConceptForm.Visibility = Visibility.Visible;
+        }
+
 
         public void PropsButton_Click(object sender, RoutedEventArgs e)
         {
@@ -156,6 +172,36 @@ namespace StudioManager
             new DAL().UpdateHomeAddress(updated);
             MessageBox.Show("Home address updated successfully.");
             DashboardButton_Click(null, null);
+        }
+
+
+        private void RefreshConceptOverviews()
+        {
+            List<Concept> allConcepts = new DAL().GetAllConcepts();
+
+            ConceptsDataGrid.ItemsSource = allConcepts;
+            DashboardConceptsDataGrid.ItemsSource = allConcepts;
+        }
+
+
+
+
+        private void CreateNewConcept_Click(object sender, RoutedEventArgs e)
+        {
+            string description = NewConceptDescriptionTextBox.Text;
+            string sketch = NewConceptSketchTextBox.Text;
+            string name = NewConceptNameTextBox.Text;
+            List<Prop> props = PropSelectionListBox.SelectedItems.Cast<Prop>().ToList();
+            List<Contact> models = ModelSelectionListBox.SelectedItems.Cast<Contact>().ToList();
+
+            Concept newConcept = new Concept(0, name, description, sketch, props, null);
+            newConcept.Models = models;
+            newConcept.Create();
+
+            MessageBox.Show("Concept successfully created.");
+            RefreshConceptOverviews();
+            HidePanels();
+            ConceptsView.Visibility = Visibility.Visible;
         }
     }
 }
