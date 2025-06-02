@@ -756,9 +756,5 @@
                 Click="ConceptsButton_Click"/>
             </Grid>
         </Grid>
-
-
-
-
     </Grid>
 </Window>
