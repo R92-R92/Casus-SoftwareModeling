@@ -36,9 +36,19 @@ namespace StudioManager
             Pictures.Add(picture);
         }
 
+        public void ClearPictures()
+        {
+            Pictures.Clear();
+        }
+
         public void Create()
         {
             dal.AddConcept(this);
+        }
+
+        public void Update()
+        {
+            new DAL().UpdateConcept(this);
         }
 
 
