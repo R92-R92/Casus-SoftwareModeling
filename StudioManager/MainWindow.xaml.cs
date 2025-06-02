@@ -17,6 +17,7 @@ namespace StudioManager
         private List<string> selectedPicturePaths = new();
         private string? selectedSketchPath;
         private int currentPictureIndex = -1;
+        private Concept? conceptBeingEdited = null;
 
         public MainWindow()
         {
@@ -76,18 +77,15 @@ namespace StudioManager
             ModelSelectionListBox.UnselectAll();
             ShootSelectionComboBox.SelectedItem = null;
 
-            // Reset sketch
             selectedSketchPath = null;
             SketchPreviewImage.Source = null;
             SketchPreviewImage.Visibility = Visibility.Collapsed;
             SketchAddIcon.Visibility = Visibility.Visible;
             DeleteSketchButton.Visibility = Visibility.Collapsed;
 
-            // Reset pictures
             selectedPicturePaths.Clear();
             currentPictureIndex = -1;
 
-            // Reset picture preview
             PicturePreviewImage.Source = null;
             PicturePreviewImage.Visibility = Visibility.Collapsed;
             PictureAddIcon.Visibility = Visibility.Visible;
@@ -202,9 +200,10 @@ namespace StudioManager
             );
 
             new DAL().UpdateHomeAddress(updated);
-            // MessageBox.Show("Home address updated successfully.");
             DashboardButton_Click(null, null);
         }
+
+
 
 
 
@@ -226,7 +225,6 @@ namespace StudioManager
             string description = NewConceptDescriptionTextBox.Text;
             string sketch = "";
 
-            // LATER WEGWERKEN
             if (string.IsNullOrWhiteSpace(name))
             {
                 MessageBox.Show("Please enter a name for the concept before creating it.");
@@ -272,15 +270,10 @@ namespace StudioManager
 
             newConcept.Sketch = sketch;
             newConcept.Create();
-            // MessageBox.Show("Concept successfully created.");
             RefreshConceptOverviews();
             HidePanels();
             ConceptsView.Visibility = Visibility.Visible;
         }
-
-
-
-
 
 
         private void UploadPicture_Click(object sender, RoutedEventArgs e)
@@ -293,16 +286,31 @@ namespace StudioManager
 
             if (dlg.ShowDialog() == true)
             {
+                foreach (var oldPath in selectedPicturePaths)
+                {
+                    try
+                    {
+                        if (File.Exists(oldPath)) File.Delete(oldPath);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Kon oude foto '{oldPath}' niet verwijderen: {ex.Message}", "Fout", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    }
+                }
+
+                selectedPicturePaths.Clear();
+
                 foreach (var file in dlg.FileNames)
                 {
-                    selectedPicturePaths.Add(file);
+                    string tempPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), Guid.NewGuid().ToString() + System.IO.Path.GetExtension(file));
+                    File.Copy(file, tempPath, overwrite: true);
+                    selectedPicturePaths.Add(tempPath);
                 }
 
                 currentPictureIndex = selectedPicturePaths.Count - 1;
-                ShowCurrentPicture();
+                ShowCurrentPicture(EditConceptForm.Visibility == Visibility.Visible);
             }
         }
-
 
 
 
@@ -311,6 +319,19 @@ namespace StudioManager
         {
             if (currentPictureIndex >= 0 && currentPictureIndex < selectedPicturePaths.Count)
             {
+                EditPicturePreviewImage.Source = null;
+                PicturePreviewImage.Source = null;
+                string fileToDelete = selectedPicturePaths[currentPictureIndex];
+
+                try
+                {
+                    if (File.Exists(fileToDelete)) File.Delete(fileToDelete);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Kon foto '{fileToDelete}' niet verwijderen: {ex.Message}", "Fout", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+
                 selectedPicturePaths.RemoveAt(currentPictureIndex);
 
                 if (selectedPicturePaths.Count == 0)
@@ -322,9 +343,10 @@ namespace StudioManager
                     currentPictureIndex = selectedPicturePaths.Count - 1;
                 }
 
-                ShowCurrentPicture();
+                ShowCurrentPicture(EditConceptForm.Visibility == Visibility.Visible);
             }
         }
+
 
         private void PrevPicture_Click(object sender, RoutedEventArgs e)
         {
@@ -344,48 +366,59 @@ namespace StudioManager
             }
         }
 
-        private void ShowCurrentPicture()
+        private void ShowCurrentPicture(bool isEditMode = false)
         {
             if (selectedPicturePaths.Count > 0 && currentPictureIndex >= 0)
             {
-                PicturePreviewImage.Source = new BitmapImage(new Uri(selectedPicturePaths[currentPictureIndex]));
-                PicturePreviewImage.Visibility = Visibility.Visible;
-                PictureAddIcon.Visibility = Visibility.Collapsed;
-                PictureUploadBorder.MouseLeftButtonUp -= UploadPicture_Click;
-                DeletePictureButton.Visibility = Visibility.Visible;
-                ExtraPictureButton.Visibility = Visibility.Visible;
-                PrevPictureButton.Visibility = selectedPicturePaths.Count > 1 ? Visibility.Visible : Visibility.Collapsed;
-                NextPictureButton.Visibility = selectedPicturePaths.Count > 1 ? Visibility.Visible : Visibility.Collapsed;
+                var bitmap = LoadImageWithoutLock(selectedPicturePaths[currentPictureIndex]);
+
+                if (isEditMode)
+                {
+                    EditPicturePreviewImage.Source = bitmap;
+                    EditPicturePreviewImage.Visibility = Visibility.Visible;
+                    EditPictureAddIcon.Visibility = Visibility.Collapsed;
+                    EditDeletePictureButton.Visibility = Visibility.Visible;
+                    EditExtraPictureButton.Visibility = Visibility.Visible;
+                    EditPrevPictureButton.Visibility = selectedPicturePaths.Count > 1 ? Visibility.Visible : Visibility.Collapsed;
+                    EditNextPictureButton.Visibility = selectedPicturePaths.Count > 1 ? Visibility.Visible : Visibility.Collapsed;
+                }
+                else
+                {
+                    PicturePreviewImage.Source = bitmap;
+                    PicturePreviewImage.Visibility = Visibility.Visible;
+                    PictureAddIcon.Visibility = Visibility.Collapsed;
+                    PictureUploadBorder.MouseLeftButtonUp -= UploadPicture_Click;
+                    DeletePictureButton.Visibility = Visibility.Visible;
+                    ExtraPictureButton.Visibility = Visibility.Visible;
+                    PrevPictureButton.Visibility = selectedPicturePaths.Count > 1 ? Visibility.Visible : Visibility.Collapsed;
+                    NextPictureButton.Visibility = selectedPicturePaths.Count > 1 ? Visibility.Visible : Visibility.Collapsed;
+                }
             }
             else
             {
-                PicturePreviewImage.Source = null;
-                PicturePreviewImage.Visibility = Visibility.Collapsed;
-                PictureAddIcon.Visibility = Visibility.Visible;
-                PictureUploadBorder.MouseLeftButtonUp += UploadPicture_Click;
-                DeletePictureButton.Visibility = Visibility.Collapsed;
-                ExtraPictureButton.Visibility = Visibility.Collapsed;
-                PrevPictureButton.Visibility = Visibility.Collapsed;
-                NextPictureButton.Visibility = Visibility.Collapsed;
+                if (isEditMode)
+                {
+                    EditPicturePreviewImage.Source = null;
+                    EditPicturePreviewImage.Visibility = Visibility.Collapsed;
+                    EditPictureAddIcon.Visibility = Visibility.Visible;
+                    EditDeletePictureButton.Visibility = Visibility.Collapsed;
+                    EditExtraPictureButton.Visibility = Visibility.Collapsed;
+                    EditPrevPictureButton.Visibility = Visibility.Collapsed;
+                    EditNextPictureButton.Visibility = Visibility.Collapsed;
+                }
+                else
+                {
+                    PicturePreviewImage.Source = null;
+                    PicturePreviewImage.Visibility = Visibility.Collapsed;
+                    PictureAddIcon.Visibility = Visibility.Visible;
+                    PictureUploadBorder.MouseLeftButtonUp += UploadPicture_Click;
+                    DeletePictureButton.Visibility = Visibility.Collapsed;
+                    ExtraPictureButton.Visibility = Visibility.Collapsed;
+                    PrevPictureButton.Visibility = Visibility.Collapsed;
+                    NextPictureButton.Visibility = Visibility.Collapsed;
+                }
             }
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
         private void UploadSketch_Click(object sender, MouseButtonEventArgs e)
         {
@@ -396,35 +429,66 @@ namespace StudioManager
 
             if (dlg.ShowDialog() == true)
             {
-                selectedSketchPath = dlg.FileName;
-                SketchPreviewImage.Source = new BitmapImage(new Uri(selectedSketchPath));
+                if (!string.IsNullOrEmpty(selectedSketchPath) && File.Exists(selectedSketchPath))
+                {
+                    try
+                    {
+                        File.Delete(selectedSketchPath);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Kon oude sketch-bestand niet verwijderen: {ex.Message}", "Fout", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
+
+                string tempPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), Guid.NewGuid().ToString() + System.IO.Path.GetExtension(dlg.FileName));
+                File.Copy(dlg.FileName, tempPath, overwrite: true);
+                selectedSketchPath = tempPath;
+
+                var bitmap = LoadImageWithoutLock(selectedSketchPath);
+                SketchPreviewImage.Source = bitmap;
+                EditSketchPreviewImage.Source = bitmap;
+
                 SketchPreviewImage.Visibility = Visibility.Visible;
+                EditSketchPreviewImage.Visibility = Visibility.Visible;
                 SketchAddIcon.Visibility = Visibility.Collapsed;
+                EditSketchAddIcon.Visibility = Visibility.Collapsed;
                 DeleteSketchButton.Visibility = Visibility.Visible;
+                EditDeleteSketchButton.Visibility = Visibility.Visible;
             }
         }
 
+
         private void DeleteSketch_Click(object sender, RoutedEventArgs e)
         {
+            if (!string.IsNullOrEmpty(selectedSketchPath) && File.Exists(selectedSketchPath))
+            {
+                try
+                {
+                    File.Delete(selectedSketchPath);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Kon sketch-bestand niet verwijderen: {ex.Message}", "Fout", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+
             selectedSketchPath = null;
+
             SketchPreviewImage.Source = null;
             SketchPreviewImage.Visibility = Visibility.Collapsed;
             SketchAddIcon.Visibility = Visibility.Visible;
             DeleteSketchButton.Visibility = Visibility.Collapsed;
+
+            EditSketchPreviewImage.Source = null;
+            EditSketchPreviewImage.Visibility = Visibility.Collapsed;
+            EditSketchAddIcon.Visibility = Visibility.Visible;
+            EditDeleteSketchButton.Visibility = Visibility.Collapsed;
         }
 
 
-
-
-
-
-
-
-        private Concept? conceptBeingEdited = null;
-
         private void EditConcept_Click(object sender, RoutedEventArgs e)
         {
-            // Haal het geselecteerde concept op vanuit de juiste datagrid
             Concept? selected = null;
 
             if (DashboardView.Visibility == Visibility.Visible)
@@ -440,16 +504,13 @@ namespace StudioManager
 
             conceptBeingEdited = selected;
 
-            // ❗ VUL DE LISTS IN
             EditPropSelectionListBox.ItemsSource = new DAL().GetAllProps();
             EditModelSelectionListBox.ItemsSource = new DAL().GetAllContacts();
             EditShootSelectionComboBox.ItemsSource = new DAL().GetAllShoots();
 
-            // Vul de invoervelden
             EditConceptNameTextBox.Text = selected.Name;
             EditConceptDescriptionTextBox.Text = selected.Description;
 
-            // Selecteer de juiste props
             EditPropSelectionListBox.SelectedItems.Clear();
             foreach (var prop in selected.Props)
             {
@@ -459,7 +520,6 @@ namespace StudioManager
             }
 
 
-            // Selecteer de juiste modellen
             EditModelSelectionListBox.SelectedItems.Clear();
             foreach (var model in selected.Models)
             {
@@ -469,16 +529,15 @@ namespace StudioManager
             }
 
 
-            // Selecteer de juiste shoot
             var shootMatch = (EditShootSelectionComboBox.ItemsSource as List<Shoot>)?.FirstOrDefault(s => s.Id == selected.Shoot?.Id);
             EditShootSelectionComboBox.SelectedItem = shootMatch;
 
 
-            // Sketch inladen
             if (!string.IsNullOrEmpty(selected.Sketch) && File.Exists(selected.Sketch))
             {
                 selectedSketchPath = selected.Sketch;
-                EditSketchPreviewImage.Source = new BitmapImage(new Uri(selectedSketchPath));
+                EditSketchPreviewImage.Source = LoadImageWithoutLock(selected.Sketch);
+
                 EditSketchPreviewImage.Visibility = Visibility.Visible;
                 EditSketchAddIcon.Visibility = Visibility.Collapsed;
                 EditDeleteSketchButton.Visibility = Visibility.Visible;
@@ -492,12 +551,10 @@ namespace StudioManager
                 EditDeleteSketchButton.Visibility = Visibility.Collapsed;
             }
 
-            // Pictures inladen
             selectedPicturePaths = selected.Pictures.ToList();
             currentPictureIndex = selectedPicturePaths.Count > 0 ? 0 : -1;
-            //ShowCurrentPicture_Edit();
+            ShowCurrentPicture(true);
 
-            // Toon edit form
             HidePanels();
             EditConceptForm.Visibility = Visibility.Visible;
         }
@@ -512,52 +569,84 @@ namespace StudioManager
                 return;
             }
 
-            // Update basisvelden
-            conceptBeingEdited.Name = EditConceptNameTextBox.Text;
+            string oldName = conceptBeingEdited.Name;
+            string newName = EditConceptNameTextBox.Text;
+
+            if (!string.Equals(oldName, newName, StringComparison.OrdinalIgnoreCase))
+            {
+                if (new DAL().ConceptNameExists(newName))
+                {
+                    MessageBox.Show("Er bestaat al een concept met deze naam. Kies een andere naam.");
+                    return;
+                }
+            }
+
+            conceptBeingEdited.Name = newName;
             conceptBeingEdited.Description = EditConceptDescriptionTextBox.Text;
             conceptBeingEdited.Props = EditPropSelectionListBox.SelectedItems.Cast<Prop>().ToList();
             conceptBeingEdited.Models = EditModelSelectionListBox.SelectedItems.Cast<Contact>().ToList();
             conceptBeingEdited.Shoot = EditShootSelectionComboBox.SelectedItem as Shoot;
 
-            // Verwerk sketch
+            string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+            string rootPath = Directory.GetParent(baseDir)!.Parent!.Parent!.Parent!.Parent!.FullName;
+
             if (!string.IsNullOrEmpty(selectedSketchPath))
             {
-                string baseDir = AppDomain.CurrentDomain.BaseDirectory;
-                string rootPath = Directory.GetParent(baseDir)!.Parent!.Parent!.Parent!.Parent!.FullName;
-                string sketchFolder = System.IO.Path.Combine(rootPath, "Pictures", conceptBeingEdited.Name, "Sketch");
+                string sketchFolder = System.IO.Path.Combine(rootPath, "Pictures", newName, "Sketch");
                 Directory.CreateDirectory(sketchFolder);
                 string fileName = System.IO.Path.GetFileName(selectedSketchPath);
                 string destPath = System.IO.Path.Combine(sketchFolder, fileName);
+
                 if (!string.Equals(selectedSketchPath, destPath, StringComparison.OrdinalIgnoreCase))
                 {
                     File.Copy(selectedSketchPath, destPath, overwrite: true);
                 }
+
                 conceptBeingEdited.Sketch = destPath;
             }
 
-            // Verwerk pictures
             conceptBeingEdited.ClearPictures();
+
             if (selectedPicturePaths.Count > 0)
             {
-                string baseDir = AppDomain.CurrentDomain.BaseDirectory;
-                string rootPath = Directory.GetParent(baseDir)!.Parent!.Parent!.Parent!.Parent!.FullName;
-                string pictureFolder = System.IO.Path.Combine(rootPath, "Pictures", conceptBeingEdited.Name, "Pictures");
+                string pictureFolder = System.IO.Path.Combine(rootPath, "Pictures", newName, "Pictures");
                 Directory.CreateDirectory(pictureFolder);
 
                 foreach (string path in selectedPicturePaths)
                 {
                     string fileName = System.IO.Path.GetFileName(path);
                     string destPath = System.IO.Path.Combine(pictureFolder, fileName);
+
                     if (!string.Equals(path, destPath, StringComparison.OrdinalIgnoreCase))
                     {
                         File.Copy(path, destPath, overwrite: true);
                     }
+
                     conceptBeingEdited.AddPictures(destPath);
                 }
             }
 
-            // Sla wijzigingen op in database
             conceptBeingEdited.Update();
+
+            if (!string.Equals(oldName, newName, StringComparison.OrdinalIgnoreCase))
+            {
+                EditSketchPreviewImage.Source = new BitmapImage();
+                EditPicturePreviewImage.Source = new BitmapImage();
+
+
+                string oldConceptPath = System.IO.Path.Combine(rootPath, "Pictures", oldName);
+                try
+                {
+                    if (Directory.Exists(oldConceptPath))
+                    {
+                        Directory.Delete(oldConceptPath, recursive: true);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Kon oude map '{oldConceptPath}' niet verwijderen: {ex.Message}", "Fout", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
 
             conceptBeingEdited = null;
             RefreshConceptOverviews();
@@ -565,15 +654,19 @@ namespace StudioManager
             ConceptsView.Visibility = Visibility.Visible;
         }
 
-
-
-
-
-
-
-
-
-
+        private BitmapImage LoadImageWithoutLock(string path)
+        {
+            using (var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
+            {
+                var bitmap = new BitmapImage();
+                bitmap.BeginInit();
+                bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                bitmap.StreamSource = stream;
+                bitmap.EndInit();
+                bitmap.Freeze(); 
+                return bitmap;
+            }
+        }
 
         private void DeleteConcept_Click(object sender, RoutedEventArgs e)
         {
