@@ -286,19 +286,6 @@ namespace StudioManager
 
             if (dlg.ShowDialog() == true)
             {
-                foreach (var oldPath in selectedPicturePaths)
-                {
-                    try
-                    {
-                        if (File.Exists(oldPath)) File.Delete(oldPath);
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show($"Kon oude foto '{oldPath}' niet verwijderen: {ex.Message}", "Fout", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    }
-                }
-
-                selectedPicturePaths.Clear();
 
                 foreach (var file in dlg.FileNames)
                 {
@@ -311,6 +298,7 @@ namespace StudioManager
                 ShowCurrentPicture(EditConceptForm.Visibility == Visibility.Visible);
             }
         }
+
 
 
 
@@ -353,7 +341,8 @@ namespace StudioManager
             if (selectedPicturePaths.Count > 0)
             {
                 currentPictureIndex = (currentPictureIndex - 1 + selectedPicturePaths.Count) % selectedPicturePaths.Count;
-                ShowCurrentPicture();
+                ShowCurrentPicture(EditConceptForm.Visibility == Visibility.Visible);
+
             }
         }
 
@@ -362,7 +351,7 @@ namespace StudioManager
             if (selectedPicturePaths.Count > 0)
             {
                 currentPictureIndex = (currentPictureIndex + 1) % selectedPicturePaths.Count;
-                ShowCurrentPicture();
+                ShowCurrentPicture(EditConceptForm.Visibility == Visibility.Visible);
             }
         }
 
