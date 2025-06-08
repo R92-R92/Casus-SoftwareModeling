@@ -24,7 +24,7 @@ namespace StudioManager
         public MainWindow()
         {
             InitializeComponent();
-            RefreshConceptOverviews();
+            RefreshConceptOverview();
             PropSelectionListBox.ItemsSource = new DAL().GetAllProps();
             ModelSelectionListBox.ItemsSource = new DAL().GetAllContacts();
             ShootSelectionComboBox.ItemsSource = new DAL().GetAllShoots();
@@ -48,26 +48,28 @@ namespace StudioManager
 
         public void DashboardButton_Click(object sender, RoutedEventArgs e)
         {
-            RefreshConceptOverviews();
+            RefreshConceptOverview();
             HidePanels();
             DashboardView.Visibility = Visibility.Visible;
         }
 
         public void ProjectsButton_Click(object sender, RoutedEventArgs e)
         {
+            RefreshProjectOverview();
             HidePanels();
             ProjectsView.Visibility = Visibility.Visible;
         }
 
         public void ShootsButton_Click(object sender, RoutedEventArgs e)
         {
+            RefreshShootOverview();
             HidePanels();
             ShootsView.Visibility = Visibility.Visible;
         }
 
         public void ConceptsButton_Click(object sender, RoutedEventArgs e)
         {
-            RefreshConceptOverviews();
+            RefreshConceptOverview();
             HidePanels();
             ConceptsView.Visibility = Visibility.Visible;
         }
@@ -120,10 +122,9 @@ namespace StudioManager
             NewPropForm.Visibility = Visibility.Visible;
         }
 
-
-
         public void ContactsButton_Click(object sender, RoutedEventArgs e)
         {
+            RefreshContactOverview();
             HidePanels();
             ContactsView.Visibility = Visibility.Visible;
         }
@@ -227,7 +228,7 @@ namespace StudioManager
 
 
         // CONCEPT
-        private void RefreshConceptOverviews()
+        private void RefreshConceptOverview()
         {
             List<Concept> allConcepts = new DAL().GetAllConcepts();
 
@@ -258,7 +259,7 @@ namespace StudioManager
             List<Contact> models = ModelSelectionListBox.SelectedItems.Cast<Contact>().ToList();
             Shoot? shoot = ShootSelectionComboBox.SelectedItem as Shoot;
 
-            Concept newConcept = new Concept(0 , name, address, description, sketch, props, shoot);
+            Concept newConcept = new Concept(0, name, address, description, sketch, props, shoot);
             newConcept.Models = models;
 
             string baseDir = AppDomain.CurrentDomain.BaseDirectory;
@@ -287,7 +288,7 @@ namespace StudioManager
 
             newConcept.Sketch = sketch;
             newConcept.Create();
-            RefreshConceptOverviews();
+            RefreshConceptOverview();
             HidePanels();
             ConceptsView.Visibility = Visibility.Visible;
         }
@@ -580,7 +581,7 @@ namespace StudioManager
 
             conceptBeingEdited.Name = newName;
             conceptBeingEdited.Description = EditConceptDescriptionTextBox.Text;
-            conceptBeingEdited.Address = EditConceptAddressTextBox.Text; 
+            conceptBeingEdited.Address = EditConceptAddressTextBox.Text;
             conceptBeingEdited.Props = EditPropSelectionListBox.SelectedItems.Cast<Prop>().ToList();
             conceptBeingEdited.Models = EditModelSelectionListBox.SelectedItems.Cast<Contact>().ToList();
             conceptBeingEdited.Shoot = EditShootSelectionComboBox.SelectedItem as Shoot;
@@ -647,7 +648,7 @@ namespace StudioManager
             }
 
             conceptBeingEdited = null;
-            RefreshConceptOverviews();
+            RefreshConceptOverview();
             HidePanels();
             ConceptsView.Visibility = Visibility.Visible;
         }
@@ -661,7 +662,7 @@ namespace StudioManager
                 bitmap.CacheOption = BitmapCacheOption.OnLoad;
                 bitmap.StreamSource = stream;
                 bitmap.EndInit();
-                bitmap.Freeze(); 
+                bitmap.Freeze();
                 return bitmap;
             }
         }
@@ -707,7 +708,7 @@ namespace StudioManager
                     }
                 }
 
-                RefreshConceptOverviews();
+                RefreshConceptOverview();
             }
             else
             {
@@ -823,6 +824,30 @@ namespace StudioManager
                 new DAL().DeleteProp(selected.Id);
                 RefreshPropOverview();
             }
+        }
+
+
+
+        // SHOOTS - R
+
+        private void RefreshShootOverview()
+        {
+            ShootsDataGrid.ItemsSource = new DAL().GetAllShoots();
+        }
+
+
+        // CONTACTS
+
+        private void RefreshContactOverview()
+        {
+            ContactsDataGrid.ItemsSource = new DAL().GetAllContacts();
+        }
+
+        // PROJECTS
+
+        private void RefreshProjectOverview()
+        {
+            ProjectsDataGrid.ItemsSource = new DAL().GetAllProjects();
         }
 
     }

@@ -155,7 +155,7 @@
                     <TextBlock Grid.Row="1" Text="Project Overview" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center" Margin="0,0,0,5"/>
 
                     <!-- Project Overview Table -->
-                    <DataGrid x:Name="ProjectsDataGrid" Grid.Row="2" AutoGenerateColumns="False" CanUserAddRows="False" Margin="0,0,0,10">
+                        <DataGrid x:Name="ProjectsDataGrid" Grid.Row="2" AutoGenerateColumns="False" CanUserAddRows="False" HeadersVisibility="Column" RowHeaderWidth="0" Margin="0,0,0,10">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*"/>
                             <DataGridTextColumn Header="Deadline" Binding="{Binding Description}" Width="2*"/>
@@ -235,7 +235,7 @@
                     <TextBlock Grid.Row="1" Text="Shoot Overview" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center" Margin="0,0,0,5"/>
 
                     <!-- Shoot Overview Table -->
-                    <DataGrid x:Name="ShootsDataGrid" Grid.Row="2" AutoGenerateColumns="False" CanUserAddRows="False" Margin="0,0,0,10">
+                    <DataGrid x:Name="ShootsDataGrid" Grid.Row="2" AutoGenerateColumns="False" CanUserAddRows="False" HeadersVisibility="Column" RowHeaderWidth="0" Margin="0,0,0,10">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Location" Binding="{Binding Location}" Width="*"/>
                             <DataGridTextColumn Header="Date" Binding="{Binding Date}" Width="*"/>
@@ -481,7 +481,7 @@
                     <TextBlock Grid.Row="1" Text="Contact Overview" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center" Margin="0,0,0,5"/>
 
                     <!-- Contact Overview Table -->
-                    <DataGrid x:Name="ContactsDataGrid" Grid.Row="2" AutoGenerateColumns="False" CanUserAddRows="False" Margin="0,0,0,10">
+                    <DataGrid x:Name="ContactsDataGrid" Grid.Row="2" AutoGenerateColumns="False" CanUserAddRows="False" HeadersVisibility="Column" RowHeaderWidth="0" Margin="0,0,0,10">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="First Name" Binding="{Binding FirstName}" Width="*"/>
                             <DataGridTextColumn Header="Last Name" Binding="{Binding LastName}" Width="*"/>
@@ -969,7 +969,5 @@
                 Click="PropsButton_Click"/>
             </Grid>
         </Grid>
-
-
     </Grid>
 </Window>
