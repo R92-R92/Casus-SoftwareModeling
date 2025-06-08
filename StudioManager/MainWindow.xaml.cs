@@ -223,6 +223,7 @@ namespace StudioManager
         {
             string name = NewConceptNameTextBox.Text;
             string description = NewConceptDescriptionTextBox.Text;
+            string address = NewConceptAddressTextBox.Text;
             string sketch = "";
 
             if (string.IsNullOrWhiteSpace(name))
@@ -241,7 +242,7 @@ namespace StudioManager
             List<Contact> models = ModelSelectionListBox.SelectedItems.Cast<Contact>().ToList();
             Shoot? shoot = ShootSelectionComboBox.SelectedItem as Shoot;
 
-            Concept newConcept = new Concept(0, name, description, sketch, props, shoot);
+            Concept newConcept = new Concept(0 , name, address, description, sketch, props, shoot);
             newConcept.Models = models;
 
             string baseDir = AppDomain.CurrentDomain.BaseDirectory;
@@ -499,6 +500,7 @@ namespace StudioManager
 
             EditConceptNameTextBox.Text = selected.Name;
             EditConceptDescriptionTextBox.Text = selected.Description;
+            EditConceptAddressTextBox.Text = selected.Address;
 
             EditPropSelectionListBox.SelectedItems.Clear();
             foreach (var prop in selected.Props)
@@ -572,6 +574,7 @@ namespace StudioManager
 
             conceptBeingEdited.Name = newName;
             conceptBeingEdited.Description = EditConceptDescriptionTextBox.Text;
+            conceptBeingEdited.Address = EditConceptAddressTextBox.Text; 
             conceptBeingEdited.Props = EditPropSelectionListBox.SelectedItems.Cast<Prop>().ToList();
             conceptBeingEdited.Models = EditModelSelectionListBox.SelectedItems.Cast<Contact>().ToList();
             conceptBeingEdited.Shoot = EditShootSelectionComboBox.SelectedItem as Shoot;
