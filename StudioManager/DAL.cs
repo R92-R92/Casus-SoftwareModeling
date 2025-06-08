@@ -1004,6 +1004,25 @@ namespace StudioManager
             return count > 0;
         }
 
+        public bool PropNameExists(string name, int? excludeId = null)
+        {
+            using SqlConnection conn = new(connectionString);
+            conn.Open();
+
+            string query = "SELECT COUNT(*) FROM Prop WHERE Name = @Name";
+            if (excludeId.HasValue)
+                query += " AND Id != @Id";
+
+            using SqlCommand cmd = new(query, conn);
+            cmd.Parameters.AddWithValue("@Name", name);
+            if (excludeId.HasValue)
+                cmd.Parameters.AddWithValue("@Id", excludeId.Value);
+
+            int count = (int)cmd.ExecuteScalar();
+            return count > 0;
+        }
+
+
         private void AddPictureToConcept(int conceptId, string picture)
         {
             using SqlConnection conn = new(connectionString);
