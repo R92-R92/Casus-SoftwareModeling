@@ -113,7 +113,7 @@ namespace StudioManager
             using SqlConnection conn = new(connectionString);
             conn.Open();
 
-            string query = "SELECT Id, Name, Description, Sketch, ShootId FROM Concept";
+            string query = "SELECT Id, Name, Description, Sketch, ShootId, Address FROM Concept";
             using SqlCommand cmd = new(query, conn);
             using SqlDataReader reader = cmd.ExecuteReader();
 
@@ -125,6 +125,7 @@ namespace StudioManager
                 Concept concept = new(
                     id: conceptId,
                     name: reader["Name"]?.ToString(),
+                    address: reader["Address"]?.ToString(),
                     description: reader["Description"]?.ToString(),
                     sketch: reader["Sketch"]?.ToString(),
                     props: GetPropsByConceptId(conceptId),
@@ -150,8 +151,8 @@ namespace StudioManager
             conn.Open();
 
             string query = @"
-                INSERT INTO Concept (Name, Description, Sketch, ShootId)
-                VALUES (@Name, @Description, @Sketch, @ShootId);
+                INSERT INTO Concept (Name, Description, Sketch, ShootId, Address)
+                VALUES (@Name, @Description, @Sketch, @ShootId, @Address);
                 SELECT SCOPE_IDENTITY();";
 
             using SqlCommand cmd = new(query, conn);
@@ -159,6 +160,7 @@ namespace StudioManager
             cmd.Parameters.AddWithValue("@Description", concept.Description ?? "");
             cmd.Parameters.AddWithValue("@Sketch", concept.Sketch ?? "");
             cmd.Parameters.AddWithValue("@ShootId", concept.Shoot?.Id ?? (object)DBNull.Value);
+            cmd.Parameters.AddWithValue("@Address", concept.Address ?? (object)DBNull.Value);
 
             int newId = Convert.ToInt32(cmd.ExecuteScalar());
             concept.Id = newId;
@@ -184,7 +186,8 @@ namespace StudioManager
                 SET Name = @Name,
                     Description = @Description,
                     Sketch = @Sketch,
-                    ShootId = @ShootId
+                    ShootId = @ShootId,
+                    Address = @Address
                 WHERE Id = @Id";
 
             using SqlCommand cmd = new(query, conn);
@@ -193,6 +196,7 @@ namespace StudioManager
             cmd.Parameters.AddWithValue("@Description", concept.Description ?? "");
             cmd.Parameters.AddWithValue("@Sketch", concept.Sketch ?? "");
             cmd.Parameters.AddWithValue("@ShootId", concept.Shoot?.Id ?? (object)DBNull.Value);
+            cmd.Parameters.AddWithValue("@Address", concept.Address ?? (object)DBNull.Value);
             cmd.ExecuteNonQuery();
 
             DeleteAllConceptRelations(concept.Id);
@@ -954,7 +958,7 @@ namespace StudioManager
             conn.Open();
 
             string query = @"
-                SELECT c.Id,c.Name, c.Description, c.Sketch, c.ShootId
+                SELECT c.Id,c.Name, c.Description, c.Sketch, c.ShootId, c.Address
                 FROM Concept c
                 INNER JOIN ConceptProject cp ON c.Id = cp.ConceptId
                 WHERE cp.ProjectId = @ProjectId";
@@ -970,6 +974,7 @@ namespace StudioManager
                 Concept concept = new(
                     id: conceptId,
                     name: reader["Name"]?.ToString(),
+                    address: reader["Address"]?.ToString(),
                     description: reader["Description"]?.ToString(),
                     sketch: reader["Sketch"]?.ToString(),
                     props: GetPropsByConceptId(conceptId),
