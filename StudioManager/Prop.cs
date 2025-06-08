@@ -32,5 +32,10 @@ namespace StudioManager
         {
             dal.AddProp(this);
         }
+
+        public void Update()
+        {
+            dal.UpdateProp(this);
+        }
     }
 }

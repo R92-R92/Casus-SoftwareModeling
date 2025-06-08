@@ -18,6 +18,8 @@ namespace StudioManager
         private string? selectedSketchPath;
         private int currentPictureIndex = -1;
         private Concept? conceptBeingEdited = null;
+        private Prop? propBeingEdited = null;
+
 
         public MainWindow()
         {
@@ -40,6 +42,8 @@ namespace StudioManager
             HomeAddressView.Visibility = Visibility.Collapsed;
             NewConceptForm.Visibility = Visibility.Collapsed;
             EditConceptForm.Visibility = Visibility.Collapsed;
+            NewPropForm.Visibility = Visibility.Collapsed;
+            EditPropForm.Visibility = Visibility.Collapsed;
         }
 
         public void DashboardButton_Click(object sender, RoutedEventArgs e)
@@ -102,9 +106,21 @@ namespace StudioManager
 
         public void PropsButton_Click(object sender, RoutedEventArgs e)
         {
+            RefreshPropOverview();
             HidePanels();
             PropsView.Visibility = Visibility.Visible;
         }
+
+        private void NewPropButton_Click(object sender, RoutedEventArgs e)
+        {
+            HidePanels();
+            NewPropNameTextBox.Text = "";
+            NewPropDescriptionTextBox.Text = "";
+            NewPropAvailableCheckBox.IsChecked = false;
+            NewPropForm.Visibility = Visibility.Visible;
+        }
+
+
 
         public void ContactsButton_Click(object sender, RoutedEventArgs e)
         {
@@ -276,7 +292,6 @@ namespace StudioManager
             ConceptsView.Visibility = Visibility.Visible;
         }
 
-
         private void UploadPicture_Click(object sender, RoutedEventArgs e)
         {
             var dlg = new Microsoft.Win32.OpenFileDialog
@@ -299,10 +314,6 @@ namespace StudioManager
                 ShowCurrentPicture(EditConceptForm.Visibility == Visibility.Visible);
             }
         }
-
-
-
-
 
         private void DeletePicture_Click(object sender, RoutedEventArgs e)
         {
@@ -335,7 +346,6 @@ namespace StudioManager
                 ShowCurrentPicture(EditConceptForm.Visibility == Visibility.Visible);
             }
         }
-
 
         private void PrevPicture_Click(object sender, RoutedEventArgs e)
         {
@@ -448,7 +458,6 @@ namespace StudioManager
             }
         }
 
-
         private void DeleteSketch_Click(object sender, RoutedEventArgs e)
         {
             if (!string.IsNullOrEmpty(selectedSketchPath) && File.Exists(selectedSketchPath))
@@ -475,7 +484,6 @@ namespace StudioManager
             EditSketchAddIcon.Visibility = Visibility.Visible;
             EditDeleteSketchButton.Visibility = Visibility.Collapsed;
         }
-
 
         private void EditConcept_Click(object sender, RoutedEventArgs e)
         {
@@ -549,8 +557,6 @@ namespace StudioManager
             HidePanels();
             EditConceptForm.Visibility = Visibility.Visible;
         }
-
-
 
         private void SaveEditConcept_Click(object sender, RoutedEventArgs e)
         {
@@ -708,5 +714,116 @@ namespace StudioManager
                 MessageBox.Show("Please select a concept to delete.", "No Selection", MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
+
+
+
+        // PROPS
+
+        private void RefreshPropOverview()
+        {
+            PropsDataGrid.ItemsSource = new DAL().GetAllProps();
+        }
+
+        private void CreateNewProp_Click(object sender, RoutedEventArgs e)
+        {
+            string name = NewPropNameTextBox.Text;
+            string description = NewPropDescriptionTextBox.Text;
+            bool isAvailable = NewPropAvailableCheckBox.IsChecked == true;
+
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                MessageBox.Show("Please enter a name for the prop.");
+                return;
+            }
+
+            if (new DAL().PropNameExists(name))
+            {
+                MessageBox.Show("A prop with this name already exists. Please choose a different name.");
+                return;
+            }
+
+            Prop newProp = new Prop(0, name, description, isAvailable);
+            newProp.Create();
+
+            RefreshPropOverview();
+            HidePanels();
+            PropsView.Visibility = Visibility.Visible;
+        }
+
+        private void EditProp_Click(object sender, RoutedEventArgs e)
+        {
+            Prop? selected = PropsDataGrid.SelectedItem as Prop;
+
+            if (selected == null)
+            {
+                MessageBox.Show("Please select a prop to edit.");
+                return;
+            }
+
+            propBeingEdited = selected;
+
+            EditPropNameTextBox.Text = selected.Name;
+            EditPropDescriptionTextBox.Text = selected.Description;
+            EditPropAvailableCheckBox.IsChecked = selected.IsAvailable;
+
+            HidePanels();
+            EditPropForm.Visibility = Visibility.Visible;
+        }
+
+        private void SaveEditProp_Click(object sender, RoutedEventArgs e)
+        {
+            if (propBeingEdited == null)
+            {
+                MessageBox.Show("No prop selected to edit.");
+                return;
+            }
+
+            string newName = EditPropNameTextBox.Text;
+
+            if (string.IsNullOrWhiteSpace(newName))
+            {
+                MessageBox.Show("Please enter a name for the prop.");
+                return;
+            }
+
+            if (new DAL().PropNameExists(newName, propBeingEdited.Id))
+            {
+                MessageBox.Show("A prop with this name already exists. Please choose a different name.");
+                return;
+            }
+
+            propBeingEdited.Name = newName;
+            propBeingEdited.Description = EditPropDescriptionTextBox.Text;
+            propBeingEdited.IsAvailable = EditPropAvailableCheckBox.IsChecked == true;
+
+            propBeingEdited.Update();
+
+            propBeingEdited = null;
+            RefreshPropOverview();
+            HidePanels();
+            PropsView.Visibility = Visibility.Visible;
+        }
+
+        private void DeleteProp_Click(object sender, RoutedEventArgs e)
+        {
+            Prop? selected = PropsDataGrid.SelectedItem as Prop;
+
+            if (selected == null)
+            {
+                MessageBox.Show("Please select a prop to delete.", "No Selection", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            MessageBoxResult result = MessageBox.Show(
+                $"Are you sure you want to delete the prop \"{selected.Name}\"?",
+                "Confirm Deletion", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                new DAL().DeleteProp(selected.Id);
+                RefreshPropOverview();
+            }
+        }
+
     }
 }
