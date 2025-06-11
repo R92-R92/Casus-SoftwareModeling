@@ -11,23 +11,63 @@ namespace StudioManager
     public class Concept
     {
         public int Id { get; set; }
+        public string Name { get; set; }
         public string Description { get; set; }
-        public Address Location { get; set; }
         public string Sketch { get; set; }
-        public string Picture { get; set; }
+        public List<string> Pictures { get; set; } = new List<string>();
         public List<Contact> Models { get; set; } = new List<Contact>();
         public List<Prop> Props { get; set; }
         public Shoot? Shoot { get; set; }
+        new DAL dal = new DAL();
 
-        public Concept(int id, string description, Address location, string sketch, string picture, List<Prop> props, Shoot shoot)
+
+        public Concept(int id, string name, string description, string sketch, List<Prop> props, Shoot shoot)
         { 
             Id = id;
+            Name = name;
             Description = description;
-            Location = location;
             Sketch = sketch;
-            Picture = picture;
             Props = props;
             Shoot = shoot;
         }
+
+        public void AddPictures(string picture)
+        {
+            Pictures.Add(picture);
+        }
+
+        public void Create()
+        {
+            dal.AddConcept(this);
+        }
+
+
+
+
+        // EVENTUEEL ANDERE OPLOSSING - WEERGAVEN NAAM + PROPS + ADDRESS EN SHOOT IN CONCEPT OVERVIEW
+        public string PropsText
+        {
+            get
+            {
+                if (Props == null || Props.Count == 0) return "–";
+                return string.Join(", ", Props.Select(p => p.Name));
+            }
+        }
+
+        public string ModelText
+        {
+            get
+            {
+                if (Models == null || Models.Count == 0) return "–";
+                return string.Join(", ", Models.Select(m => m.FirstName + " " + m.LastName));
+            }
+        }
+
+        public string ShootDateText => Shoot?.Date?.ToString("yyyy-MM-dd") ?? "–";
+
+        public string Location => Shoot?.Location != null
+            ? $"{Shoot.Location.Street} {Shoot.Location.HouseNumber}, {Shoot.Location.PostalCode} {Shoot.Location.City}"
+            : "–";
     }
+
 }

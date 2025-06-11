@@ -9,28 +9,29 @@ namespace StudioManager
 {
     public class Address
     {
+        public int Id { get; set; }
         public string Street { get; set; }
         public string HouseNumber { get; set; }
         public string PostalCode { get; set; }
         public string City { get; set; }
         public string Country { get; set; }
+        DAL dal = new DAL();
 
-        public string FullAdress
-        {
-            get
-            {
-                return $"{Street} {HouseNumber}, {PostalCode} {City}, {Country}";
-            }
-        }
 
-        public Address(string street, string houseNumber, string postalCode, string city, string country)
+        public Address(int id, string street, string houseNumber, string postalCode, string city, string country)
 
         {
+            Id = id;
             Street = street;
             HouseNumber = houseNumber;
             PostalCode = postalCode;
             City = city;
             Country = country;
+        }
+
+        public void Create()
+        {
+            dal.AddAddress(this);
         }
     }
 }

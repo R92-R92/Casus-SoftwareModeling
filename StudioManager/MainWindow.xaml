@@ -17,23 +17,36 @@
 
         <!-- NAVIGATION -->
         <Border Background="#F5F5F5" CornerRadius="10" Margin="10" Padding="10" Grid.Column="0">
-            <StackPanel VerticalAlignment="Stretch">
-                <!-- LOGO PLACEHOLDER -->
-                <Border Height="100" Background="White" CornerRadius="5" Margin="0,0,0,20">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- LOGO -->
+                <Border Grid.Row="0" Height="100" Background="White" CornerRadius="5" Margin="0,0,0,20">
                     <TextBlock Text="Logo"
-                               VerticalAlignment="Center"
-                               HorizontalAlignment="Center"
-                               FontWeight="Bold"/>
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center"
+                       FontWeight="Bold"/>
                 </Border>
 
-                <Button Content="Dashboard" Margin="0,5" Padding="10" Click="DashboardButton_Click"/>
-                <Button Content="Projects" Margin="0,5" Padding="10" Click="ProjectsButton_Click"/>
-                <Button Content="Shoots" Margin="0,5" Padding="10" Click="ShootsButton_Click"/>
-                <Button Content="Concepts" Margin="0,5" Padding="10" Click="ConceptsButton_Click"/>
-                <Button Content="Props" Margin="0,5" Padding="10" Click="PropsButton_Click"/>
-                <Button Content="Contacts" Margin="0,5" Padding="10" Click="ContactsButton_Click"/>
-            </StackPanel>
+                <!-- Navigatieknoppen -->
+                <StackPanel Grid.Row="1">
+                    <Button Content="Dashboard" Margin="0,5" Padding="10" Click="DashboardButton_Click"/>
+                    <Button Content="Projects" Margin="0,5" Padding="10" Click="ProjectsButton_Click"/>
+                    <Button Content="Concepts" Margin="0,5" Padding="10" Click="ConceptsButton_Click"/>
+                    <Button Content="Shoots" Margin="0,5" Padding="10" Click="ShootsButton_Click"/>
+                    <Button Content="Props" Margin="0,5" Padding="10" Click="PropsButton_Click"/>
+                    <Button Content="Contacts" Margin="0,5" Padding="10" Click="ContactsButton_Click"/>
+                </StackPanel>
+
+                <!-- Change Location onderaan -->
+                <Button Grid.Row="2" Content="Change Location" Margin="0,10,0,0" Padding="10" Click="ChangeLocation_Click"/>
+            </Grid>
         </Border>
+
 
         <!-- RIGHT SIDE -->
         <Border Grid.Column="1" Background="#F5F5F5" CornerRadius="10" Margin="10" Padding="10">
@@ -46,110 +59,73 @@
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
-                    <Grid Grid.Row="0" Margin="0,0,0,10">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-
-                        <!-- OVERVIEW -->
-                        <Border Background="#E0E0E0" CornerRadius="5" Padding="10" Margin="0,0,5,0">
-                            <StackPanel>
-                                <TextBlock Text="Overview" FontWeight="Bold" FontSize="14" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,0,0,10"/>
-                                <StackPanel Margin="10,0,0,0">
-                                    <TextBlock Text="• Open projects" FontSize="12" Margin="0,2"/>
-                                    <TextBlock Text="• Planned shots" FontSize="12" Margin="0,2"/>
-                                    <TextBlock Text="• Contracts not signed" FontSize="12" Margin="0,2"/>
-                                </StackPanel>
-                            </StackPanel>
-                        </Border>
-
-                        <!-- PROGRESS -->
-                        <Border Background="#E0E0E0" CornerRadius="5" Padding="10" Margin="5,0,0,0" Grid.Column="1">
-                            <StackPanel>
-                                <TextBlock Text="Progress" FontWeight="Bold" FontSize="14" HorizontalAlignment="Center" Margin="0,0,0,10"/>
-
-                                <!-- Project 1 -->
-                                <StackPanel Margin="0,5">
-                                    <TextBlock Text="Project 1" FontWeight="SemiBold"/>
-                                    <DockPanel LastChildFill="True">
-                                        <TextBlock Text="25%" VerticalAlignment="Center" DockPanel.Dock="Right" Margin="5,0,0,0"/>
-                                        <ProgressBar Value="25" Minimum="0" Maximum="100" Height="20" Margin="0,0,5,0"/>
-                                    </DockPanel>
-                                </StackPanel>
-
-                                <!-- Project 2 -->
-                                <StackPanel Margin="0,5">
-                                    <TextBlock Text="Project 2" FontWeight="SemiBold"/>
-                                    <DockPanel LastChildFill="True">
-                                        <TextBlock Text="50%" VerticalAlignment="Center" DockPanel.Dock="Right" Margin="5,0,0,0"/>
-                                        <ProgressBar Value="50" Minimum="0" Maximum="100" Height="20" Margin="0,0,5,0"/>
-                                    </DockPanel>
-                                </StackPanel>
-
-                                <!-- Project 3 -->
-                                <StackPanel Margin="0,5">
-                                    <TextBlock Text="Project 3" FontWeight="SemiBold"/>
-                                    <DockPanel LastChildFill="True">
-                                        <TextBlock Text="75%" VerticalAlignment="Center" DockPanel.Dock="Right" Margin="5,0,0,0"/>
-                                        <ProgressBar Value="75" Minimum="0" Maximum="100" Height="20" Margin="0,0,5,0"/>
-                                    </DockPanel>
-                                </StackPanel>
-
-                                <!-- Project 4 -->
-                                <StackPanel Margin="0,5">
-                                    <TextBlock Text="Project 4" FontWeight="SemiBold"/>
-                                    <DockPanel LastChildFill="True">
-                                        <TextBlock Text="100%" VerticalAlignment="Center" DockPanel.Dock="Right" Margin="5,0,0,0"/>
-                                        <ProgressBar Value="100" Minimum="0" Maximum="100" Height="20" Margin="0,0,5,0"/>
-                                    </DockPanel>
-                                </StackPanel>
-                            </StackPanel>
-                        </Border>
-                    </Grid>
-
-                    <!-- AGENDA -->
-                    <Grid Grid.Row="1">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-
-                        <Border Background="#E0E0E0" CornerRadius="5" Padding="10" Margin="0,0,5,0">
-                            <StackPanel>
-                                <TextBlock Text="Agenda" FontWeight="Bold" FontSize="14" HorizontalAlignment="Center" Margin="0,0,0,10"/>
-                                <Calendar x:Name="AgendaCalendar" DisplayDate="{x:Static sys:DateTime.Now}" />
-                            </StackPanel>
-                        </Border>
-
-                        <!-- MY LOCATION -->
-                        <Grid Grid.Column="1" Margin="5,0,0,0">
+                    <!-- CONCEPT OVERVIEW PANE -->
+                    <Border Grid.Row="0" Background="#E0E0E0" CornerRadius="5" Padding="10" Margin="0,0,0,10">
+                        <Grid>
                             <Grid.RowDefinitions>
-                                <RowDefinition Height="3*"/>
-                                <RowDefinition Height="1*"/>
+                                <RowDefinition Height="Auto"/>
+                                <!-- Titel -->
+                                <RowDefinition Height="Auto"/>
+                                <!-- Search + Button -->
+                                <RowDefinition Height="*"/>
+                                <!-- Tabel -->
                             </Grid.RowDefinitions>
 
-                            <Border Background="#E0E0E0" CornerRadius="5" Padding="10" Grid.Row="0">
-                                <Grid>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto"/>
-                                        <RowDefinition Height="*"/>
-                                    </Grid.RowDefinitions>
+                            <!-- Titel -->
+                            <TextBlock Grid.Row="0" Text="Concept Overview" FontWeight="Bold" FontSize="14" HorizontalAlignment="Center" Margin="0,0,0,5"/>
 
-                                    <TextBlock Text="My Location" FontWeight="Bold" FontSize="14" HorizontalAlignment="Center" Margin="0,0,0,5"/>
-                                    <wv2:WebView2 x:Name="MapBrowser" Grid.Row="1"
-                                        Source="https://www.openstreetmap.org/export/embed.html?bbox=5.3258%2C50.9250%2C5.3498%2C50.9360&amp;layer=mapnik&amp;marker=50.9307%2C5.3378"
-                                        Margin="0"/>
+                            <!-- Zoekveld + New Concept -->
+                            <Grid Grid.Row="1" Margin="0,0,0,5">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Zoekveld -->
+                                <Grid Grid.Column="0" Width="200" Height="25" HorizontalAlignment="Left" VerticalAlignment="Center">
+                                    <TextBox x:Name="DashboardConceptSearchTextBox" VerticalContentAlignment="Center" Padding="2,0,0,0" TextChanged="SearchBox_DashboardConcepts"/>
+                                    <TextBlock x:Name="DashboardConceptSearchPlaceholder" Text="Search concepts..." Foreground="Gray" Margin="5,0,0,0" VerticalAlignment="Center" IsHitTestVisible="False" Visibility="Visible"/>
                                 </Grid>
-                            </Border>
-                            
-                            <!-- CHANGE LOCATION -->
-                            <Grid Grid.Row="1">
-                                <Button Content="Change Location" Width="130" Height="30" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+
+                                <!-- Button -->
+                                <Button Grid.Column="1" Content="New Concept" Width="100" Margin="10,0,0,0" HorizontalAlignment="Right" Click="NewConceptButton_Click"/>
                             </Grid>
+
+                            <!-- Tabel -->
+                            <DataGrid x:Name="DashboardConceptsDataGrid" Grid.Row="2" AutoGenerateColumns="False" CanUserAddRows="False" HeadersVisibility="Column" ScrollViewer.CanContentScroll="False" >
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*"/>
+                                    <DataGridTextColumn Header="Model" Binding="{Binding ModelText}" Width="*"/>
+                                    <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="2*"/>
+                                    <DataGridTextColumn Header="Props" Binding="{Binding PropsText}" Width="*"/>
+                                    <DataGridTextColumn Header="Address" Binding="{Binding Location}" Width="*"/>
+                                    <DataGridTextColumn Header="Shoot Date" Binding="{Binding ShootDateText}" Width="*"/>
+                                    <DataGridTemplateColumn Header="Edit" Width="Auto">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Button Content="Edit" Width="50" Margin="2"/>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                    <DataGridTemplateColumn Header="Del" Width="Auto">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Button Content="Delete" Width="60" Margin="2" Click="DeleteConcept_Click"/>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                </DataGrid.Columns>
+                            </DataGrid>
                         </Grid>
-                    </Grid>
+                    </Border>
+
+
+                    <!-- NOTSURE -->
+                    <Border Grid.Row="1" Background="#E0E0E0" CornerRadius="5" Padding="10">
+                        <TextBlock Text="NOTSUREYET" FontWeight="Bold" FontSize="14" HorizontalAlignment="Center" Margin="0,0,0,10"/>
+                    </Border>
                 </Grid>
+
 
                 <!-- PROJECTS -->
                 <Grid x:Name="ProjectsView" Visibility="Collapsed">
@@ -337,19 +313,21 @@
                         </Grid>
 
                         <!-- New Concept Button -->
-                        <Button Grid.Column="1" Content="New Concept" Width="100" HorizontalAlignment="Right"/>
+                        <Button Grid.Column="1" Content="New Concept" Width="100" HorizontalAlignment="Right" Click="NewConceptButton_Click"/>
                     </Grid>
 
                     <!-- Concept Overview Label -->
                     <TextBlock Grid.Row="1" Text="Concept Overview" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center" Margin="0,0,0,5"/>
 
                     <!-- Concept Overview Table -->
-                    <DataGrid x:Name="ConceptsDataGrid" Grid.Row="2" AutoGenerateColumns="False" CanUserAddRows="False" Margin="0,0,0,10">
+                    <DataGrid x:Name="ConceptsDataGrid" Grid.Row="2" AutoGenerateColumns="False" CanUserAddRows="False" HeadersVisibility="Column" RowHeaderWidth="0" Margin="0,0,0,10" ScrollViewer.CanContentScroll="False">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Model" Binding="{Binding Model}" Width="*"/>
+                            <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*"/>
+                            <DataGridTextColumn Header="Model" Binding="{Binding ModelText}" Width="*"/>
                             <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="2*"/>
-                            <DataGridTextColumn Header="Location" Binding="{Binding Location}" Width="*"/>
-                            <DataGridTextColumn Header="Props" Binding="{Binding Props}" Width="*"/>
+                            <DataGridTextColumn Header="Props" Binding="{Binding PropsText}" Width="*"/>
+                            <DataGridTextColumn Header="Address" Binding="{Binding Location}" Width="*"/>
+                            <DataGridTextColumn Header="Shoot Date" Binding="{Binding ShootDateText}" Width="*"/>
                             <DataGridTemplateColumn Header="Edit" Width="Auto">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
@@ -360,12 +338,13 @@
                             <DataGridTemplateColumn Header="Del" Width="Auto">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <Button Content="Delete" Width="60" Margin="2"/>
+                                        <Button Content="Delete" Width="60" Margin="2" Click="DeleteConcept_Click"/>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
                         </DataGrid.Columns>
                     </DataGrid>
+
 
                     <!-- Concept Details Label -->
                     <TextBlock Grid.Row="3" Text="Concept Details" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center" Margin="0,0,0,5"/>
@@ -507,7 +486,8 @@
                     <!-- Contact Overview Table -->
                     <DataGrid x:Name="ContactsDataGrid" Grid.Row="2" AutoGenerateColumns="False" CanUserAddRows="False" Margin="0,0,0,10">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*"/>
+                            <DataGridTextColumn Header="First Name" Binding="{Binding FirstName}" Width="*"/>
+                            <DataGridTextColumn Header="Last Name" Binding="{Binding LastName}" Width="*"/>
                             <DataGridTextColumn Header="Role" Binding="{Binding Role}" Width="*"/>
                             <DataGridTextColumn Header="Address" Binding="{Binding Address}" Width="2*"/>
                             <DataGridTextColumn Header="Phone" Binding="{Binding Phone}" Width="*"/>
@@ -559,5 +539,127 @@
                 </Grid>
             </Grid>
         </Border>
+
+        <!-- HOMEADDRESS -->
+        <Grid x:Name="HomeAddressView" Visibility="Collapsed" Grid.Column="1" Background="#F5F5F5" Margin="10" >
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Titel -->
+            <TextBlock Grid.Row="0" Text="Edit Home Address" FontWeight="Bold" FontSize="16"
+               HorizontalAlignment="Center" Margin="0,20,0,10"/>
+
+            <!-- Formulier -->
+            <StackPanel Grid.Row="1" Margin="20">
+                <!-- Formulier -->
+                <StackPanel Grid.Row="1" Margin="20" VerticalAlignment="Top">
+                    <StackPanel Orientation="Horizontal" Margin="0,5">
+                        <TextBlock Text="Street:" Width="100"/>
+                        <TextBox x:Name="HomeStreetTextBox" Width="200"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,5">
+                        <TextBlock Text="House Number:" Width="100"/>
+                        <TextBox x:Name="HomeHouseNumberTextBox" Width="200"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,5">
+                        <TextBlock Text="Postal Code:" Width="100"/>
+                        <TextBox x:Name="HomePostalCodeTextBox" Width="200"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,5">
+                        <TextBlock Text="City:" Width="100"/>
+                        <TextBox x:Name="HomeCityTextBox" Width="200"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,5">
+                        <TextBlock Text="Country:" Width="100"/>
+                        <TextBox x:Name="HomeCountryTextBox" Width="200"/>
+                    </StackPanel>
+                </StackPanel>
+            </StackPanel>
+
+            <!-- WebView2 Map -->
+            <Border Grid.Row="2" Margin="20" CornerRadius="5" Background="White">
+                <wv2:WebView2 x:Name="HomeMapWebView" Source="" />
+            </Border>
+
+            <!-- Knoppen -->
+            <Grid Grid.Row="3" Margin="0,10,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Button Content="Save" Width="100" HorizontalAlignment="Left" Grid.Column="0" Margin="110,10"
+                Click="SaveHomeAddress_Click"/>
+                <Button Content="Cancel" Width="100" HorizontalAlignment="Right" Grid.Column="1" Margin="110,10"
+                Click="DashboardButton_Click"/>
+            </Grid>
+        </Grid>
+
+        
+        
+        
+        
+        <!--NEW CONCEPT-->
+        <Grid x:Name="NewConceptForm" Visibility="Collapsed" Grid.Column="1" Background="#F5F5F5" Margin="10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Titel -->
+            <TextBlock Grid.Row="0" Text="Create New Concept" FontWeight="Bold" FontSize="16"
+               HorizontalAlignment="Center" Margin="0,20,0,10"/>
+
+            <!-- Formulier -->
+            <StackPanel Grid.Row="1" Margin="20">
+                <StackPanel Orientation="Horizontal" Margin="0,5">
+                    <TextBlock Text="Name:" Width="100"/>
+                    <TextBox x:Name="NewConceptNameTextBox" Width="200"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,5">
+                    <TextBlock Text="Description:" Width="100"/>
+                    <TextBox x:Name="NewConceptDescriptionTextBox" Width="200"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,5">
+                    <TextBlock Text="Select Props:" Width="100" />
+                    <ListBox x:Name="PropSelectionListBox" SelectionMode="Multiple" DisplayMemberPath="Name" Height="100" Width="200"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,5">
+                    <TextBlock Text="Select Models:" Width="100"/>
+                    <ListBox x:Name="ModelSelectionListBox" SelectionMode="Multiple" DisplayMemberPath="FullName" Height="100" Width="200" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,5">
+                    <TextBlock Text="Select Shoot:" Width="100"/>
+                    <ListBox x:Name="ShootSelectionComboBox" DisplayMemberPath="Date" Height="100" Width="200"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,5">
+                    <TextBlock Text="Sketch:" Width="100"/>
+                    <Button Content="Upload Sketch" Click="UploadSketch_Click" Width="200"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,5">
+                    <TextBlock Text="Pictures:" Width="100"/>
+                    <Button Content="Upload Picture(s)" Click="UploadPictures_Click" Width="200"/>
+                </StackPanel>
+            </StackPanel>
+
+            <!-- Knoppen -->
+            <Grid Grid.Row="3" Margin="0,10,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Button Content="Create" Width="100" HorizontalAlignment="Left" Grid.Column="0" Margin="110,10"
+                Click="CreateNewConcept_Click"/>
+                <Button Content="Cancel" Width="100" HorizontalAlignment="Right" Grid.Column="1" Margin="110,10"
+                Click="ConceptsButton_Click"/>
+            </Grid>
+        </Grid>
     </Grid>
 </Window>

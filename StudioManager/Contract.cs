@@ -14,18 +14,25 @@ namespace StudioManager
         public Contact? Signee { get; set; }
         public bool IsSigned { get; set; }
         public DateTime? SignedOn { get; set; }
-        public User Author { get; set; }
         public Shoot? Shoot { get; set; }
+        public bool Payment { get; set; }
+        new DAL dal = new DAL();
 
-        public Contract(int id, string body, Contact? signee, DateTime? signedOn, User author, Shoot? shoot)
+
+        public Contract(int id, string body, Contact? signee, bool isSigned, DateTime? signedOn, Shoot? shoot, bool payment)
         {
             Id = id;
             Body = body;
             Signee = signee;
-            IsSigned = false;
+            IsSigned = isSigned;
             SignedOn = signedOn;
-            Author = author;
             Shoot = shoot;
+            Payment = payment;
+        }
+
+        public void Create()
+        {
+            dal.AddContract(this);
         }
     }
 }
