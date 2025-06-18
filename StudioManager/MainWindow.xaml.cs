@@ -459,6 +459,36 @@ namespace StudioManager
             }
         }
 
+
+    
+        public void ShowNewConceptForm()
+        {
+            
+            HidePanels();
+            NewConceptNameTextBox.Text = "";
+            NewConceptDescriptionTextBox.Text = "";
+            PropSelectionListBox.UnselectAll();
+            ModelSelectionListBox.UnselectAll();
+            ShootSelectionComboBox.SelectedItem = null;
+            selectedSketchPath = null;
+            SketchPreviewImage.Source = null;
+            SketchPreviewImage.Visibility = Visibility.Collapsed;
+            SketchAddIcon.Visibility = Visibility.Visible;
+            DeleteSketchButton.Visibility = Visibility.Collapsed;
+            selectedPicturePaths.Clear();
+            currentPictureIndex = -1;
+            PicturePreviewImage.Source = null;
+            PicturePreviewImage.Visibility = Visibility.Collapsed;
+            PictureAddIcon.Visibility = Visibility.Visible;
+            DeletePictureButton.Visibility = Visibility.Collapsed;
+            ExtraPictureButton.Visibility = Visibility.Collapsed;
+            NextPictureButton.Visibility = Visibility.Collapsed;
+            PrevPictureButton.Visibility = Visibility.Collapsed;
+            PictureUploadBorder.MouseLeftButtonUp -= UploadPicture_Click;
+            PictureUploadBorder.MouseLeftButtonUp += UploadPicture_Click;
+            NewConceptForm.Visibility = Visibility.Visible;
+        }
+
         private void DeleteSketch_Click(object sender, RoutedEventArgs e)
         {
             if (!string.IsNullOrEmpty(selectedSketchPath) && File.Exists(selectedSketchPath))
