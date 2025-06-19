@@ -28,6 +28,9 @@ namespace StudioManager
             PropSelectionListBox.ItemsSource = new DAL().GetAllProps();
             ModelSelectionListBox.ItemsSource = new DAL().GetAllContacts();
             ShootSelectionComboBox.ItemsSource = new DAL().GetAllShoots();
+            //HidePanels();
+            //StartUpWindow.Visibility = Visibility.Visible;
+
         }
 
         // NAVIGATION
@@ -44,6 +47,7 @@ namespace StudioManager
             EditConceptForm.Visibility = Visibility.Collapsed;
             NewPropForm.Visibility = Visibility.Collapsed;
             EditPropForm.Visibility = Visibility.Collapsed;
+            StartUpWindow.Visibility = Visibility.Collapsed;
         }
 
         public void DashboardButton_Click(object sender, RoutedEventArgs e)
@@ -487,6 +491,7 @@ namespace StudioManager
             PictureUploadBorder.MouseLeftButtonUp -= UploadPicture_Click;
             PictureUploadBorder.MouseLeftButtonUp += UploadPicture_Click;
             NewConceptForm.Visibility = Visibility.Visible;
+            StartUpWindow.Visibility = Visibility.Collapsed;
         }
 
         private void DeleteSketch_Click(object sender, RoutedEventArgs e)
@@ -880,5 +885,20 @@ namespace StudioManager
             ProjectsDataGrid.ItemsSource = new DAL().GetAllProjects();
         }
 
+        private void DashboardBtn_Click(object sender, RoutedEventArgs e)
+        {
+            RefreshConceptOverview();
+            HidePanels(); 
+            DashboardView.Visibility = Visibility.Visible; 
+
+        }
+
+        private void ConceptBtn_Click(object sender, RoutedEventArgs e)
+        {
+            RefreshConceptOverview();
+            HidePanels();
+            NewConceptForm.Visibility = Visibility.Visible;
+
+        }
     }
 }
