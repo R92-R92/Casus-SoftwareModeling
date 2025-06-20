@@ -28,6 +28,9 @@ namespace StudioManager
             PropSelectionListBox.ItemsSource = new DAL().GetAllProps();
             ModelSelectionListBox.ItemsSource = new DAL().GetAllContacts();
             ShootSelectionComboBox.ItemsSource = new DAL().GetAllShoots();
+            //HidePanels();
+            //StartUpWindow.Visibility = Visibility.Visible;
+
         }
 
         // NAVIGATION
@@ -44,6 +47,7 @@ namespace StudioManager
             EditConceptForm.Visibility = Visibility.Collapsed;
             NewPropForm.Visibility = Visibility.Collapsed;
             EditPropForm.Visibility = Visibility.Collapsed;
+            StartUpWindow.Visibility = Visibility.Collapsed;
         }
 
         public void DashboardButton_Click(object sender, RoutedEventArgs e)
@@ -459,6 +463,37 @@ namespace StudioManager
             }
         }
 
+
+    
+        public void ShowNewConceptForm()
+        {
+            
+            HidePanels();
+            NewConceptNameTextBox.Text = "";
+            NewConceptDescriptionTextBox.Text = "";
+            PropSelectionListBox.UnselectAll();
+            ModelSelectionListBox.UnselectAll();
+            ShootSelectionComboBox.SelectedItem = null;
+            selectedSketchPath = null;
+            SketchPreviewImage.Source = null;
+            SketchPreviewImage.Visibility = Visibility.Collapsed;
+            SketchAddIcon.Visibility = Visibility.Visible;
+            DeleteSketchButton.Visibility = Visibility.Collapsed;
+            selectedPicturePaths.Clear();
+            currentPictureIndex = -1;
+            PicturePreviewImage.Source = null;
+            PicturePreviewImage.Visibility = Visibility.Collapsed;
+            PictureAddIcon.Visibility = Visibility.Visible;
+            DeletePictureButton.Visibility = Visibility.Collapsed;
+            ExtraPictureButton.Visibility = Visibility.Collapsed;
+            NextPictureButton.Visibility = Visibility.Collapsed;
+            PrevPictureButton.Visibility = Visibility.Collapsed;
+            PictureUploadBorder.MouseLeftButtonUp -= UploadPicture_Click;
+            PictureUploadBorder.MouseLeftButtonUp += UploadPicture_Click;
+            NewConceptForm.Visibility = Visibility.Visible;
+            StartUpWindow.Visibility = Visibility.Collapsed;
+        }
+
         private void DeleteSketch_Click(object sender, RoutedEventArgs e)
         {
             if (!string.IsNullOrEmpty(selectedSketchPath) && File.Exists(selectedSketchPath))
@@ -850,5 +885,20 @@ namespace StudioManager
             ProjectsDataGrid.ItemsSource = new DAL().GetAllProjects();
         }
 
+        private void DashboardBtn_Click(object sender, RoutedEventArgs e)
+        {
+            RefreshConceptOverview();
+            HidePanels(); 
+            DashboardView.Visibility = Visibility.Visible; 
+
+        }
+
+        private void ConceptBtn_Click(object sender, RoutedEventArgs e)
+        {
+            RefreshConceptOverview();
+            HidePanels();
+            NewConceptForm.Visibility = Visibility.Visible;
+
+        }
     }
 }
