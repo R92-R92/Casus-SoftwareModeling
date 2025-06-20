@@ -12,7 +12,7 @@ namespace StudioManager
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public string? Address { get; set; }
+        public Address? Address { get; set; }
         public string Description { get; set; }
         public string Sketch { get; set; }
         public List<string> Pictures { get; set; } = new List<string>();
@@ -22,7 +22,7 @@ namespace StudioManager
         new DAL dal = new DAL();
 
 
-        public Concept(int id, string? name,string address, string description, string sketch, List<Prop> props, Shoot shoot)
+        public Concept(int id, string? name,Address address, string description, string sketch, List<Prop> props, Shoot shoot)
         { 
             Id = id;
             Name = name;

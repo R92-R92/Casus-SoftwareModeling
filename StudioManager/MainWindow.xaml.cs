@@ -32,6 +32,9 @@ namespace StudioManager
 
         private Shoot? editSelectedShoot = null;
 
+        private List<string> detailPicturePaths = new();
+        private int detailCurrentPictureIndex = -1;
+        private int overlayPictureIndex = -1;
 
 
 
@@ -58,6 +61,205 @@ namespace StudioManager
             EditPropForm.Visibility = Visibility.Collapsed;
             StartUpWindow.Visibility = Visibility.Collapsed;
         }
+
+
+        private void ConceptsDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (ConceptsDataGrid.SelectedItem is Concept selected)
+            {
+                DetailName.Text = $"Name: {selected.Name}";
+                DetailDescription.Text = $"Description: {selected.Description}";
+                DetailProps.Text = $"Props: {selected.PropsText}";
+                DetailModels.Text = $"Models: {selected.ModelText}";
+
+                DetailAddress.Text = selected.Address != null
+                    ? $"Address: {selected.Address.Street} {selected.Address.HouseNumber}, {selected.Address.PostalCode} {selected.Address.City}, {selected.Address.Country}"
+                    : "Address: –";
+
+                DetailShoot.Text = selected.Shoot != null
+                    ? $"Shoot: {selected.Shoot.Date?.ToString("yyyy-MM-dd")}"
+                    : "Shoot: –";
+
+                // Sketch preview tonen of verbergen
+                if (!string.IsNullOrEmpty(selected.Sketch) && File.Exists(selected.Sketch))
+                {
+                    DetailSketchPreviewImage.Source = LoadImageWithoutLock(selected.Sketch);
+                    DetailSketchBorder.Visibility = Visibility.Visible;
+                }
+                else
+                {
+                    DetailSketchPreviewImage.Source = null;
+                    DetailSketchBorder.Visibility = Visibility.Collapsed;
+                }
+
+                // Eerste geldige afbeelding uit pictures tonen of verbergen
+                if (selected.Pictures != null && selected.Pictures.Count > 0)
+                {
+                    string firstPicture = selected.Pictures.FirstOrDefault(p => File.Exists(p));
+                    if (firstPicture != null)
+                    {
+                        detailPicturePaths = selected.Pictures.Where(File.Exists).ToList();
+                        detailCurrentPictureIndex = 0;
+                        ShowDetailPicture();
+                    }
+                    else
+                    {
+                        detailPicturePaths.Clear();
+                        detailCurrentPictureIndex = -1;
+                        ShowDetailPicture();
+                    }
+                }
+                else
+                {
+                    detailPicturePaths.Clear();
+                    detailCurrentPictureIndex = -1;
+                    ShowDetailPicture();
+                }
+            }
+            else
+            {
+                DetailName.Text = "";
+                DetailDescription.Text = "";
+                DetailProps.Text = "";
+                DetailModels.Text = "";
+                DetailAddress.Text = "";
+                DetailShoot.Text = "";
+
+                DetailSketchPreviewImage.Source = null;
+                DetailSketchBorder.Visibility = Visibility.Collapsed;
+
+                DetailPicturePreviewImage.Source = null;
+                DetailPictureBorder.Visibility = Visibility.Collapsed;
+            }
+        }
+
+        private void DetailSketchPreviewImage_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            if (DetailSketchPreviewImage.Source != null)
+            {
+                OverlaySketchImage.Source = DetailSketchPreviewImage.Source;
+                DetailSketchOverlay.Visibility = Visibility.Visible;
+                ConceptsDataGrid.IsEnabled = false;
+            }
+        }
+
+        private void OverlaySketchClose_Click(object sender, RoutedEventArgs e)
+        {
+            DetailSketchOverlay.Visibility = Visibility.Collapsed;
+            ConceptsDataGrid.IsEnabled = true;
+        }
+
+
+
+
+        private void ShowDetailPicture()
+        {
+            if (detailPicturePaths.Count > 0 && detailCurrentPictureIndex >= 0)
+            {
+                string currentPath = detailPicturePaths[detailCurrentPictureIndex];
+                if (File.Exists(currentPath))
+                {
+                    DetailPicturePreviewImage.Source = LoadImageWithoutLock(currentPath);
+                    DetailPictureBorder.Visibility = Visibility.Visible;
+                    DetailPrevPictureButton.Visibility = detailPicturePaths.Count > 1 ? Visibility.Visible : Visibility.Collapsed;
+                    DetailNextPictureButton.Visibility = detailPicturePaths.Count > 1 ? Visibility.Visible : Visibility.Collapsed;
+                }
+                else
+                {
+                    DetailPicturePreviewImage.Source = null;
+                    DetailPictureBorder.Visibility = Visibility.Collapsed;
+                }
+            }
+            else
+            {
+                DetailPicturePreviewImage.Source = null;
+                DetailPictureBorder.Visibility = Visibility.Collapsed;
+                DetailPrevPictureButton.Visibility = Visibility.Collapsed;
+                DetailNextPictureButton.Visibility = Visibility.Collapsed;
+            }
+        }
+
+        private void DetailPrevPicture_Click(object sender, RoutedEventArgs e)
+        {
+            if (detailPicturePaths.Count > 0)
+            {
+                detailCurrentPictureIndex = (detailCurrentPictureIndex - 1 + detailPicturePaths.Count) % detailPicturePaths.Count;
+                ShowDetailPicture();
+            }
+        }
+
+        private void DetailNextPicture_Click(object sender, RoutedEventArgs e)
+        {
+            if (detailPicturePaths.Count > 0)
+            {
+                detailCurrentPictureIndex = (detailCurrentPictureIndex + 1) % detailPicturePaths.Count;
+                ShowDetailPicture();
+            }
+        }
+
+        private void DetailPicturePreviewImage_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            if (detailPicturePaths.Count > 0 && detailCurrentPictureIndex >= 0)
+            {
+                overlayPictureIndex = detailCurrentPictureIndex;
+                ShowOverlayPicture();
+            }
+        }
+
+
+        private void ShowOverlayPicture()
+        {
+            if (overlayPictureIndex >= 0 && overlayPictureIndex < detailPicturePaths.Count)
+            {
+                string imagePath = detailPicturePaths[overlayPictureIndex];
+                if (File.Exists(imagePath))
+                {
+                    OverlayPictureImage.Source = LoadImageWithoutLock(imagePath);
+
+                    DetailPictureOverlay.Visibility = Visibility.Visible;
+                    ConceptsDataGrid.IsEnabled = false;
+                }
+            }
+        }
+
+        private void OverlayPrev_Click(object sender, RoutedEventArgs e)
+        {
+            if (detailPicturePaths.Count > 0)
+            {
+                overlayPictureIndex = (overlayPictureIndex - 1 + detailPicturePaths.Count) % detailPicturePaths.Count;
+                ShowOverlayPicture();
+            }
+        }
+
+        private void OverlayNext_Click(object sender, RoutedEventArgs e)
+        {
+            if (detailPicturePaths.Count > 0)
+            {
+                overlayPictureIndex = (overlayPictureIndex + 1) % detailPicturePaths.Count;
+                ShowOverlayPicture();
+            }
+        }
+
+        private void OverlayClose_Click(object sender, RoutedEventArgs e)
+        {
+            DetailPictureOverlay.Visibility = Visibility.Collapsed;
+            ConceptsDataGrid.IsEnabled = true;
+            overlayPictureIndex = -1;
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         public void DashboardButton_Click(object sender, RoutedEventArgs e)
         {
@@ -102,7 +304,6 @@ namespace StudioManager
         {
             if (sender is Button btn && btn.Tag is Shoot shoot)
             {
-                // Plus is only enabled when no shoot is selected
                 bool isEnabled = editSelectedShoot == null;
                 btn.IsEnabled = isEnabled;
                 btn.Visibility = Visibility.Visible;
@@ -114,7 +315,6 @@ namespace StudioManager
         {
             if (sender is Button btn && btn.Tag is Shoot shoot)
             {
-                // Only the selected shoot has enabled minus button
                 bool isSelected = editSelectedShoot?.Id == shoot.Id;
                 btn.IsEnabled = isSelected;
                 btn.Visibility = Visibility.Visible;
@@ -150,7 +350,11 @@ namespace StudioManager
             HidePanels();
             NewConceptNameTextBox.Text = "";
             NewConceptDescriptionTextBox.Text = "";
-            NewConceptAddressTextBox.Text = "";
+            NewAddressStreetTextBox.Text = "";
+            NewAddressHouseNumberTextBox.Text = "";
+            NewAddressPostalCodeTextBox.Text = "";
+            NewAddressCityTextBox.Text = "";
+            NewAddressCountryTextBox.Text = "";
             selectedProps.Clear();
             PropToggleList.ItemsSource = new DAL().GetAllProps().Where(p => p.IsAvailable).ToList();
             selectedModels.Clear();
@@ -324,7 +528,7 @@ namespace StudioManager
             ContactsView.Visibility = Visibility.Visible;
         }
 
-        private void AddModel_Click(object sender, RoutedEventArgs e)
+        private void AddContact_Click(object sender, RoutedEventArgs e)
         {
             if (sender is Button btn && btn.DataContext is Contact model && !selectedModels.Any(m => m.Id == model.Id))
             {
@@ -333,7 +537,7 @@ namespace StudioManager
             }
         }
 
-        private void RemoveModel_Click(object sender, RoutedEventArgs e)
+        private void RemovContact_Click(object sender, RoutedEventArgs e)
         {
             if (sender is Button btn && btn.DataContext is Contact model && selectedModels.Any(m => m.Id == model.Id))
             {
@@ -342,7 +546,7 @@ namespace StudioManager
             }
         }
 
-        private void UpdateAddModelButtonState(object sender, RoutedEventArgs e)
+        private void UpdateAddContactButtonState(object sender, RoutedEventArgs e)
         {
             if (sender is Button btn && btn.Tag is Contact model)
             {
@@ -350,7 +554,7 @@ namespace StudioManager
             }
         }
 
-        private void UpdateRemoveModelButtonState(object sender, RoutedEventArgs e)
+        private void UpdateRemoveContactButtonState(object sender, RoutedEventArgs e)
         {
             if (sender is Button btn && btn.Tag is Contact model)
             {
@@ -358,7 +562,7 @@ namespace StudioManager
             }
         }
 
-        private void EditAddModel_Click(object sender, RoutedEventArgs e)
+        private void EditAddContact_Click(object sender, RoutedEventArgs e)
         {
             if (sender is Button btn && btn.DataContext is Contact model && !editSelectedModels.Any(m => m.Id == model.Id))
             {
@@ -367,7 +571,7 @@ namespace StudioManager
             }
         }
 
-        private void EditRemoveModel_Click(object sender, RoutedEventArgs e)
+        private void EditRemoveContact_Click(object sender, RoutedEventArgs e)
         {
             if (sender is Button btn && btn.DataContext is Contact model)
             {
@@ -380,7 +584,7 @@ namespace StudioManager
             }
         }
 
-        private void EditUpdateAddModelButtonState(object sender, RoutedEventArgs e)
+        private void EditUpdateAddContactButtonState(object sender, RoutedEventArgs e)
         {
             if (sender is Button btn && btn.Tag is Contact model)
             {
@@ -388,7 +592,7 @@ namespace StudioManager
             }
         }
 
-        private void EditUpdateRemoveModelButtonState(object sender, RoutedEventArgs e)
+        private void EditUpdateRemoveContactButtonState(object sender, RoutedEventArgs e)
         {
             if (sender is Button btn && btn.Tag is Contact model)
             {
@@ -510,7 +714,10 @@ namespace StudioManager
         {
             string name = NewConceptNameTextBox.Text;
             string description = NewConceptDescriptionTextBox.Text;
-            string address = NewConceptAddressTextBox.Text;
+            Address newAddress = new Address( id: 0, street: NewAddressStreetTextBox.Text, houseNumber: NewAddressHouseNumberTextBox.Text, postalCode: NewAddressPostalCodeTextBox.Text, city: NewAddressCityTextBox.Text, country: NewAddressCountryTextBox.Text);
+
+            //newAddress.Create(); 
+
             string sketch = "";
 
             if (string.IsNullOrWhiteSpace(name))
@@ -529,7 +736,7 @@ namespace StudioManager
             List<Contact> models = selectedModels.ToList();
             Shoot? shoot = null;
 
-            Concept newConcept = new Concept(0, name, address, description, sketch, props, shoot);
+            Concept newConcept = new Concept(0, name, newAddress, description, sketch, props, shoot);
             newConcept.Models = models;
 
             string baseDir = AppDomain.CurrentDomain.BaseDirectory;
@@ -580,10 +787,16 @@ namespace StudioManager
 
         private void DeletePicture_Click(object sender, RoutedEventArgs e)
         {
+
+
             if (currentPictureIndex >= 0 && currentPictureIndex < selectedPicturePaths.Count)
             {
-                EditPicturePreviewImage.Source = null;
+
                 string fileToDelete = selectedPicturePaths[currentPictureIndex];
+
+                EditPicturePreviewImage.Source = null;
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
 
                 try
                 {
@@ -710,6 +923,12 @@ namespace StudioManager
 
         private void DeleteSketch_Click(object sender, RoutedEventArgs e)
         {
+
+            EditSketchPreviewImage.Source = null;
+            SketchPreviewImage.Source = null;
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+
             if (!string.IsNullOrEmpty(selectedSketchPath) && File.Exists(selectedSketchPath))
             {
                 try
@@ -739,6 +958,11 @@ namespace StudioManager
 
         private void EditConcept_Click(object sender, RoutedEventArgs e)
         {
+            OverlayPictureImage.Source = null;
+            OverlaySketchImage.Source = null;
+            DetailPictureOverlay.Visibility = Visibility.Collapsed;
+            DetailSketchOverlay.Visibility = Visibility.Collapsed;
+
             editModeHasDeletions = false;
             Concept? selected = null;
 
@@ -768,7 +992,22 @@ namespace StudioManager
 
             EditConceptNameTextBox.Text = selected.Name;
             EditConceptDescriptionTextBox.Text = selected.Description;
-            EditConceptAddressTextBox.Text = selected.Address;
+            if (selected.Address != null)
+            {
+                EditAddressStreetTextBox.Text = selected.Address.Street;
+                EditAddressHouseNumberTextBox.Text = selected.Address.HouseNumber;
+                EditAddressPostalCodeTextBox.Text = selected.Address.PostalCode;
+                EditAddressCityTextBox.Text = selected.Address.City;
+                EditAddressCountryTextBox.Text = selected.Address.Country;
+            }
+            else
+            {
+                EditAddressStreetTextBox.Text = "";
+                EditAddressHouseNumberTextBox.Text = "";
+                EditAddressPostalCodeTextBox.Text = "";
+                EditAddressCityTextBox.Text = "";
+                EditAddressCountryTextBox.Text = "";
+            }
 
             //EditModelSelectionListBox.SelectedItems.Clear();
             //foreach (var model in selected.Models)
@@ -831,7 +1070,22 @@ namespace StudioManager
 
             conceptBeingEdited.Name = newName;
             conceptBeingEdited.Description = EditConceptDescriptionTextBox.Text;
-            conceptBeingEdited.Address = EditConceptAddressTextBox.Text;
+            Address updatedAddress = new Address(
+    id: conceptBeingEdited.Address?.Id ?? 0,
+    street: EditAddressStreetTextBox.Text,
+    houseNumber: EditAddressHouseNumberTextBox.Text,
+    postalCode: EditAddressPostalCodeTextBox.Text,
+    city: EditAddressCityTextBox.Text,
+    country: EditAddressCountryTextBox.Text
+);
+
+            // Als het een nieuw address is, maak hem aan. Anders update.
+            if (updatedAddress.Id == 0)
+                updatedAddress.Create();
+            else
+                updatedAddress.Update();
+
+            conceptBeingEdited.Address = updatedAddress;
             conceptBeingEdited.Props = editSelectedProps.ToList();
             conceptBeingEdited.Models = editSelectedModels.ToList();
             conceptBeingEdited.Shoot = editSelectedShoot;
