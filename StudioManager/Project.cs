@@ -27,7 +27,15 @@ namespace StudioManager
         {
             dal.AddProject(this);
         }
+
+        public void Update()
+        {
+            dal.UpdateProject(this);
+        }
+
+        public void Delete()
+        {
+            dal.DeleteProject(this.Id);
+        }
     }
-
-
 }

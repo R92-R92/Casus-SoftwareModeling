@@ -34,5 +34,15 @@ namespace StudioManager
         {
             dal.AddContract(this);
         }
+
+        public void Update()
+        {
+            dal.UpdateContract(this);
+        }
+
+        public void Delete()
+        {
+            dal.DeleteContract(this.Id);
+        }
     }
 }

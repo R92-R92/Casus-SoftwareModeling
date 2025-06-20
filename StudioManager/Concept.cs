@@ -50,7 +50,12 @@ namespace StudioManager
 
         public void Update()
         {
-            new DAL().UpdateConcept(this);
+            dal.UpdateConcept(this);
+        }
+
+        public void Delete()
+        {
+            dal.DeleteConcept(this.Id);
         }
 
 
