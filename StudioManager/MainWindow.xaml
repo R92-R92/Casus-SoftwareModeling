@@ -130,7 +130,7 @@
                         <RowDefinition Height="Auto"/>
                         <!-- Label -->
                         <RowDefinition Height="Auto"/>
-                        <!-- Search + New -->
+                        <!-- Search + New Project -->
                         <RowDefinition Height="*"/>
                         <!-- DataGrid -->
                         <RowDefinition Height="Auto"/>
@@ -147,7 +147,7 @@
              HorizontalAlignment="Center"
              Margin="0,0,0,5"/>
 
-                    <!-- 2) Search Field + New Button -->
+                    <!-- 2) Search Field + New Project Button -->
                     <Grid Grid.Row="1" Margin="0,0,0,5">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
@@ -157,24 +157,24 @@
                         <!-- Search Field -->
                         <Grid Grid.Column="0" Width="200" Height="25" HorizontalAlignment="Left" VerticalAlignment="Center">
                             <TextBox x:Name="ProjectsSearchTextBox"
-                 VerticalContentAlignment="Center"
-                 Padding="2,0,0,0"
-                 TextChanged="SearchBox_Projects"/>
+               VerticalContentAlignment="Center"
+               Padding="2,0,0,0"
+               TextChanged="SearchBox_Projects"/>
                             <TextBlock x:Name="SearchPlaceholder"
-                   Text="Search projects..."
-                   Foreground="Gray"
-                   Margin="5,0,0,0"
-                   VerticalAlignment="Center"
-                   IsHitTestVisible="False"/>
+                 Text="Search projects..."
+                 Foreground="Gray"
+                 Margin="5,0,0,0"
+                 VerticalAlignment="Center"
+                 IsHitTestVisible="False"/>
                         </Grid>
 
                         <!-- New Project Button -->
                         <Button Grid.Column="1"
-              x:Name="NewProjectButton"
-              Content="New Project"
-              Width="100"
-              HorizontalAlignment="Right"
-              Click="NewProjectButton_Click"/>
+            x:Name="NewProjectButton"
+            Content="New Project"
+            Width="100"
+            HorizontalAlignment="Right"
+            Click="NewProjectButton_Click"/>
                     </Grid>
 
                     <!-- 3) DataGrid -->
@@ -188,21 +188,21 @@
             SelectionChanged="ProjectsDataGrid_SelectionChanged">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Name"
-                            Binding="{Binding Name}"
-                            Width="*"/>
+                          Binding="{Binding Name}"
+                          Width="*"/>
                             <DataGridTextColumn Header="Deadline"
-                            Binding="{Binding Deadline, StringFormat={}{0:yyyy-MM-dd}}"
-                            Width="Auto"/>
+                          Binding="{Binding Deadline, StringFormat={}{0:yyyy-MM-dd}}"
+                          Width="Auto"/>
                             <DataGridTextColumn Header="Notes"
-                            Binding="{Binding Notes}"
-                            Width="2*"/>
+                          Binding="{Binding Notes}"
+                          Width="2*"/>
                             <DataGridTemplateColumn Header="Edit" Width="Auto">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <Button Content="Edit"
-                      Width="50"
-                      Margin="2"
-                      Click="EditProject_Click"/>
+                    Width="50"
+                    Margin="2"
+                    Click="EditProject_Click"/>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
@@ -210,9 +210,9 @@
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <Button Content="Delete"
-                      Width="60"
-                      Margin="2"
-                      Click="DeleteProject_Click"/>
+                    Width="60"
+                    Margin="2"
+                    Click="DeleteProject_Click"/>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
@@ -234,14 +234,16 @@
           Padding="10"
           Margin="0,0,0,10">
                         <StackPanel>
-                            <TextBlock x:Name="DetailNameText" Text="- Name: " />
+                            <TextBlock x:Name="DetailNameText"     Text="- Name: " />
                             <TextBlock x:Name="DetailDeadlineText" Text="- Deadline: " />
+                            <TextBlock x:Name="DetailStatusText"   Text="- Status: " />
                             <TextBlock x:Name="DetailConceptsText" Text="- Linked Concepts: " />
-                            <TextBlock x:Name="DetailNotesText" Text="- Notes: " />
+                            <TextBlock x:Name="DetailNotesText"    Text="- Notes: " />
                         </StackPanel>
                     </Border>
                 </Grid>
                 <!-- ── end PROJECTS VIEW ──────────────────────────────────────── -->
+
 
 
                 <!-- ── NEW PROJECT FORM ──────────────────────────────────────── -->
@@ -300,101 +302,195 @@
       Visibility="Collapsed"
       Grid.Column="1"
       Background="#F5F5F5"
-      Margin="10">
+      Margin="10"
+      MinWidth="600"
+      MinHeight="500">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
-                        <!-- Name -->
+                        <!-- Header -->
                         <RowDefinition Height="Auto"/>
-                        <!-- Deadline -->
+                        <!-- Fields -->
                         <RowDefinition Height="Auto"/>
-                        <!-- Notes -->
+                        <!-- Dual‐list -->
+                        <RowDefinition Height="Auto"/>
+                        <!-- Actions -->
                         <RowDefinition Height="*"/>
-                        <!-- Dual-list -->
+                        <!-- Spacer -->
                         <RowDefinition Height="Auto"/>
-                        <!-- Buttons -->
+                        <!-- Save/Cancel -->
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
-                    <!-- Name -->
-                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Name:" Width="100" VerticalAlignment="Center"/>
-                    <TextBox  Grid.Row="0" Grid.Column="1" x:Name="EditProjectNameTextBox" Width="250" Height="25"/>
+                    <!-- Header -->
+                    <TextBlock Grid.Row="0"
+             Grid.ColumnSpan="2"
+             Text="Edit Project"
+             FontSize="18"
+             FontWeight="Bold"
+             HorizontalAlignment="Center"
+             Margin="0,0,0,15"/>
 
-                    <!-- Deadline -->
-                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Deadline:" Width="100" VerticalAlignment="Center"/>
-                    <DatePicker Grid.Row="1" Grid.Column="1" x:Name="EditProjectDeadlineDatePicker" Width="250"/>
-
-                    <!-- Notes -->
-                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Notes:" Width="100" VerticalAlignment="Top"/>
-                    <TextBox  Grid.Row="2" Grid.Column="1" x:Name="EditProjectNotesTextBox"
-            Width="250" Height="100"
-            TextWrapping="Wrap" AcceptsReturn="True"/>
-
-                    <!-- Concepts dual-list -->
-                    <Grid Grid.Row="3" Grid.ColumnSpan="2" Margin="0,10">
+                    <!-- Fields: Name, Deadline, Notes, Status -->
+                    <Grid Grid.Row="1" Grid.ColumnSpan="2" Margin="0,0,0,15">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
 
-                        <!-- Available Concepts -->
-                        <StackPanel Grid.Column="0">
-                            <TextBlock Text="Available Concepts"
-                 FontWeight="Bold"
-                 Margin="0,0,0,5"/>
-                            <ListBox x:Name="AllConceptsListBox"
-               DisplayMemberPath="Name"
-               Height="150"
-               SelectionMode="Extended"/>
-                        </StackPanel>
+                        <!-- Name -->
+                        <TextBlock Grid.Row="0" Grid.Column="0"
+             Text="Name:"
+             VerticalAlignment="Center"
+             Margin="0,0,5,0"/>
+                        <TextBox Grid.Row="0" Grid.Column="1"
+           x:Name="EditProjectNameTextBox"
+           Width="200"
+           Height="25"
+           Margin="0,0,0,2"/>
 
-                        <!-- Add/Remove Buttons -->
-                        <StackPanel Grid.Column="1"
-                Orientation="Vertical"
-                VerticalAlignment="Center"
-                Margin="10,0">
-                            <Button Content="»"
-              Width="40"
-              Click="AddConceptsToProject_Click"
-              Margin="0,2"/>
-                            <Button Content="«"
-              Width="40"
-              Click="RemoveConceptsFromProject_Click"
-              Margin="0,2"/>
-                        </StackPanel>
+                        <!-- Deadline -->
+                        <TextBlock Grid.Row="1" Grid.Column="0"
+             Text="Deadline:"
+             VerticalAlignment="Center"
+             Margin="0,0,5,0"/>
+                        <DatePicker Grid.Row="1" Grid.Column="1"
+              x:Name="EditProjectDeadlineDatePicker"
+              Width="120"
+              Height="25"
+              Margin="0,0,0,2"/>
 
-                        <!-- Assigned to this Project -->
-                        <StackPanel Grid.Column="2">
-                            <TextBlock Text="Assigned Concepts"
-                 FontWeight="Bold"
-                 Margin="0,0,0,5"/>
-                            <ListBox x:Name="ProjectConceptsListBox"
-               DisplayMemberPath="Name"
-               Height="150"
-               SelectionMode="Extended"/>
-                        </StackPanel>
+                        <!-- Notes -->
+                        <TextBlock Grid.Row="2" Grid.Column="0"
+             Text="Notes:"
+             VerticalAlignment="Top"
+             Margin="0,0,5,0"/>
+                        <TextBox Grid.Row="2" Grid.Column="1"
+           x:Name="EditProjectNotesTextBox"
+           Width="200"
+           Height="60"
+           TextWrapping="Wrap"
+           AcceptsReturn="True"
+           Margin="0,0,0,2"/>
+
+                        <!-- Status -->
+                        <TextBlock Grid.Row="3" Grid.Column="0"
+             Text="Status:"
+             VerticalAlignment="Center"
+             Margin="0,0,5,0"/>
+                        <TextBlock Grid.Row="3" Grid.Column="1"
+             x:Name="EditProjectStatusText"
+             VerticalAlignment="Center"
+             FontWeight="SemiBold"/>
                     </Grid>
 
-                    <!-- Buttons -->
-                    <Grid Grid.Row="4" Grid.ColumnSpan="2" Margin="0,20,0,0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
+                    <!-- Dual-list -->
+                    <StackPanel Grid.Row="2"
+              Grid.ColumnSpan="2"
+              Margin="0,0,0,15">
+                        <TextBlock Text="Manage Concepts"
+               FontWeight="Bold"
+               Margin="0,0,0,5"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Available"
+                   FontStyle="Italic"
+                   Margin="0,0,0,3"/>
+                                <ListBox x:Name="AllConceptsListBox"
+                 DisplayMemberPath="Name"
+                 Height="120"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="1"
+                  Orientation="Vertical"
+                  VerticalAlignment="Center"
+                  Margin="10,0,10,0">
+                                <Button Content="»"
+                Width="30"
+                Click="AddConceptsToProject_Click"
+                Margin="0,2,0,2"/>
+                                <Button Content="«"
+                Width="30"
+                Click="RemoveConceptsFromProject_Click"
+                Margin="0,2,0,2"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="Assigned"
+                   FontStyle="Italic"
+                   Margin="0,0,0,3"/>
+                                <ListBox x:Name="ProjectConceptsListBox"
+                 DisplayMemberPath="Name"
+                 Height="120"/>
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+
+                    <!-- State-transition buttons -->
+                    <UniformGrid Grid.Row="3"
+               Grid.ColumnSpan="2"
+               Columns="5"
+               Margin="0,0,0,15"
+               HorizontalAlignment="Center">
+                        <Button x:Name="PutOnHoldButton"
+            Content="Put On Hold"
+            Click="PutOnHoldButton_Click"
+            IsEnabled="False"
+            Margin="5,0"/>
+                        <Button x:Name="ResumeButton"
+            Content="Resume"
+            Click="ResumeButton_Click"
+            IsEnabled="False"
+            Margin="5,0"/>
+                        <Button x:Name="CompleteButton"
+            Content="Complete"
+            Click="CompleteButton_Click"
+            IsEnabled="False"
+            Margin="5,0"/>
+                        <Button x:Name="CancelProjectButton"
+            Content="Cancel"
+            Click="CancelProjectButton_Click"
+            IsEnabled="False"
+            Margin="5,0"/>
+                        <Button x:Name="ArchiveButton"
+            Content="Archive"
+            Click="ArchiveButton_Click"
+            IsEnabled="False"
+            Margin="5,0"/>
+                    </UniformGrid>
+
+                    <!-- Save & Cancel -->
+                    <StackPanel Grid.Row="5"
+              Grid.ColumnSpan="2"
+              Orientation="Horizontal"
+              HorizontalAlignment="Right"
+              Margin="0,10,0,0">
                         <Button Content="Save"
             Width="100"
-            HorizontalAlignment="Left"
+            Margin="5,0"
             Click="SaveEditProject_Click"/>
                         <Button Content="Cancel"
             Width="100"
-            HorizontalAlignment="Right"
+            Margin="5,0"
             Click="CancelEditProject_Click"/>
-                    </Grid>
+                    </StackPanel>
                 </Grid>
                 <!-- ── end EDIT PROJECT FORM ─────────────────────────────────── -->
+
 
 
                 <!-- SHOOTS -->

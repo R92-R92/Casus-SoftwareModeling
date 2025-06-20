@@ -10,6 +10,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Collections.ObjectModel;
+using static StudioManager.Project;
 
 
 namespace StudioManager
@@ -1105,18 +1106,14 @@ private void NewProjectButton_Click(object sender, RoutedEventArgs e)
         private void EditProject_Click(object sender, RoutedEventArgs e)
         {
             var selected = ProjectsDataGrid.SelectedItem as Project;
-            if (selected == null)
-            {
-                MessageBox.Show("Please select a project to edit.", "No Selection", MessageBoxButton.OK, MessageBoxImage.Information);
-                return;
-            }
+            if (selected == null) return;
 
             projectBeingEdited = selected;
-
-            // Basic fields
             EditProjectNameTextBox.Text = selected.Name;
             EditProjectDeadlineDatePicker.SelectedDate = selected.Deadline;
             EditProjectNotesTextBox.Text = selected.Notes;
+            EditProjectStatusText.Text = selected.State.ToString();
+
 
             // ─── Populate dual-list boxes ──────────────────────────────
             var all = new DAL().GetAllConcepts();
@@ -1162,7 +1159,6 @@ private void NewProjectButton_Click(object sender, RoutedEventArgs e)
         }
 
 
-        // Save changes back to the database
         private void SaveEditProject_Click(object sender, RoutedEventArgs e)
         {
             if (projectBeingEdited == null)
@@ -1182,17 +1178,24 @@ private void NewProjectButton_Click(object sender, RoutedEventArgs e)
             projectBeingEdited.Deadline = EditProjectDeadlineDatePicker.SelectedDate;
             projectBeingEdited.Notes = EditProjectNotesTextBox.Text;
 
-            // ─── NEW: capture the selected concepts ───
-            var assigned = ((ObservableCollection<Concept>)ProjectConceptsListBox.ItemsSource!);
+            var assigned = (ObservableCollection<Concept>)ProjectConceptsListBox.ItemsSource!;
             projectBeingEdited.Concepts = assigned.ToList();
-            // ──────────────────────────────────────────────────────────
 
-            projectBeingEdited.Update();
+            if (projectBeingEdited.State == ProjectState.Created && projectBeingEdited.Concepts.Any())
+            {
+                projectBeingEdited.Activate();
+            }
+            else
+            {
+                projectBeingEdited.Update();
+            }
+
             projectBeingEdited = null;
             RefreshProjectOverview();
             HidePanels();
             ProjectsView.Visibility = Visibility.Visible;
         }
+
         // Cancel out of the edit‐project form
         private void CancelEditProject_Click(object sender, RoutedEventArgs e)
         {
@@ -1230,26 +1233,114 @@ private void NewProjectButton_Click(object sender, RoutedEventArgs e)
             var project = ProjectsDataGrid.SelectedItem as Project;
             if (project == null)
             {
-                // Clear if nothing selected
                 DetailNameText.Text = "- Name: ";
                 DetailDeadlineText.Text = "- Deadline: ";
+                DetailStatusText.Text = "- Status: ";
                 DetailConceptsText.Text = "- Linked Concepts: ";
                 DetailNotesText.Text = "- Notes: ";
+                PutOnHoldButton.IsEnabled = false;
+                CompleteButton.IsEnabled = project != null && project.State == ProjectState.Active;
+                CancelProjectButton.IsEnabled = project != null && project.State != ProjectState.Archived;
+                ArchiveButton.IsEnabled = project != null &&
+                                                    (project.State == ProjectState.Completed || project.State == ProjectState.Cancelled);
+
+                ResumeButton.IsEnabled = false;
                 return;
             }
 
-            // Fill in the details
             DetailNameText.Text = $"- Name: {project.Name}";
-            DetailDeadlineText.Text = $"- Deadline: {project.Deadline?.ToString("yyyy-MM-dd")}";
+            DetailDeadlineText.Text = $"- Deadline: {project.Deadline:yyyy-MM-dd}";
+            DetailStatusText.Text = $"- Status: {project.State}";
+            var names = project.Concepts.Any()
+                        ? string.Join(", ", project.Concepts.Select(c => c.Name))
+                        : "(none)";
+            DetailConceptsText.Text = $"- Linked Concepts: {names}";
+            DetailNotesText.Text = $"- Notes: {project.Notes}";
 
-            // Build comma-separated list of concept names
-            var conceptNames = project.Concepts != null && project.Concepts.Any()
-                ? string.Join(", ", project.Concepts.Select(c => c.Name))
-                : "(none)";
-            DetailConceptsText.Text = $"- Linked Concepts: {conceptNames}";
-
-            DetailNotesText.Text = $"- Notes: {project.Notes ?? ""}";
+            PutOnHoldButton.IsEnabled = project.State == ProjectState.Active;
+            ResumeButton.IsEnabled = project.State == ProjectState.OnHold;
         }
+
+        private void PutOnHoldButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (ProjectsDataGrid.SelectedItem is Project project)
+            {
+                try
+                {
+                    project.PutOnHold();
+                    RefreshProjectOverview();
+                }
+                catch (InvalidOperationException ex)
+                {
+                    MessageBox.Show(ex.Message, "Cannot Put On Hold", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+            }
+        }
+
+        private void ResumeButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (ProjectsDataGrid.SelectedItem is Project project)
+            {
+                try
+                {
+                    project.Resume();
+                    RefreshProjectOverview();
+                }
+                catch (InvalidOperationException ex)
+                {
+                    MessageBox.Show(ex.Message, "Cannot Resume", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+            }
+        }
+        private void CompleteButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (ProjectsDataGrid.SelectedItem is Project p)
+            {
+                try
+                {
+                    p.Complete();
+                    RefreshProjectOverview();
+                }
+                catch (InvalidOperationException ex)
+                {
+                    MessageBox.Show(ex.Message, "Cannot Complete", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+            }
+        }
+
+        private void CancelProjectButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (ProjectsDataGrid.SelectedItem is Project p)
+            {
+                try
+                {
+                    p.Cancel();
+                    RefreshProjectOverview();
+                }
+                catch (InvalidOperationException ex)
+                {
+                    MessageBox.Show(ex.Message, "Cannot Cancel", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+            }
+        }
+
+        private void ArchiveButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (ProjectsDataGrid.SelectedItem is Project p)
+            {
+                try
+                {
+                    p.Archive();
+                    RefreshProjectOverview();
+                }
+                catch (InvalidOperationException ex)
+                {
+                    MessageBox.Show(ex.Message, "Cannot Archive", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+            }
+        }
+
+
 
     }
 }
