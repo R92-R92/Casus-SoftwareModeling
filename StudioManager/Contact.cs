@@ -36,5 +36,15 @@ namespace StudioManager
         {
             dal.AddContact(this);
         }
+
+        public void Update()
+        { 
+            dal.UpdateContact(this); 
+        }
+
+        public void Delete()
+        {
+            dal.DeleteContact(this.Id);
+        }
     }
 }

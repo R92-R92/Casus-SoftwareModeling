@@ -692,7 +692,7 @@ namespace StudioManager
                     return;
                 }
 
-                new DAL().DeleteConcept(concept.Id);
+                concept.Delete();
 
                 string baseDir = AppDomain.CurrentDomain.BaseDirectory;
                 string rootPath = Directory.GetParent(baseDir)!.Parent!.Parent!.Parent!.Parent!.FullName;
@@ -823,7 +823,7 @@ namespace StudioManager
 
             if (result == MessageBoxResult.Yes)
             {
-                new DAL().DeleteProp(selected.Id);
+                selected.Delete();
                 RefreshPropOverview();
             }
         }

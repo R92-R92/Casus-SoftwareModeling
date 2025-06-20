@@ -37,5 +37,10 @@ namespace StudioManager
         {
             dal.UpdateProp(this);
         }
+
+        public void Delete()
+        {
+            dal.DeleteProp(this.Id);
+        }
     }
 }

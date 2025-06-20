@@ -27,5 +27,15 @@ namespace StudioManager
         {
             dal.AddShoot(this);
         }
+        
+        public void Update()
+        {
+            dal.UpdateShoot(this);
+        }
+
+        public void Delete()
+        {
+            dal.DeleteShoot(this.Id);
+        }
     }
 }

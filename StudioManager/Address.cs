@@ -33,5 +33,15 @@ namespace StudioManager
         {
             dal.AddAddress(this);
         }
+
+        public void Update()
+        {
+            dal.UpdateAddress(this);
+        }
+
+        public void Delete()
+        {
+            dal.DeleteAddress(this.Id);
+        }
     }
 }
