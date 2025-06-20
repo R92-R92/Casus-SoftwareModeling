@@ -54,7 +54,7 @@
             <Grid>
 
                 <!-- DASHBOARD VIEW -->
-                <Grid x:Name="DashboardView" Visibility="Visible">
+                <Grid x:Name="DashboardView" Visibility="Collapsed">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="*"/>
@@ -972,58 +972,26 @@
             </Grid>
             
         </Grid>
+        
+        
         <!-- ==== STARTUP OVERLAY ==== -->
-        <Border x:Name="StartUpWindow"
-        Grid.Column="0"
-        Grid.ColumnSpan="2"
-        Panel.ZIndex="100"
-        Background="#F5F5F5"
-        CornerRadius="10"
-        Margin="10"
-        Padding="10">
+        <Border x:Name="StartUpWindow" Visibility="Visible" Grid.Column="0" Grid.ColumnSpan="2" Panel.ZIndex="100" Background="#F5F5F5" CornerRadius="10" Margin="10" Padding="10">
             <Grid>
                 <!-- je eigen background transparant laten, want de Border voert de styling uit -->
-                <StackPanel VerticalAlignment="Center"
-                    HorizontalAlignment="Center"
-                    Width="400">
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Width="400">
                     <!-- Titel en subtitel -->
-                    <TextBlock Text="Miel Document Management Application"
-                       FontSize="20"
-                       FontWeight="Bold"
-                       TextAlignment="Center"
-                       Margin="0,0,0,5"/>
-                    <TextBlock Text="M.D.M.A"
-                       FontSize="14"
-                       Foreground="Gray"
-                       TextAlignment="Center"
-                       Margin="0,0,0,20"/>
+                    <TextBlock Text="Miel Document Management Application" FontSize="20" FontWeight="Bold"  TextAlignment="Center" Margin="0,0,0,5"/>
+                    <TextBlock Text="M.D.M.A" FontSize="14" Foreground="Gray" TextAlignment="Center" Margin="0,0,0,20"/>
+
+                    <!-- Brain dump knop --> 
+                    <Button Content="Brain dump / Idee opslaan"  Height="50" FontSize="16" Click="NewConceptButton_Click" Margin="0,0,0,5"/>
+
+                    <TextBlock Text="Open het hoofdscherm van de applicatie waar je projecten, shoots, props en meer kunt beheren." FontSize="12" TextWrapping="Wrap" TextAlignment="Center" Foreground="DarkGray" Margin="0,0,0,20"/>
 
                     <!-- Go naar Dashboard knop -->
-                    <Button Content="Brain dump / Idee opslaan"
-                            Height="50"
-                            FontSize="16"
-                            Click="ConceptBtn_Click"
-                            Margin="0,0,0,5"/>
+                    <Button Content="Ga naar Dashboard" Height="50" FontSize="16" Click="DashboardButton_Click" Margin="0,0,0,5"/>
 
-                    <TextBlock Text="Open het hoofdscherm van de applicatie waar je projecten, shoots, props en meer kunt beheren."
-                               FontSize="12"
-                               TextWrapping="Wrap"
-                               TextAlignment="Center"
-                               Foreground="DarkGray"
-                               Margin="0,0,0,20"/>
-
-                    <!-- Brain dump knop -->
-                    <Button Content="Ga naar Dashboard"
-                            Height="50"
-                            FontSize="16"
-                            Click="DashboardBtn_Click"
-                            Margin="0,0,0,5"/>
-
-                    <TextBlock Text="Gebruik dit om direct een concept aan te maken als je snel een idee hebt."
-                       FontSize="12"
-                       TextWrapping="Wrap"
-                       TextAlignment="Center"
-                       Foreground="DarkGray"/>
+                    <TextBlock Text="Gebruik dit om direct een concept aan te maken als je snel een idee hebt." FontSize="12" TextWrapping="Wrap" TextAlignment="Center" Foreground="DarkGray"/>
                 </StackPanel>
             </Grid>
         </Border>
