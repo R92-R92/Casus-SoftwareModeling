@@ -54,7 +54,7 @@
             <Grid>
 
                 <!-- DASHBOARD VIEW -->
-                <Grid x:Name="DashboardView" Visibility="Collapsed">
+                <Grid x:Name="DashboardView" Visibility="Visible">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="*"/>
@@ -82,10 +82,7 @@
                                 <Grid Grid.Column="0" Width="200" Height="25" HorizontalAlignment="Left" VerticalAlignment="Center">
                                     <TextBox x:Name="DashboardConceptSearchTextBox" VerticalContentAlignment="Center" Padding="2,0,0,0" TextChanged="SearchBox_DashboardConcepts"/>
                                     <TextBlock x:Name="DashboardConceptSearchPlaceholder" Text="Search concepts..." Foreground="Gray" Margin="5,0,0,0" VerticalAlignment="Center" IsHitTestVisible="False" Visibility="Visible"/>
-                                </Grid>
-
-                                <!-- Button -->
-                                <Button Grid.Column="1" Content="New Concept" Width="100" Margin="10,0,0,0" HorizontalAlignment="Right" Click="NewConceptButton_Click"/>
+                                </Grid>                              
                             </Grid>
 
                             <!-- Tabel -->
@@ -129,14 +126,16 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="2*"/>
-                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="0.6*"/>
                     </Grid.RowDefinitions>
 
+                    <!-- Project Overview Label -->
+                    <TextBlock Grid.Row="0" Text="Project Overview" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center" Margin="0,0,0,5"/>
+
                     <!-- Search Field (left) + New Project Button (right) -->
-                    <Grid Grid.Row="0" Margin="0,0,0,5">
+                    <Grid Grid.Row="1" Margin="0,0,0,5">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
@@ -152,8 +151,7 @@
                         <Button Grid.Column="1" Content="New Project" Width="100" HorizontalAlignment="Right"/>
                     </Grid>
 
-                    <!-- Project Overview Label -->
-                    <TextBlock Grid.Row="1" Text="Project Overview" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center" Margin="0,0,0,5"/>
+                 
 
                     <!-- Project Overview Table -->
                         <DataGrid x:Name="ProjectsDataGrid" Grid.Row="2" AutoGenerateColumns="False" CanUserAddRows="False" HeadersVisibility="Column" RowHeaderWidth="0" Margin="0,0,0,10">
@@ -191,17 +189,6 @@
                             <TextBlock Text="- Notes: [Notes about the project]"/>
                         </StackPanel>
                     </Border>
-
-                    <!-- Save / Cancel Buttons -->
-                    <Grid Grid.Row="5" Margin="0,0,0,0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-
-                        <Button Content="Save" Width="100" HorizontalAlignment="Left" Grid.Column="0" Margin="100,0"/>
-                        <Button Content="Cancel" Width="100" HorizontalAlignment="Right" Grid.Column="1" Margin="100,0"/>
-                    </Grid>
                 </Grid>
 
                 <!-- SHOOTS -->
@@ -209,14 +196,16 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="2*"/>
-                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="0.6*"/>
                     </Grid.RowDefinitions>
 
+                    <!-- Shoot Overview Label -->
+                    <TextBlock Grid.Row="0" Text="Shoot Overview" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center" Margin="0,0,0,5"/>
+
                     <!-- Search Field (left) + New Shoot Button (right) -->
-                    <Grid Grid.Row="0" Margin="0,0,0,5">
+                    <Grid Grid.Row="1" Margin="0,0,0,5">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
@@ -232,8 +221,7 @@
                         <Button Grid.Column="1" Content="New Shoot" Width="100" HorizontalAlignment="Right"/>
                     </Grid>
 
-                    <!-- Shoot Overview Label -->
-                    <TextBlock Grid.Row="1" Text="Shoot Overview" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center" Margin="0,0,0,5"/>
+
 
                     <!-- Shoot Overview Table -->
                     <DataGrid x:Name="ShootsDataGrid" Grid.Row="2" AutoGenerateColumns="False" CanUserAddRows="False" HeadersVisibility="Column" RowHeaderWidth="0" Margin="0,0,0,10">
@@ -272,17 +260,6 @@
                             <TextBlock Text="- Linked Concepts: [Concept A, Concept B]"/>
                         </StackPanel>
                     </Border>
-
-                    <!-- Save / Cancel Buttons -->
-                    <Grid Grid.Row="5" Margin="0,0,0,0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-
-                        <Button Content="Save" Width="100" HorizontalAlignment="Left" Grid.Column="0" Margin="100,0"/>
-                        <Button Content="Cancel" Width="100" HorizontalAlignment="Right" Grid.Column="1" Margin="100,0"/>
-                    </Grid>
                 </Grid>
 
                 <!-- CONCEPTS -->
@@ -290,14 +267,16 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="2*"/>
-                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="0.6*"/>
                     </Grid.RowDefinitions>
 
+                    <!-- Concept Overview Label -->
+                    <TextBlock Grid.Row="0" Text="Concept Overview" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center" Margin="0,0,0,5"/>
+
                     <!-- Search Field (left) + New Concept Button (right) -->
-                    <Grid Grid.Row="0" Margin="0,0,0,5">
+                    <Grid Grid.Row="1" Margin="0,0,0,5">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
@@ -312,9 +291,6 @@
                         <!-- New Concept Button -->
                         <Button Grid.Column="1" Content="New Concept" Width="100" HorizontalAlignment="Right" Click="NewConceptButton_Click"/>
                     </Grid>
-
-                    <!-- Concept Overview Label -->
-                    <TextBlock Grid.Row="1" Text="Concept Overview" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center" Margin="0,0,0,5"/>
 
                     <!-- Concept Overview Table -->
                     <DataGrid x:Name="ConceptsDataGrid" Grid.Row="2" AutoGenerateColumns="False" CanUserAddRows="False" HeadersVisibility="Column" RowHeaderWidth="0" Margin="0,0,0,10" ScrollViewer.CanContentScroll="False">
@@ -359,17 +335,6 @@
                             <TextBlock Text="- Linked Shoots: [Shoot A, Shoot B]"/>
                         </StackPanel>
                     </Border>
-
-                    <!-- Save / Cancel Buttons -->
-                    <Grid Grid.Row="5" Margin="0,0,0,0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-
-                        <Button Content="Save" Width="100" HorizontalAlignment="Left" Grid.Column="0" Margin="100,0"/>
-                        <Button Content="Cancel" Width="100" HorizontalAlignment="Right" Grid.Column="1" Margin="100,0"/>
-                    </Grid>
                 </Grid>
 
                 <!-- PROPS -->
@@ -377,14 +342,16 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="2*"/>
-                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="0.6*"/>
                     </Grid.RowDefinitions>
 
+                    <!-- Prop Overview Label -->
+                    <TextBlock Grid.Row="0" Text="Prop Overview" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center" Margin="0,0,0,5"/>
+
                     <!-- Search Field (left) + New Prop Button (right) -->
-                    <Grid Grid.Row="0" Margin="0,0,0,5">
+                    <Grid Grid.Row="1" Margin="0,0,0,5">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
@@ -399,9 +366,6 @@
                         <!-- New Prop Button -->
                         <Button Grid.Column="1" Content="New Prop" Width="100" HorizontalAlignment="Right" Click="NewPropButton_Click"/>
                     </Grid>
-
-                    <!-- Prop Overview Label -->
-                    <TextBlock Grid.Row="1" Text="Prop Overview" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center" Margin="0,0,0,5"/>
 
                     <!-- Prop Overview Table -->
                     <DataGrid x:Name="PropsDataGrid" Grid.Row="2" AutoGenerateColumns="False" CanUserAddRows="False" HeadersVisibility="Column" RowHeaderWidth="0" Margin="0,0,0,10">
@@ -437,17 +401,6 @@
                             <TextBlock Text="- Available: [Yes/No]"/>
                         </StackPanel>
                     </Border>
-
-                    <!-- Save / Cancel Buttons -->
-                    <Grid Grid.Row="5" Margin="0,0,0,0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-
-                        <Button Content="Save" Width="100" HorizontalAlignment="Left" Grid.Column="0" Margin="100,0"/>
-                        <Button Content="Cancel" Width="100" HorizontalAlignment="Right" Grid.Column="1" Margin="100,0"/>
-                    </Grid>
                 </Grid>
 
                 <!-- CONTACTS -->
@@ -455,14 +408,16 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="2*"/>
-                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="0.6*"/>
                     </Grid.RowDefinitions>
 
+                    <!-- Contact Overview Label -->
+                    <TextBlock Grid.Row="0" Text="Contact Overview" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center" Margin="0,0,0,5"/>
+
                     <!-- Search Field (left) + New Contact Button (right) -->
-                    <Grid Grid.Row="0" Margin="0,0,0,5">
+                    <Grid Grid.Row="1" Margin="0,0,0,5">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
@@ -477,9 +432,6 @@
                         <!-- New Contact Button -->
                         <Button Grid.Column="1" Content="New Contact" Width="100" HorizontalAlignment="Right"/>
                     </Grid>
-
-                    <!-- Contact Overview Label -->
-                    <TextBlock Grid.Row="1" Text="Contact Overview" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center" Margin="0,0,0,5"/>
 
                     <!-- Contact Overview Table -->
                     <DataGrid x:Name="ContactsDataGrid" Grid.Row="2" AutoGenerateColumns="False" CanUserAddRows="False" HeadersVisibility="Column" RowHeaderWidth="0" Margin="0,0,0,10">
@@ -523,17 +475,6 @@
                             <TextBlock Text="- Linked Concepts: [Concept A, Concept B]"/>
                         </StackPanel>
                     </Border>
-
-                    <!-- Save / Cancel Buttons -->
-                    <Grid Grid.Row="5" Margin="0,0,0,0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-
-                        <Button Content="Save" Width="100" HorizontalAlignment="Left" Grid.Column="0" Margin="100,0"/>
-                        <Button Content="Cancel" Width="100" HorizontalAlignment="Right" Grid.Column="1" Margin="100,0"/>
-                    </Grid>
                 </Grid>
             </Grid>
         </Border>
@@ -663,18 +604,11 @@
                     <TextBlock Text="Select Props:" Width="100" VerticalAlignment="Top"/>
                     <ListBox x:Name="PropSelectionListBox" SelectionMode="Multiple" DisplayMemberPath="Name" Height="150" Width="250"/>
                 </StackPanel>
-                
-                <!-- Select Shoot -->
-                <StackPanel Orientation="Horizontal" Grid.Row="2" Grid.Column="1" Margin="10,5,0,5">
-                    <TextBlock Text="Select Shoot:" Width="100" VerticalAlignment="Top"/>
-                    <ListBox x:Name="ShootSelectionComboBox" DisplayMemberPath="Date" Height="150" Width="250"/>
-                </StackPanel>
             </Grid>
 
             <!-- Sketch + Pictures -->
             <Grid Grid.Row="2" Margin="20,10,20,0">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
@@ -696,35 +630,6 @@
                             <TextBlock x:Name="SketchAddIcon" Text="+" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Visible"/>
                             <Button x:Name="DeleteSketchButton" Content="X" Width="20" Height="20" HorizontalAlignment="Right" VerticalAlignment="Top"
                         Visibility="Collapsed" Click="DeleteSketch_Click" Background="Transparent" BorderThickness="0" Foreground="Black"
-                        FontWeight="Bold" Cursor="Hand"/>
-                        </Grid>
-                    </Border>
-                </Grid>
-
-                <!-- Pictures -->
-                <Grid Grid.Column="1" Margin="10,0,0,0">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
-
-                    <TextBlock Text="Pictures" FontWeight="Bold" Margin="0,0,0,5"/>
-                    <Border Grid.Row="1" BorderBrush="Gray" BorderThickness="1" Background="White" CornerRadius="5"
-                MouseLeftButtonUp="UploadPicture_Click" x:Name="PictureUploadBorder" VerticalAlignment="Stretch">
-                        <Grid>
-                            <Image x:Name="PicturePreviewImage" Stretch="Uniform" Visibility="Collapsed"/>
-                            <TextBlock x:Name="PictureAddIcon" Text="+" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Visible" Cursor="Hand"/>
-                            <Button x:Name="DeletePictureButton" Content="X" Width="20" Height="20" HorizontalAlignment="Right" VerticalAlignment="Top"
-                        Visibility="Collapsed" Click="DeletePicture_Click" Background="Transparent" BorderThickness="0" Foreground="Black"
-                        FontWeight="Bold" Cursor="Hand"/>
-                            <Button x:Name="ExtraPictureButton" Content="+" Width="20" Height="20" HorizontalAlignment="Left" VerticalAlignment="Top"
-                        Visibility="Collapsed" Click="UploadPicture_Click" Background="Transparent" BorderThickness="0" Foreground="Black"
-                        FontWeight="Bold" FontSize="16" Cursor="Hand"/>
-                            <Button x:Name="PrevPictureButton" Content="◄" Width="20" Height="20" HorizontalAlignment="Left" VerticalAlignment="Center"
-                        Visibility="Collapsed" Click="PrevPicture_Click" Background="Transparent" BorderThickness="0" FontWeight="Bold"
-                        Cursor="Hand" Margin="0,0,25,0"/>
-                            <Button x:Name="NextPictureButton" Content="►" Width="20" Height="20" HorizontalAlignment="Right" VerticalAlignment="Center"
-                        Margin="25,0,0,0" Visibility="Collapsed" Click="NextPicture_Click" Background="Transparent" BorderThickness="0"
                         FontWeight="Bold" Cursor="Hand"/>
                         </Grid>
                     </Border>
@@ -883,7 +788,7 @@
                 <Button Content="Save Changes" Width="100" HorizontalAlignment="Left" Grid.Column="0" Margin="110,10"
                 Click="SaveEditConcept_Click"/>
                 <Button Content="Cancel" Width="100" HorizontalAlignment="Right" Grid.Column="1" Margin="110,10"
-                Click="ConceptsButton_Click"/>
+                Click="CancelEditConcept_Click"/>
             </Grid>
         </Grid>
 
@@ -975,7 +880,7 @@
         
         
         <!-- ==== STARTUP OVERLAY ==== -->
-        <Border x:Name="StartUpWindow" Visibility="Visible" Grid.Column="0" Grid.ColumnSpan="2" Panel.ZIndex="100" Background="#F5F5F5" CornerRadius="10" Margin="10" Padding="10">
+        <Border x:Name="StartUpWindow" Visibility="Collapsed" Grid.Column="0" Grid.ColumnSpan="2" Panel.ZIndex="100" Background="#F5F5F5" CornerRadius="10" Margin="10" Padding="10">
             <Grid>
                 <!-- je eigen background transparant laten, want de Border voert de styling uit -->
                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Width="400">
