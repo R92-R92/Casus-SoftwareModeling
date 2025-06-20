@@ -20,9 +20,15 @@ namespace StudioManager
         private Concept? conceptBeingEdited = null;
         private Prop? propBeingEdited = null;
         private bool editModeHasDeletions = false;
+
+
         private List<Prop> selectedProps = new();
         private List<Prop> editSelectedProps = new();
         private string? returnToView = null;
+
+        private List<Contact> selectedModels = new();
+        private List<Contact> editSelectedModels = new();
+
 
 
 
@@ -33,7 +39,6 @@ namespace StudioManager
         {
             InitializeComponent();
             RefreshConceptOverview();
-            ModelSelectionListBox.ItemsSource = new DAL().GetAllContacts();
         }
 
         // NAVIGATION
@@ -103,7 +108,8 @@ namespace StudioManager
             NewConceptAddressTextBox.Text = "";
             selectedProps.Clear();
             PropToggleList.ItemsSource = new DAL().GetAllProps().Where(p => p.IsAvailable).ToList();
-            ModelSelectionListBox.UnselectAll();
+            selectedModels.Clear();
+            ModelToggleList.ItemsSource = new DAL().GetAllContacts();
 
             selectedSketchPath = null;
             SketchPreviewImage.Source = null;
@@ -273,6 +279,81 @@ namespace StudioManager
             ContactsView.Visibility = Visibility.Visible;
         }
 
+        private void AddModel_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.DataContext is Contact model && !selectedModels.Any(m => m.Id == model.Id))
+            {
+                selectedModels.Add(model);
+                ModelToggleList.Items.Refresh();
+            }
+        }
+
+        private void RemoveModel_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.DataContext is Contact model && selectedModels.Any(m => m.Id == model.Id))
+            {
+                selectedModels.Remove(model);
+                ModelToggleList.Items.Refresh();
+            }
+        }
+
+        private void UpdateAddModelButtonState(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.Tag is Contact model)
+            {
+                btn.IsEnabled = !selectedModels.Any(m => m.Id == model.Id);
+            }
+        }
+
+        private void UpdateRemoveModelButtonState(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.Tag is Contact model)
+            {
+                btn.IsEnabled = selectedModels.Any(m => m.Id == model.Id);
+            }
+        }
+
+        private void EditAddModel_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.DataContext is Contact model && !editSelectedModels.Any(m => m.Id == model.Id))
+            {
+                editSelectedModels.Add(model);
+                EditModelToggleList.Items.Refresh();
+            }
+        }
+
+        private void EditRemoveModel_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.DataContext is Contact model)
+            {
+                var match = editSelectedModels.FirstOrDefault(m => m.Id == model.Id);
+                if (match != null)
+                {
+                    editSelectedModels.Remove(match);
+                    EditModelToggleList.Items.Refresh();
+                }
+            }
+        }
+
+        private void EditUpdateAddModelButtonState(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.Tag is Contact model)
+            {
+                btn.IsEnabled = !editSelectedModels.Any(m => m.Id == model.Id);
+            }
+        }
+
+        private void EditUpdateRemoveModelButtonState(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.Tag is Contact model)
+            {
+                btn.IsEnabled = editSelectedModels.Any(m => m.Id == model.Id);
+            }
+        }
+
+
+
+
 
         // SEARCHBOXES
         private void SearchBox_Projects(object sender, TextChangedEventArgs e)
@@ -400,7 +481,7 @@ namespace StudioManager
             }
 
             List<Prop> props = selectedProps.ToList();
-            List<Contact> models = ModelSelectionListBox.SelectedItems.Cast<Contact>().ToList();
+            List<Contact> models = selectedModels.ToList();
             Shoot? shoot = null;
 
             Concept newConcept = new Concept(0, name, address, description, sketch, props, shoot);
@@ -631,20 +712,24 @@ namespace StudioManager
 
             editSelectedProps = selected.Props.ToList();
             EditPropToggleList.ItemsSource = new DAL().GetAllProps().Where(p => p.IsAvailable).ToList();
-            EditModelSelectionListBox.ItemsSource = new DAL().GetAllContacts();
+
+            editSelectedModels = selected.Models.ToList();
+            EditModelToggleList.ItemsSource = new DAL().GetAllContacts();
+
+            //EditModelSelectionListBox.ItemsSource = new DAL().GetAllContacts();
             EditShootSelectionComboBox.ItemsSource = new DAL().GetAllShoots();
 
             EditConceptNameTextBox.Text = selected.Name;
             EditConceptDescriptionTextBox.Text = selected.Description;
             EditConceptAddressTextBox.Text = selected.Address;
 
-            EditModelSelectionListBox.SelectedItems.Clear();
-            foreach (var model in selected.Models)
-            {
-                var match = (EditModelSelectionListBox.ItemsSource as List<Contact>)?.FirstOrDefault(m => m.Id == model.Id);
-                if (match != null)
-                    EditModelSelectionListBox.SelectedItems.Add(match);
-            }
+            //EditModelSelectionListBox.SelectedItems.Clear();
+            //foreach (var model in selected.Models)
+            //{
+            //    var match = (EditModelSelectionListBox.ItemsSource as List<Contact>)?.FirstOrDefault(m => m.Id == model.Id);
+            //    if (match != null)
+            //        EditModelSelectionListBox.SelectedItems.Add(match);
+            //}
 
 
             var shootMatch = (EditShootSelectionComboBox.ItemsSource as List<Shoot>)?.FirstOrDefault(s => s.Id == selected.Shoot?.Id);
@@ -701,7 +786,7 @@ namespace StudioManager
             conceptBeingEdited.Description = EditConceptDescriptionTextBox.Text;
             conceptBeingEdited.Address = EditConceptAddressTextBox.Text;
             conceptBeingEdited.Props = editSelectedProps.ToList();
-            conceptBeingEdited.Models = EditModelSelectionListBox.SelectedItems.Cast<Contact>().ToList();
+            conceptBeingEdited.Models = editSelectedModels.ToList();
             conceptBeingEdited.Shoot = EditShootSelectionComboBox.SelectedItem as Shoot;
 
             string baseDir = AppDomain.CurrentDomain.BaseDirectory;
