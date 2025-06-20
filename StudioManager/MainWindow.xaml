@@ -805,13 +805,35 @@
 
 
                 <!-- Shoot -->
+                <!-- Shoots -->
                 <StackPanel Orientation="Horizontal" Grid.Row="2" Grid.Column="1" Margin="10,5,0,5">
                     <TextBlock Text="Select Shoot:" Width="100" VerticalAlignment="Top"/>
                     <StackPanel>
-                        <ListBox x:Name="EditShootSelectionComboBox" DisplayMemberPath="Date" Height="150" Width="250"/>
-                        <Button Content="Add Shoot" Width="100" Margin="0,5,0,0" />
+                        <Border BorderBrush="Gray" BorderThickness="1" Background="White" Width="250" Height="150" CornerRadius="5">
+                            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                <ItemsControl x:Name="EditShootToggleList">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <DockPanel Margin="4,2">
+                                                <TextBlock Text="{Binding Date}" Width="160" VerticalAlignment="Center"/>
+                                                <Button Content="–" Width="25" Margin="2,0" 
+                                        Click="EditRemoveShoot_Click" 
+                                        Tag="{Binding}" 
+                                        Loaded="EditUpdateRemoveShootButtonState"/>
+                                                <Button Content="+" Width="25" Margin="2,0" 
+                                        Click="EditAddShoot_Click" 
+                                        Tag="{Binding}" 
+                                        Loaded="EditUpdateAddShootButtonState"/>
+                                            </DockPanel>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+                        </Border>
+                        <Button Content="Add Shoot" Width="100" Margin="0,5,0,0"/>
                     </StackPanel>
                 </StackPanel>
+
 
             </Grid>
 

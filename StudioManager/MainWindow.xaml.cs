@@ -30,6 +30,7 @@ namespace StudioManager
         private List<Contact> editSelectedModels = new();
 
 
+        private Shoot? editSelectedShoot = null;
 
 
 
@@ -78,6 +79,50 @@ namespace StudioManager
             HidePanels();
             ShootsView.Visibility = Visibility.Visible;
         }
+
+        private void EditAddShoot_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.DataContext is Shoot shoot && editSelectedShoot == null)
+            {
+                editSelectedShoot = shoot;
+                EditShootToggleList.Items.Refresh();
+            }
+        }
+
+        private void EditRemoveShoot_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.DataContext is Shoot shoot && editSelectedShoot?.Id == shoot.Id)
+            {
+                editSelectedShoot = null;
+                EditShootToggleList.Items.Refresh();
+            }
+        }
+
+        private void EditUpdateAddShootButtonState(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.Tag is Shoot shoot)
+            {
+                // Plus is only enabled when no shoot is selected
+                bool isEnabled = editSelectedShoot == null;
+                btn.IsEnabled = isEnabled;
+                btn.Visibility = Visibility.Visible;
+            }
+        }
+
+
+        private void EditUpdateRemoveShootButtonState(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.Tag is Shoot shoot)
+            {
+                // Only the selected shoot has enabled minus button
+                bool isSelected = editSelectedShoot?.Id == shoot.Id;
+                btn.IsEnabled = isSelected;
+                btn.Visibility = Visibility.Visible;
+            }
+        }
+
+
+
 
         public void ConceptsButton_Click(object sender, RoutedEventArgs e)
         {
@@ -717,7 +762,9 @@ namespace StudioManager
             EditModelToggleList.ItemsSource = new DAL().GetAllContacts();
 
             //EditModelSelectionListBox.ItemsSource = new DAL().GetAllContacts();
-            EditShootSelectionComboBox.ItemsSource = new DAL().GetAllShoots();
+            //EditShootSelectionComboBox.ItemsSource = new DAL().GetAllShoots();
+            editSelectedShoot = selected.Shoot;
+            EditShootToggleList.ItemsSource = new DAL().GetAllShoots();
 
             EditConceptNameTextBox.Text = selected.Name;
             EditConceptDescriptionTextBox.Text = selected.Description;
@@ -732,8 +779,8 @@ namespace StudioManager
             //}
 
 
-            var shootMatch = (EditShootSelectionComboBox.ItemsSource as List<Shoot>)?.FirstOrDefault(s => s.Id == selected.Shoot?.Id);
-            EditShootSelectionComboBox.SelectedItem = shootMatch;
+            //var shootMatch = (EditShootSelectionComboBox.ItemsSource as List<Shoot>)?.FirstOrDefault(s => s.Id == selected.Shoot?.Id);
+            //EditShootSelectionComboBox.SelectedItem = shootMatch;
 
 
             if (!string.IsNullOrEmpty(selected.Sketch) && File.Exists(selected.Sketch))
@@ -787,7 +834,7 @@ namespace StudioManager
             conceptBeingEdited.Address = EditConceptAddressTextBox.Text;
             conceptBeingEdited.Props = editSelectedProps.ToList();
             conceptBeingEdited.Models = editSelectedModels.ToList();
-            conceptBeingEdited.Shoot = EditShootSelectionComboBox.SelectedItem as Shoot;
+            conceptBeingEdited.Shoot = editSelectedShoot;
 
             string baseDir = AppDomain.CurrentDomain.BaseDirectory;
             string rootPath = Directory.GetParent(baseDir)!.Parent!.Parent!.Parent!.Parent!.FullName;
