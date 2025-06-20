@@ -20,13 +20,19 @@ namespace StudioManager
         private Concept? conceptBeingEdited = null;
         private Prop? propBeingEdited = null;
         private bool editModeHasDeletions = false;
+        private List<Prop> selectedProps = new();
+        private List<Prop> editSelectedProps = new();
+        private string? returnToView = null;
+
+
+
+
 
 
         public MainWindow()
         {
             InitializeComponent();
             RefreshConceptOverview();
-            PropSelectionListBox.ItemsSource = new DAL().GetAllProps();
             ModelSelectionListBox.ItemsSource = new DAL().GetAllContacts();
         }
 
@@ -95,7 +101,8 @@ namespace StudioManager
             NewConceptNameTextBox.Text = "";
             NewConceptDescriptionTextBox.Text = "";
             NewConceptAddressTextBox.Text = "";
-            PropSelectionListBox.UnselectAll();
+            selectedProps.Clear();
+            PropToggleList.ItemsSource = new DAL().GetAllProps().Where(p => p.IsAvailable).ToList();
             ModelSelectionListBox.UnselectAll();
 
             selectedSketchPath = null;
@@ -106,14 +113,149 @@ namespace StudioManager
             NewConceptForm.Visibility = Visibility.Visible;
         }
 
-
-
         public void PropsButton_Click(object sender, RoutedEventArgs e)
         {
             RefreshPropOverview();
             HidePanels();
             PropsView.Visibility = Visibility.Visible;
         }
+
+        private void QuickAddPropFromNewConcept_Click(object sender, RoutedEventArgs e)
+        {
+            HidePanels();
+            NewQuickPropNameTextBox.Text = "";
+            NewQuickPropDescriptionTextBox.Text = "";
+            NewQuickPropAvailableCheckBox.IsChecked = true;
+            returnToView = "NewConcept";
+            QuickAddPropForm.Visibility = Visibility.Visible;
+        }
+
+        private void QuickAddPropFromEditConcept_Click(object sender, RoutedEventArgs e)
+        {
+            HidePanels();
+            NewQuickPropNameTextBox.Text = "";
+            NewQuickPropDescriptionTextBox.Text = "";
+            NewQuickPropAvailableCheckBox.IsChecked = true;
+            returnToView = "EditConcept";
+            QuickAddPropForm.Visibility = Visibility.Visible;
+        }
+
+        private void CreateQuickProp_Click(object sender, RoutedEventArgs e)
+        {
+            var name = NewQuickPropNameTextBox.Text;
+            var desc = NewQuickPropDescriptionTextBox.Text;
+            var avail = NewQuickPropAvailableCheckBox.IsChecked == true;
+
+            if (string.IsNullOrWhiteSpace(name) || new DAL().PropNameExists(name))
+            {
+                MessageBox.Show("Prop name is empty or already exists.");
+                return;
+            }
+
+            var prop = new Prop(0, name, desc, avail);
+            prop.Create();
+
+            if (returnToView == "NewConcept")
+            {
+                PropToggleList.ItemsSource = new DAL().GetAllProps().Where(p => p.IsAvailable).ToList();
+                NewConceptForm.Visibility = Visibility.Visible;
+            }
+            else if (returnToView == "EditConcept")
+            {
+                EditPropToggleList.ItemsSource = new DAL().GetAllProps().Where(p => p.IsAvailable).ToList();
+                EditConceptForm.Visibility = Visibility.Visible;
+            }
+
+            returnToView = null;
+            QuickAddPropForm.Visibility = Visibility.Collapsed;
+        }
+
+        private void CancelQuickAddProp_Click(object sender, RoutedEventArgs e)
+        {
+            if (returnToView == "NewConcept")
+                NewConceptForm.Visibility = Visibility.Visible;
+            else if (returnToView == "EditConcept")
+                EditConceptForm.Visibility = Visibility.Visible;
+
+            returnToView = null;
+            QuickAddPropForm.Visibility = Visibility.Collapsed;
+        }
+
+
+        private void AddProp_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.DataContext is Prop prop && !selectedProps.Contains(prop))
+            {
+                selectedProps.Add(prop);
+                PropToggleList.Items.Refresh();
+            }
+        }
+
+        private void RemoveProp_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.DataContext is Prop prop && selectedProps.Contains(prop))
+            {
+                selectedProps.Remove(prop);
+                PropToggleList.Items.Refresh();
+            }
+        }
+
+        private void UpdateAddButtonState(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.Tag is Prop prop)
+            {
+                btn.IsEnabled = !selectedProps.Any(p => p.Id == prop.Id);
+            }
+        }
+
+        private void UpdateRemoveButtonState(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.Tag is Prop prop)
+            {
+                btn.IsEnabled = selectedProps.Any(p => p.Id == prop.Id);
+            }
+        }
+
+        private void EditAddProp_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.DataContext is Prop prop && !editSelectedProps.Any(p => p.Id == prop.Id))
+            {
+                editSelectedProps.Add(prop);
+                EditPropToggleList.Items.Refresh();
+            }
+        }
+
+        private void EditRemoveProp_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.DataContext is Prop prop)
+            {
+                var match = editSelectedProps.FirstOrDefault(p => p.Id == prop.Id);
+                if (match != null)
+                {
+                    editSelectedProps.Remove(match);
+                    EditPropToggleList.Items.Refresh();
+                }
+            }
+        }
+
+        private void EditUpdateAddButtonState(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.Tag is Prop prop)
+            {
+                btn.IsEnabled = !editSelectedProps.Any(p => p.Id == prop.Id);
+            }
+        }
+
+        private void EditUpdateRemoveButtonState(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.Tag is Prop prop)
+            {
+                btn.IsEnabled = editSelectedProps.Any(p => p.Id == prop.Id);
+            }
+        }
+
+
+
 
         private void NewPropButton_Click(object sender, RoutedEventArgs e)
         {
@@ -257,7 +399,7 @@ namespace StudioManager
                 return;
             }
 
-            List<Prop> props = PropSelectionListBox.SelectedItems.Cast<Prop>().ToList();
+            List<Prop> props = selectedProps.ToList();
             List<Contact> models = ModelSelectionListBox.SelectedItems.Cast<Contact>().ToList();
             Shoot? shoot = null;
 
@@ -487,22 +629,14 @@ namespace StudioManager
 
             conceptBeingEdited = selected;
 
-            EditPropSelectionListBox.ItemsSource = new DAL().GetAllProps();
+            editSelectedProps = selected.Props.ToList();
+            EditPropToggleList.ItemsSource = new DAL().GetAllProps().Where(p => p.IsAvailable).ToList();
             EditModelSelectionListBox.ItemsSource = new DAL().GetAllContacts();
             EditShootSelectionComboBox.ItemsSource = new DAL().GetAllShoots();
 
             EditConceptNameTextBox.Text = selected.Name;
             EditConceptDescriptionTextBox.Text = selected.Description;
             EditConceptAddressTextBox.Text = selected.Address;
-
-            EditPropSelectionListBox.SelectedItems.Clear();
-            foreach (var prop in selected.Props)
-            {
-                var match = (EditPropSelectionListBox.ItemsSource as List<Prop>)?.FirstOrDefault(p => p.Id == prop.Id);
-                if (match != null)
-                    EditPropSelectionListBox.SelectedItems.Add(match);
-            }
-
 
             EditModelSelectionListBox.SelectedItems.Clear();
             foreach (var model in selected.Models)
@@ -566,7 +700,7 @@ namespace StudioManager
             conceptBeingEdited.Name = newName;
             conceptBeingEdited.Description = EditConceptDescriptionTextBox.Text;
             conceptBeingEdited.Address = EditConceptAddressTextBox.Text;
-            conceptBeingEdited.Props = EditPropSelectionListBox.SelectedItems.Cast<Prop>().ToList();
+            conceptBeingEdited.Props = editSelectedProps.ToList();
             conceptBeingEdited.Models = EditModelSelectionListBox.SelectedItems.Cast<Contact>().ToList();
             conceptBeingEdited.Shoot = EditShootSelectionComboBox.SelectedItem as Shoot;
 
