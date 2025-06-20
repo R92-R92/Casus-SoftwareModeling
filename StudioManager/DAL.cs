@@ -45,14 +45,15 @@ namespace StudioManager
         }
 
         // CREATE
-        public void AddAddress(Address address)
+        public int AddAddress(Address address)
         {
             using SqlConnection conn = new(connectionString);
             conn.Open();
 
             string query = @"
-                INSERT INTO Address (Street, HouseNumber, PostalCode, City, Country)
-                VALUES (@Street, @HouseNumber, @PostalCode, @City, @Country)";
+        INSERT INTO Address (Street, HouseNumber, PostalCode, City, Country)
+        VALUES (@Street, @HouseNumber, @PostalCode, @City, @Country);
+        SELECT SCOPE_IDENTITY();";
 
             using SqlCommand cmd = new(query, conn);
             cmd.Parameters.AddWithValue("@Street", address.Street);
@@ -61,8 +62,10 @@ namespace StudioManager
             cmd.Parameters.AddWithValue("@City", address.City);
             cmd.Parameters.AddWithValue("@Country", address.Country);
 
-            cmd.ExecuteNonQuery();
+            int newId = Convert.ToInt32(cmd.ExecuteScalar());
+            return newId;
         }
+
 
         // UPDATE
         public void UpdateAddress(Address address)
@@ -113,7 +116,7 @@ namespace StudioManager
             using SqlConnection conn = new(connectionString);
             conn.Open();
 
-            string query = "SELECT Id, Name, Description, Sketch, ShootId, Address FROM Concept";
+            string query = "SELECT Id, Name, Description, Sketch, ShootId, AddressId FROM Concept";
             using SqlCommand cmd = new(query, conn);
             using SqlDataReader reader = cmd.ExecuteReader();
 
@@ -125,7 +128,7 @@ namespace StudioManager
                 Concept concept = new(
                     id: conceptId,
                     name: reader["Name"]?.ToString(),
-                    address: reader["Address"]?.ToString(),
+                    address: reader["AddressId"] != DBNull.Value ? GetAddressById((int)reader["AddressId"]) : null,
                     description: reader["Description"]?.ToString(),
                     sketch: reader["Sketch"]?.ToString(),
                     props: GetPropsByConceptId(conceptId),
@@ -150,9 +153,16 @@ namespace StudioManager
             using SqlConnection conn = new(connectionString);
             conn.Open();
 
+            if (concept.Address != null && concept.Address.Id == 0)
+            {
+                int addressId = AddAddress(concept.Address);
+                concept.Address.Id = addressId;
+            }
+
+
             string query = @"
-                INSERT INTO Concept (Name, Description, Sketch, ShootId, Address)
-                VALUES (@Name, @Description, @Sketch, @ShootId, @Address);
+                INSERT INTO Concept (Name, Description, Sketch, ShootId, AddressId)
+                VALUES (@Name, @Description, @Sketch, @ShootId, @AddressId);
                 SELECT SCOPE_IDENTITY();";
 
             using SqlCommand cmd = new(query, conn);
@@ -160,7 +170,8 @@ namespace StudioManager
             cmd.Parameters.AddWithValue("@Description", concept.Description ?? "");
             cmd.Parameters.AddWithValue("@Sketch", concept.Sketch ?? "");
             cmd.Parameters.AddWithValue("@ShootId", concept.Shoot?.Id ?? (object)DBNull.Value);
-            cmd.Parameters.AddWithValue("@Address", concept.Address ?? (object)DBNull.Value);
+            cmd.Parameters.AddWithValue("@AddressId", concept.Address?.Id ?? (object)DBNull.Value);
+
 
             int newId = Convert.ToInt32(cmd.ExecuteScalar());
             concept.Id = newId;
@@ -181,13 +192,19 @@ namespace StudioManager
             using SqlConnection conn = new(connectionString);
             conn.Open();
 
+            if (concept.Address != null && concept.Address.Id == 0)
+            {
+                int addressId = AddAddress(concept.Address);
+                concept.Address.Id = addressId;
+            }
+
             string query = @"
                 UPDATE Concept
                 SET Name = @Name,
                     Description = @Description,
                     Sketch = @Sketch,
                     ShootId = @ShootId,
-                    Address = @Address
+                    AddressId = @AddressId
                 WHERE Id = @Id";
 
             using SqlCommand cmd = new(query, conn);
@@ -196,7 +213,8 @@ namespace StudioManager
             cmd.Parameters.AddWithValue("@Description", concept.Description ?? "");
             cmd.Parameters.AddWithValue("@Sketch", concept.Sketch ?? "");
             cmd.Parameters.AddWithValue("@ShootId", concept.Shoot?.Id ?? (object)DBNull.Value);
-            cmd.Parameters.AddWithValue("@Address", concept.Address ?? (object)DBNull.Value);
+            cmd.Parameters.AddWithValue("@AddressId", concept.Address?.Id ?? (object)DBNull.Value);
+
             cmd.ExecuteNonQuery();
 
             DeleteAllConceptRelations(concept.Id);
@@ -217,11 +235,46 @@ namespace StudioManager
             using SqlConnection conn = new(connectionString);
             conn.Open();
 
+            int? addressId = null;
+            using (SqlCommand getAddressCmd = new("SELECT AddressId FROM Concept WHERE Id = @ConceptId", conn))
+            {
+                getAddressCmd.Parameters.AddWithValue("@ConceptId", conceptId);
+                object result = getAddressCmd.ExecuteScalar();
+                if (result != DBNull.Value && result != null)
+                    addressId = Convert.ToInt32(result);
+            }
+
+            DeleteAllConceptRelations(conceptId);
+
             string deleteConcept = "DELETE FROM Concept WHERE Id = @ConceptId";
-            using SqlCommand cmd = new(deleteConcept, conn);
-            cmd.Parameters.AddWithValue("@ConceptId", conceptId);
-            cmd.ExecuteNonQuery();
+            using (SqlCommand deleteCmd = new(deleteConcept, conn))
+            {
+                deleteCmd.Parameters.AddWithValue("@ConceptId", conceptId);
+                deleteCmd.ExecuteNonQuery();
+            }
+
+            if (addressId.HasValue)
+            {
+                string checkUsage = @"
+            SELECT COUNT(*) FROM (
+                SELECT AddressId FROM Contact WHERE AddressId = @AddressId
+                UNION ALL
+                SELECT AddressId FROM Shoot WHERE AddressId = @AddressId
+                UNION ALL
+                SELECT AddressId FROM Concept WHERE AddressId = @AddressId
+            ) AS Uses";
+
+                using SqlCommand checkCmd = new(checkUsage, conn);
+                checkCmd.Parameters.AddWithValue("@AddressId", addressId.Value);
+                int usageCount = (int)checkCmd.ExecuteScalar();
+
+                if (usageCount == 0)
+                {
+                    DeleteAddress(addressId.Value);
+                }
+            }
         }
+
 
         // CONTACTS
 
@@ -958,7 +1011,7 @@ namespace StudioManager
             conn.Open();
 
             string query = @"
-                SELECT c.Id,c.Name, c.Description, c.Sketch, c.ShootId, c.Address
+                SELECT c.Id,c.Name, c.Description, c.Sketch, c.ShootId, c.AddressId
                 FROM Concept c
                 INNER JOIN ConceptProject cp ON c.Id = cp.ConceptId
                 WHERE cp.ProjectId = @ProjectId";
@@ -974,7 +1027,7 @@ namespace StudioManager
                 Concept concept = new(
                     id: conceptId,
                     name: reader["Name"]?.ToString(),
-                    address: reader["Address"]?.ToString(),
+                    address: reader["AddressId"] != DBNull.Value ? GetAddressById((int)reader["AddressId"]) : null,
                     description: reader["Description"]?.ToString(),
                     sketch: reader["Sketch"]?.ToString(),
                     props: GetPropsByConceptId(conceptId),
@@ -1070,6 +1123,8 @@ namespace StudioManager
             cmd.Parameters.AddWithValue("@ConceptId", conceptId);
             cmd.ExecuteNonQuery();
         }
+
+
 
         private void DeleteAllConceptRelations(int conceptId)
         {

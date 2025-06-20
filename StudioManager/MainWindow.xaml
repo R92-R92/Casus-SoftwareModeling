@@ -293,7 +293,7 @@
                     </Grid>
 
                     <!-- Concept Overview Table -->
-                    <DataGrid x:Name="ConceptsDataGrid" Grid.Row="2" AutoGenerateColumns="False" CanUserAddRows="False" HeadersVisibility="Column" RowHeaderWidth="0" Margin="0,0,0,10" ScrollViewer.CanContentScroll="False">
+                    <DataGrid x:Name="ConceptsDataGrid" Grid.Row="2" AutoGenerateColumns="False" CanUserAddRows="False" HeadersVisibility="Column" RowHeaderWidth="0" Margin="0,0,0,10" ScrollViewer.CanContentScroll="False" SelectionChanged="ConceptsDataGrid_SelectionChanged">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*"/>
                             <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="2*"/>
@@ -324,18 +324,75 @@
 
                     <!-- Concept Details -->
                     <Border Grid.Row="4" BorderThickness="1" BorderBrush="Gray" Padding="10" Margin="0,0,0,10">
-                        <StackPanel>
-                            <TextBlock Text="- Description: [Description details]"/>
-                            <TextBlock Text="- Location: [Location details]"/>
-                            <TextBlock Text="- Props: [Props details]"/>
-                            <TextBlock Text="- Models: [Models details]"/>
-                            <TextBlock Text="- Upload Sketch: [Link or Filename]"/>
-                            <TextBlock Text="- Upload Picture: [Link or Filename]"/>
-                            <TextBlock Text="- View Picture: [Link or Filename]"/>
-                            <TextBlock Text="- Linked Shoots: [Shoot A, Shoot B]"/>
-                        </StackPanel>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="2*"/>
+                                <ColumnDefinition Width="2*"/>
+                                <ColumnDefinition Width="1.5*"/>
+                                <ColumnDefinition Width="1.5*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock x:Name="DetailName" Grid.Row="0" Grid.Column="0" Margin="0,2"/>
+                            <TextBlock x:Name="DetailDescription" Grid.Row="0" Grid.Column="1" Margin="10,2"/>
+                            <TextBlock x:Name="DetailModels" Grid.Row="1" Grid.Column="0" Margin="0,2"/>
+                            <TextBlock x:Name="DetailAddress" Grid.Row="1" Grid.Column="1" Margin="10,2"/>
+                            <TextBlock x:Name="DetailProps" Grid.Row="2" Grid.Column="0" Margin="0,2"/>
+                            <TextBlock x:Name="DetailShoot" Grid.Row="2" Grid.Column="1" Margin="10,2"/>
+
+                            <!-- Sketch Preview -->
+                            <Border x:Name="DetailSketchBorder" Grid.Row="0" Grid.RowSpan="4" Grid.Column="2" 
+        Margin="10,0,0,0" BorderThickness="1" BorderBrush="DarkGray" 
+        Width="100" Height="100" Visibility="Collapsed">
+                                <Image x:Name="DetailSketchPreviewImage" Stretch="Uniform" MouseLeftButtonUp="DetailSketchPreviewImage_MouseLeftButtonUp"/>
+                            </Border>
+
+                            <!-- Picture Preview -->
+                            <Border x:Name="DetailPictureBorder" Grid.Row="0" Grid.RowSpan="4" Grid.Column="3"
+        Margin="10,0,0,0" BorderThickness="1" BorderBrush="DarkGray"
+        Width="150" Height="100" Visibility="Collapsed">
+                                <Grid>
+                                    <Image x:Name="DetailPicturePreviewImage" Stretch="Uniform" MouseLeftButtonUp="DetailPicturePreviewImage_MouseLeftButtonUp"/>
+                                    <Button x:Name="DetailPrevPictureButton" Content="◄" Width="25" Height="25" HorizontalAlignment="Left" VerticalAlignment="Center" Click="DetailPrevPicture_Click" Visibility="Collapsed" Background="Transparent" BorderThickness="0" Foreground="Black" FontWeight="Bold" FontSize="16" Cursor="Hand"/>
+                                    <Button x:Name="DetailNextPictureButton" Content="►" Width="25" Height="25" HorizontalAlignment="Right" VerticalAlignment="Center" Click="DetailNextPicture_Click" Visibility="Collapsed" Background="Transparent" BorderThickness="0" Foreground="Black" FontWeight="Bold" FontSize="16" Cursor="Hand"/>
+                                </Grid>
+                            </Border>
+                        </Grid>
                     </Border>
+
                 </Grid>
+
+                <!-- Picture preview overlay -->
+                <Grid x:Name="DetailPictureOverlay" Visibility="Collapsed" Background="#AAFFFFFF" Grid.RowSpan="5" Grid.ColumnSpan="4" Panel.ZIndex="100">
+                    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="#F5F5F5" Margin="40">
+                        <Image x:Name="OverlayPictureImage" Stretch="Uniform" Margin="10"/>
+                        <Button Content="◄" Width="40" Height="40" Click="OverlayPrev_Click"
+                HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10"
+                FontSize="20" FontWeight="Bold" Background="Transparent" Foreground="Black" BorderBrush="Transparent"/>
+                        <Button Content="►" Width="40" Height="40" Click="OverlayNext_Click"
+                HorizontalAlignment="Right" VerticalAlignment="Center" Margin="10"
+                FontSize="20" FontWeight="Bold" Background="Transparent" Foreground="Black" BorderBrush="Transparent"/>
+                        <Button Content="X" Width="30" Height="30" Click="OverlayClose_Click"
+                HorizontalAlignment="Right" VerticalAlignment="Top" Margin="10"
+                FontSize="14" FontWeight="Bold" Background="Transparent" Foreground="Black" BorderBrush="Transparent"/>
+                    </Grid>
+                </Grid>
+
+                <!-- Sketch Overlay Preview -->
+                <Grid x:Name="DetailSketchOverlay" Visibility="Collapsed" Background="#AAFFFFFF" Grid.RowSpan="5" Grid.ColumnSpan="4" Panel.ZIndex="101">
+                    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="#F5F5F5" Margin="40">
+                        <Image x:Name="OverlaySketchImage" Stretch="Uniform" Margin="10"/>
+                        <Button Content="X" Width="30" Height="30" Click="OverlaySketchClose_Click"
+                HorizontalAlignment="Right" VerticalAlignment="Top" Margin="10"
+                FontSize="14" FontWeight="Bold" Background="Transparent" Foreground="Black" BorderBrush="Transparent"/>
+                    </Grid>
+                </Grid>
+
 
                 <!-- PROPS -->
                 <Grid x:Name="PropsView" Visibility="Collapsed">
@@ -588,12 +645,33 @@
                 </StackPanel>
 
                 <!-- Location -->
-                <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="0" Margin="0,5">
-                    <TextBlock Text="Location:" Width="100" VerticalAlignment="Top"/>
-                    <TextBox x:Name="NewConceptAddressTextBox" Width="250" Height="25" VerticalAlignment="Top"  MaxLength="37"/>
+                <StackPanel Grid.Row="1" Grid.Column="0" Margin="0,5">
+                    <TextBlock Text="Address Info:" FontWeight="Bold" Margin="0,0,0,5"/>
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,2">
+                            <TextBlock Text="Street:" Width="100"/>
+                            <TextBox x:Name="NewAddressStreetTextBox" Width="150"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,2">
+                            <TextBlock Text="House No.:" Width="100"/>
+                            <TextBox x:Name="NewAddressHouseNumberTextBox" Width="150"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,2">
+                            <TextBlock Text="Postal Code:" Width="100"/>
+                            <TextBox x:Name="NewAddressPostalCodeTextBox" Width="150"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,2">
+                            <TextBlock Text="City:" Width="100"/>
+                            <TextBox x:Name="NewAddressCityTextBox" Width="150"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,2">
+                            <TextBlock Text="Country:" Width="100"/>
+                            <TextBox x:Name="NewAddressCountryTextBox" Width="150"/>
+                        </StackPanel>
+                    </StackPanel>
                 </StackPanel>
 
-                <!-- Select Models -->
+
                 <!-- Select Models -->
                 <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="1" Margin="10,5,0,5">
                     <TextBlock Text="Select Models:" Width="100" VerticalAlignment="Top"/>
@@ -605,8 +683,8 @@
                                         <DataTemplate>
                                             <DockPanel Margin="4,2">
                                                 <TextBlock Text="{Binding FullName}" Width="160" VerticalAlignment="Center"/>
-                                                <Button Content="–" Width="25" Margin="2,0" Click="RemoveModel_Click" Tag="{Binding}" Loaded="UpdateRemoveModelButtonState"/>
-                                                <Button Content="+" Width="25" Margin="2,0" Click="AddModel_Click" Tag="{Binding}" Loaded="UpdateAddModelButtonState"/>
+                                                <Button Content="–" Width="25" Margin="2,0" Click="RemovContact_Click" Tag="{Binding}" Loaded="UpdateRemoveContactButtonState"/>
+                                                <Button Content="+" Width="25" Margin="2,0" Click="AddContact_Click" Tag="{Binding}" Loaded="UpdateAddContactButtonState"/>
                                             </DockPanel>
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
@@ -738,10 +816,33 @@
                 </StackPanel>
 
                 <!-- Location -->
-                <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="0" Margin="0,5">
-                    <TextBlock Text="Location:" Width="100" VerticalAlignment="Top"/>
-                    <TextBox x:Name="EditConceptAddressTextBox" Width="250" Height="25" VerticalAlignment="Top" MaxLength="37"/>
+                <!-- Address -->
+                <StackPanel Orientation="Vertical" Grid.Row="1" Grid.Column="0" Margin="0,5">
+                    <TextBlock Text="Address Info:" FontWeight="Bold" Margin="0,0,0,5"/>
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,2">
+                            <TextBlock Text="Street:" Width="100"/>
+                            <TextBox x:Name="EditAddressStreetTextBox" Width="150"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,2">
+                            <TextBlock Text="House No.:" Width="100"/>
+                            <TextBox x:Name="EditAddressHouseNumberTextBox" Width="150"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,2">
+                            <TextBlock Text="Postal Code:" Width="100"/>
+                            <TextBox x:Name="EditAddressPostalCodeTextBox" Width="150"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,2">
+                            <TextBlock Text="City:" Width="100"/>
+                            <TextBox x:Name="EditAddressCityTextBox" Width="150"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,2">
+                            <TextBlock Text="Country:" Width="100"/>
+                            <TextBox x:Name="EditAddressCountryTextBox" Width="150"/>
+                        </StackPanel>
+                    </StackPanel>
                 </StackPanel>
+
 
                 <!-- Models -->
                 <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="1" Margin="10,5,0,5">
@@ -754,14 +855,8 @@
                                         <DataTemplate>
                                             <DockPanel Margin="4,2">
                                                 <TextBlock Text="{Binding FullName}" Width="160" VerticalAlignment="Center"/>
-                                                <Button Content="–" Width="25" Margin="2,0"
-                                        Click="EditRemoveModel_Click"
-                                        Tag="{Binding}"
-                                        Loaded="EditUpdateRemoveModelButtonState"/>
-                                                <Button Content="+" Width="25" Margin="2,0"
-                                        Click="EditAddModel_Click"
-                                        Tag="{Binding}"
-                                        Loaded="EditUpdateAddModelButtonState"/>
+                                                <Button Content="–" Width="25" Margin="2,0" Click="EditRemoveContact_Click" Tag="{Binding}" Loaded="EditUpdateRemoveContactButtonState"/>
+                                                <Button Content="+" Width="25" Margin="2,0" Click="EditAddContact_Click" Tag="{Binding}" Loaded="EditUpdateAddContactButtonState"/>
                                             </DockPanel>
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
