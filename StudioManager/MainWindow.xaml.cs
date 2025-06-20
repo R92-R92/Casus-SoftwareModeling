@@ -9,6 +9,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Collections.ObjectModel;
+
 
 namespace StudioManager
 {
@@ -20,6 +22,8 @@ namespace StudioManager
         private Concept? conceptBeingEdited = null;
         private Prop? propBeingEdited = null;
         private bool editModeHasDeletions = false;
+        private Project? projectBeingEdited = null;
+
 
 
         private List<Prop> selectedProps = new();
@@ -56,6 +60,8 @@ namespace StudioManager
             NewPropForm.Visibility = Visibility.Collapsed;
             EditPropForm.Visibility = Visibility.Collapsed;
             StartUpWindow.Visibility = Visibility.Collapsed;
+            NewProjectForm.Visibility = Visibility.Collapsed;
+            EditProjectForm.Visibility = Visibility.Collapsed;
         }
 
         public void DashboardButton_Click(object sender, RoutedEventArgs e)
@@ -1053,5 +1059,197 @@ namespace StudioManager
         {
             ProjectsDataGrid.ItemsSource = new DAL().GetAllProjects();
         }
+        
+
+// Show blank form for a brand-new project
+private void NewProjectButton_Click(object sender, RoutedEventArgs e)
+        {
+            HidePanels();
+            NewProjectNameTextBox.Text = "";
+            NewProjectDeadlineDatePicker.SelectedDate = null;
+            NewProjectNotesTextBox.Text = "";
+            NewProjectForm.Visibility = Visibility.Visible;
+        }
+
+        // Cancel out of the new‐project form
+        private void CancelNewProject_Click(object sender, RoutedEventArgs e)
+        {
+            HidePanels();
+            ProjectsView.Visibility = Visibility.Visible;
+        }
+
+
+
+        // Read inputs and save a new project
+        private void CreateNewProject_Click(object sender, RoutedEventArgs e)
+        {
+            string name = NewProjectNameTextBox.Text;
+            DateTime? deadline = NewProjectDeadlineDatePicker.SelectedDate;
+            string notes = NewProjectNotesTextBox.Text;
+
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                MessageBox.Show("Please enter a name for the project.", "Validation", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            var project = new Project(0, name, deadline, notes);
+            project.Create();
+
+            RefreshProjectOverview();
+            HidePanels();
+            ProjectsView.Visibility = Visibility.Visible;
+        }
+
+        // Show form with selected project’s data for editing
+        private void EditProject_Click(object sender, RoutedEventArgs e)
+        {
+            var selected = ProjectsDataGrid.SelectedItem as Project;
+            if (selected == null)
+            {
+                MessageBox.Show("Please select a project to edit.", "No Selection", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            projectBeingEdited = selected;
+
+            // Basic fields
+            EditProjectNameTextBox.Text = selected.Name;
+            EditProjectDeadlineDatePicker.SelectedDate = selected.Deadline;
+            EditProjectNotesTextBox.Text = selected.Notes;
+
+            // ─── Populate dual-list boxes ──────────────────────────────
+            var all = new DAL().GetAllConcepts();
+            var assigned = selected.Concepts ?? new List<Concept>();
+
+            // Available = all minus assigned
+            var available = new ObservableCollection<Concept>(all.Where(c => !assigned.Any(a => a.Id == c.Id)));
+            // Assigned collection
+            var assignedColl = new ObservableCollection<Concept>(assigned);
+
+            AllConceptsListBox.ItemsSource = available;
+            ProjectConceptsListBox.ItemsSource = assignedColl;
+            // ──────────────────────────────────────────────────────────
+
+            HidePanels();
+            EditProjectForm.Visibility = Visibility.Visible;
+        }
+
+        private void AddConceptsToProject_Click(object sender, RoutedEventArgs e)
+        {
+            var available = (ObservableCollection<Concept>)AllConceptsListBox.ItemsSource!;
+            var assigned = (ObservableCollection<Concept>)ProjectConceptsListBox.ItemsSource!;
+
+            // Move each selected concept
+            foreach (Concept c in AllConceptsListBox.SelectedItems.Cast<Concept>().ToList())
+            {
+                available.Remove(c);
+                assigned.Add(c);
+            }
+        }
+
+        private void RemoveConceptsFromProject_Click(object sender, RoutedEventArgs e)
+        {
+            var available = (ObservableCollection<Concept>)AllConceptsListBox.ItemsSource!;
+            var assigned = (ObservableCollection<Concept>)ProjectConceptsListBox.ItemsSource!;
+
+            // Move back each selected concept
+            foreach (Concept c in ProjectConceptsListBox.SelectedItems.Cast<Concept>().ToList())
+            {
+                assigned.Remove(c);
+                available.Add(c);
+            }
+        }
+
+
+        // Save changes back to the database
+        private void SaveEditProject_Click(object sender, RoutedEventArgs e)
+        {
+            if (projectBeingEdited == null)
+            {
+                MessageBox.Show("No project is currently being edited.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            string newName = EditProjectNameTextBox.Text;
+            if (string.IsNullOrWhiteSpace(newName))
+            {
+                MessageBox.Show("Please enter a name for the project.", "Validation", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            projectBeingEdited.Name = newName;
+            projectBeingEdited.Deadline = EditProjectDeadlineDatePicker.SelectedDate;
+            projectBeingEdited.Notes = EditProjectNotesTextBox.Text;
+
+            // ─── NEW: capture the selected concepts ───
+            var assigned = ((ObservableCollection<Concept>)ProjectConceptsListBox.ItemsSource!);
+            projectBeingEdited.Concepts = assigned.ToList();
+            // ──────────────────────────────────────────────────────────
+
+            projectBeingEdited.Update();
+            projectBeingEdited = null;
+            RefreshProjectOverview();
+            HidePanels();
+            ProjectsView.Visibility = Visibility.Visible;
+        }
+        // Cancel out of the edit‐project form
+        private void CancelEditProject_Click(object sender, RoutedEventArgs e)
+        {
+            projectBeingEdited = null;
+            HidePanels();
+            ProjectsView.Visibility = Visibility.Visible;
+        }
+
+
+        // Delete the selected project after confirmation
+        private void DeleteProject_Click(object sender, RoutedEventArgs e)
+        {
+            var selected = ProjectsDataGrid.SelectedItem as Project;
+            if (selected == null)
+            {
+                MessageBox.Show("Please select a project to delete.", "No Selection", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            var result = MessageBox.Show(
+                $"Are you sure you want to delete the project \"{selected.Name}\"?",
+                "Confirm Deletion",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Warning);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                selected.Delete();
+                RefreshProjectOverview();
+            }
+        }
+        // Fires whenever the user selects a different project row
+        private void ProjectsDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var project = ProjectsDataGrid.SelectedItem as Project;
+            if (project == null)
+            {
+                // Clear if nothing selected
+                DetailNameText.Text = "- Name: ";
+                DetailDeadlineText.Text = "- Deadline: ";
+                DetailConceptsText.Text = "- Linked Concepts: ";
+                DetailNotesText.Text = "- Notes: ";
+                return;
+            }
+
+            // Fill in the details
+            DetailNameText.Text = $"- Name: {project.Name}";
+            DetailDeadlineText.Text = $"- Deadline: {project.Deadline?.ToString("yyyy-MM-dd")}";
+
+            // Build comma-separated list of concept names
+            var conceptNames = project.Concepts != null && project.Concepts.Any()
+                ? string.Join(", ", project.Concepts.Select(c => c.Name))
+                : "(none)";
+            DetailConceptsText.Text = $"- Linked Concepts: {conceptNames}";
+
+            DetailNotesText.Text = $"- Notes: {project.Notes ?? ""}";
+        }
+
     }
 }
