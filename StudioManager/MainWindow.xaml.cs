@@ -19,6 +19,7 @@ namespace StudioManager
         private int currentPictureIndex = -1;
         private Concept? conceptBeingEdited = null;
         private Prop? propBeingEdited = null;
+        private bool editModeHasDeletions = false;
 
 
         public MainWindow()
@@ -27,7 +28,6 @@ namespace StudioManager
             RefreshConceptOverview();
             PropSelectionListBox.ItemsSource = new DAL().GetAllProps();
             ModelSelectionListBox.ItemsSource = new DAL().GetAllContacts();
-            ShootSelectionComboBox.ItemsSource = new DAL().GetAllShoots();
         }
 
         // NAVIGATION
@@ -75,33 +75,34 @@ namespace StudioManager
             ConceptsView.Visibility = Visibility.Visible;
         }
 
+        private void CancelEditConcept_Click(object sender, RoutedEventArgs e)
+        {
+            if (editModeHasDeletions)
+            {
+                MessageBox.Show("You have deleted one or more photos or a sketch. You can no longer cancel this operation. Please choose 'Save Changes' to continue.", "Cancellation Not Allowed", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            conceptBeingEdited = null;
+            HidePanels();
+            ConceptsView.Visibility = Visibility.Visible;
+        }
+
+
         private void NewConceptButton_Click(object sender, RoutedEventArgs e)
         {
             HidePanels();
             NewConceptNameTextBox.Text = "";
             NewConceptDescriptionTextBox.Text = "";
+            NewConceptAddressTextBox.Text = "";
             PropSelectionListBox.UnselectAll();
             ModelSelectionListBox.UnselectAll();
-            ShootSelectionComboBox.SelectedItem = null;
 
             selectedSketchPath = null;
             SketchPreviewImage.Source = null;
             SketchPreviewImage.Visibility = Visibility.Collapsed;
             SketchAddIcon.Visibility = Visibility.Visible;
             DeleteSketchButton.Visibility = Visibility.Collapsed;
-
-            selectedPicturePaths.Clear();
-            currentPictureIndex = -1;
-
-            PicturePreviewImage.Source = null;
-            PicturePreviewImage.Visibility = Visibility.Collapsed;
-            PictureAddIcon.Visibility = Visibility.Visible;
-            DeletePictureButton.Visibility = Visibility.Collapsed;
-            ExtraPictureButton.Visibility = Visibility.Collapsed;
-            NextPictureButton.Visibility = Visibility.Collapsed;
-            PrevPictureButton.Visibility = Visibility.Collapsed;
-            PictureUploadBorder.MouseLeftButtonUp -= UploadPicture_Click;
-            PictureUploadBorder.MouseLeftButtonUp += UploadPicture_Click;
             NewConceptForm.Visibility = Visibility.Visible;
         }
 
@@ -258,7 +259,7 @@ namespace StudioManager
 
             List<Prop> props = PropSelectionListBox.SelectedItems.Cast<Prop>().ToList();
             List<Contact> models = ModelSelectionListBox.SelectedItems.Cast<Contact>().ToList();
-            Shoot? shoot = ShootSelectionComboBox.SelectedItem as Shoot;
+            Shoot? shoot = null;
 
             Concept newConcept = new Concept(0, name, address, description, sketch, props, shoot);
             newConcept.Models = models;
@@ -267,14 +268,6 @@ namespace StudioManager
             string rootPath = Directory.GetParent(baseDir)!.Parent!.Parent!.Parent!.Parent!.FullName;
             string conceptFolder = System.IO.Path.Combine(rootPath, "Pictures", name, "Pictures");
             Directory.CreateDirectory(conceptFolder);
-
-            foreach (string originalPath in selectedPicturePaths)
-            {
-                string fileName = System.IO.Path.GetFileName(originalPath);
-                string destPath = System.IO.Path.Combine(conceptFolder, fileName);
-                File.Copy(originalPath, destPath, overwrite: true);
-                newConcept.AddPictures(destPath);
-            }
 
             string sketchFolder = System.IO.Path.Combine(rootPath, "Pictures", name, "Sketch");
             Directory.CreateDirectory(sketchFolder);
@@ -322,12 +315,12 @@ namespace StudioManager
             if (currentPictureIndex >= 0 && currentPictureIndex < selectedPicturePaths.Count)
             {
                 EditPicturePreviewImage.Source = null;
-                PicturePreviewImage.Source = null;
                 string fileToDelete = selectedPicturePaths[currentPictureIndex];
 
                 try
                 {
                     if (File.Exists(fileToDelete)) File.Delete(fileToDelete);
+                    editModeHasDeletions = true;
                 }
                 catch (Exception ex)
                 {
@@ -386,14 +379,7 @@ namespace StudioManager
                 }
                 else
                 {
-                    PicturePreviewImage.Source = bitmap;
-                    PicturePreviewImage.Visibility = Visibility.Visible;
-                    PictureAddIcon.Visibility = Visibility.Collapsed;
-                    PictureUploadBorder.MouseLeftButtonUp -= UploadPicture_Click;
-                    DeletePictureButton.Visibility = Visibility.Visible;
-                    ExtraPictureButton.Visibility = Visibility.Visible;
-                    PrevPictureButton.Visibility = selectedPicturePaths.Count > 1 ? Visibility.Visible : Visibility.Collapsed;
-                    NextPictureButton.Visibility = selectedPicturePaths.Count > 1 ? Visibility.Visible : Visibility.Collapsed;
+                    return;
                 }
             }
             else
@@ -410,14 +396,7 @@ namespace StudioManager
                 }
                 else
                 {
-                    PicturePreviewImage.Source = null;
-                    PicturePreviewImage.Visibility = Visibility.Collapsed;
-                    PictureAddIcon.Visibility = Visibility.Visible;
-                    PictureUploadBorder.MouseLeftButtonUp += UploadPicture_Click;
-                    DeletePictureButton.Visibility = Visibility.Collapsed;
-                    ExtraPictureButton.Visibility = Visibility.Collapsed;
-                    PrevPictureButton.Visibility = Visibility.Collapsed;
-                    NextPictureButton.Visibility = Visibility.Collapsed;
+                    return;
                 }
             }
         }
@@ -468,6 +447,8 @@ namespace StudioManager
                 try
                 {
                     File.Delete(selectedSketchPath);
+                    editModeHasDeletions = true;
+
                 }
                 catch (Exception ex)
                 {
@@ -490,6 +471,7 @@ namespace StudioManager
 
         private void EditConcept_Click(object sender, RoutedEventArgs e)
         {
+            editModeHasDeletions = false;
             Concept? selected = null;
 
             if (DashboardView.Visibility == Visibility.Visible)
@@ -628,6 +610,7 @@ namespace StudioManager
             }
 
             conceptBeingEdited.Update();
+            editModeHasDeletions = false;
 
             if (!string.Equals(oldName, newName, StringComparison.OrdinalIgnoreCase))
             {
