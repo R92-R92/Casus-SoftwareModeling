@@ -43,8 +43,6 @@ namespace StudioManager
 
 
 
-
-
         public MainWindow()
         {
             InitializeComponent();
@@ -250,6 +248,7 @@ namespace StudioManager
             Address updated = new Address(
                 id: 0,
                 locationName: null,
+                isLocationOnly: false,
                 street: HomeStreetTextBox.Text,
                 houseNumber: HomeHouseNumberTextBox.Text,
                 postalCode: HomePostalCodeTextBox.Text,
@@ -275,9 +274,6 @@ namespace StudioManager
             string name = NewConceptNameTextBox.Text;
             string description = NewConceptDescriptionTextBox.Text;
             Address? newAddress = selectedNewConceptAddress;
-
-
-            //newAddress.Create(); 
 
             string sketch = "";
 
@@ -1293,6 +1289,8 @@ namespace StudioManager
 
         private void CreateQuickAddress_Click(object sender, RoutedEventArgs e)
         {
+            bool isLocationOnly = QuickIsLocationOnlyCheckBox.IsChecked == true;
+
             string? locationName = QuickIsLocationOnlyCheckBox.IsChecked == true
                 ? QuickAddressLocationNameTextBox.Text
                 : null;
@@ -1300,6 +1298,7 @@ namespace StudioManager
             Address newAddress = new Address(
                 id: 0,
                 locationName: locationName,
+                isLocationOnly: isLocationOnly,
                 street: QuickAddressStreetTextBox.Text,
                 houseNumber: QuickAddressHouseNumberTextBox.Text,
                 postalCode: QuickAddressPostalCodeTextBox.Text,
@@ -1311,13 +1310,11 @@ namespace StudioManager
 
             if (addressReturnToView == "NewConcept")
             {
-                //selectedNewConceptAddress = newAddress;
                 NewConceptAddressToggleList.ItemsSource = new DAL().GetAllAddresses();
                 NewConceptForm.Visibility = Visibility.Visible;
             }
             else if (addressReturnToView == "EditConcept")
             {
-                //selectedEditConceptAddress = newAddress;
                 EditConceptAddressToggleList.ItemsSource = new DAL().GetAllAddresses();
                 EditConceptForm.Visibility = Visibility.Visible;
             }
@@ -1471,7 +1468,6 @@ namespace StudioManager
             HidePanels();
             NewAddressForm.Visibility = Visibility.Visible;
 
-            // Reset velden
             IsLocationOnlyCheckBox.IsChecked = false;
             NewAddressLocationNameTextBox.Text = "";
             NewAddressStreetTextBox.Text = "";
@@ -1480,7 +1476,6 @@ namespace StudioManager
             NewAddressCityTextBox.Text = "";
             NewAddressCountryTextBox.Text = "";
 
-            // Reset velden activeren
             ToggleLocationFields(null, null);
         }
 
@@ -1501,13 +1496,17 @@ namespace StudioManager
 
         private void SaveNewAddress_Click(object sender, RoutedEventArgs e)
         {
-            string? locationName = IsLocationOnlyCheckBox.IsChecked == true
+            bool isLocationOnly = IsLocationOnlyCheckBox.IsChecked == true;
+
+            string? locationName = isLocationOnly
                 ? NewAddressLocationNameTextBox.Text
                 : null;
+
 
             Address newAddress = new Address(
                 id: 0,
                 locationName: locationName,
+                isLocationOnly: isLocationOnly,
                 street: NewAddressStreetTextBox.Text,
                 houseNumber: NewAddressHouseNumberTextBox.Text,
                 postalCode: NewAddressPostalCodeTextBox.Text,
@@ -1538,6 +1537,7 @@ namespace StudioManager
                 return;
             }
 
+            EditIsLocationOnlyCheckBox.IsChecked = selected.IsLocationOnly;
             addressBeingEdited = selected;
 
             EditAddressLocationNameTextBox.Text = selected.LocationName;
@@ -1557,6 +1557,7 @@ namespace StudioManager
         {
             if (addressBeingEdited == null) return;
 
+            addressBeingEdited.IsLocationOnly = EditIsLocationOnlyCheckBox.IsChecked == true;
             addressBeingEdited.LocationName = EditAddressLocationNameTextBox.Text;
             addressBeingEdited.Street = EditAddressStreetTextBox.Text;
             addressBeingEdited.HouseNumber = EditAddressHouseNumberTextBox.Text;

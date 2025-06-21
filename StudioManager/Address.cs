@@ -11,6 +11,7 @@ namespace StudioManager
     {
         public int Id { get; set; }
         public string? LocationName { get; set; }
+        public bool IsLocationOnly { get; set; }
         public string Street { get; set; }
         public string HouseNumber { get; set; }
         public string PostalCode { get; set; }
@@ -19,11 +20,12 @@ namespace StudioManager
         DAL dal = new DAL();
 
 
-        public Address(int id,string? locationName, string street, string houseNumber, string postalCode, string city, string country)
+        public Address(int id,string? locationName, bool isLocationOnly, string street, string houseNumber, string postalCode, string city, string country)
 
         {
             Id = id;
             LocationName = locationName;
+            IsLocationOnly = isLocationOnly;
             Street = street;
             HouseNumber = houseNumber;
             PostalCode = postalCode;

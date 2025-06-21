@@ -23,7 +23,7 @@ namespace StudioManager
             using SqlConnection conn = new(connectionString);
             conn.Open();
 
-            string query = "SELECT Id, LocationName, Street, HouseNumber, PostalCode, City, Country FROM Address";
+            string query = "SELECT Id, LocationName, IsLocationOnly, Street, HouseNumber, PostalCode, City, Country FROM Address";
             using SqlCommand cmd = new(query, conn);
             using SqlDataReader reader = cmd.ExecuteReader();
 
@@ -32,6 +32,7 @@ namespace StudioManager
                 Address address = new(
                     id: reader.GetInt32(0),
                     locationName: reader["LocationName"]?.ToString(),
+                    isLocationOnly: Convert.ToBoolean(reader["IsLocationOnly"]),
                     street: reader["Street"].ToString(),
                     houseNumber: reader["HouseNumber"]?.ToString(),
                     postalCode: reader["PostalCode"].ToString(),
@@ -52,12 +53,13 @@ namespace StudioManager
             conn.Open();
 
             string query = @"
-        INSERT INTO Address (LocationName, Street, HouseNumber, PostalCode, City, Country)
-        VALUES (@LocationName, @Street, @HouseNumber, @PostalCode, @City, @Country);
+        INSERT INTO Address (LocationName, IsLocationOnly, Street, HouseNumber, PostalCode, City, Country)
+        VALUES (@LocationName, @IsLocationOnly, @Street, @HouseNumber, @PostalCode, @City, @Country);
         SELECT SCOPE_IDENTITY();";
 
             using SqlCommand cmd = new(query, conn);
             cmd.Parameters.AddWithValue("@LocationName", (object?)address.LocationName ?? DBNull.Value);
+            cmd.Parameters.AddWithValue("@IsLocationOnly", address.IsLocationOnly);
             cmd.Parameters.AddWithValue("@Street", address.Street);
             cmd.Parameters.AddWithValue("@HouseNumber", address.HouseNumber ?? "");
             cmd.Parameters.AddWithValue("@PostalCode", address.PostalCode);
@@ -79,6 +81,7 @@ namespace StudioManager
                 UPDATE Address SET
                     Street = @Street,
                     LocationName = @LocationName,
+                    IsLocationOnly = @IsLocationOnly,
                     HouseNumber = @HouseNumber,
                     PostalCode = @PostalCode,
                     City = @City,
@@ -88,6 +91,7 @@ namespace StudioManager
             using SqlCommand cmd = new(query, conn);
             cmd.Parameters.AddWithValue("@Id", address.Id);
             cmd.Parameters.AddWithValue("@LocationName", (object?)address.LocationName ?? DBNull.Value);
+            cmd.Parameters.AddWithValue("@IsLocationOnly", address.IsLocationOnly);
             cmd.Parameters.AddWithValue("@Street", address.Street);
             cmd.Parameters.AddWithValue("@HouseNumber", address.HouseNumber ?? "");
             cmd.Parameters.AddWithValue("@PostalCode", address.PostalCode);
@@ -722,7 +726,7 @@ namespace StudioManager
             using SqlConnection conn = new(connectionString);
             conn.Open();
 
-            string query = "SELECT Id, LocationName, Street, HouseNumber, PostalCode, City, Country FROM Address WHERE IsHome = 1";
+            string query = "SELECT Id, LocationName, IsLocationOnly, Street, HouseNumber, PostalCode, City, Country FROM Address WHERE IsHome = 1";
             using SqlCommand cmd = new(query, conn);
             using SqlDataReader reader = cmd.ExecuteReader();
 
@@ -731,6 +735,7 @@ namespace StudioManager
                 return new Address(
                     id: reader.GetInt32(0),
                     locationName: reader["LocationName"]?.ToString(),
+                    isLocationOnly: Convert.ToBoolean(reader["IsLocationOnly"]),
                     street: reader["Street"].ToString(),
                     houseNumber: reader["HouseNumber"]?.ToString(),
                     postalCode: reader["PostalCode"].ToString(),
@@ -848,7 +853,7 @@ namespace StudioManager
             using SqlConnection conn = new(connectionString);
             conn.Open();
 
-            string query = "SELECT Id, LocationName, Street, HouseNumber, PostalCode, City, Country FROM Address WHERE Id = @Id";
+            string query = "SELECT Id, LocationName, IsLocationOnly, Street, HouseNumber, PostalCode, City, Country FROM Address WHERE Id = @Id";
             using SqlCommand cmd = new(query, conn);
             cmd.Parameters.AddWithValue("@Id", id);
 
@@ -858,6 +863,7 @@ namespace StudioManager
                 return new Address(
                     id: reader.GetInt32(0),
                     locationName: reader["LocationName"]?.ToString(),
+                    isLocationOnly: Convert.ToBoolean(reader["IsLocationOnly"]),
                     street: reader["Street"].ToString(),
                     houseNumber: reader["HouseNumber"]?.ToString(),
                     postalCode: reader["PostalCode"].ToString(),
@@ -875,7 +881,7 @@ namespace StudioManager
             conn.Open();
 
             string query = @"
-                SELECT s.Id, s.Date, a.Id AS AddressId, a.LocationName, a.Street, a.HouseNumber, a.PostalCode, a.City, a.Country
+                SELECT s.Id, s.Date, a.Id AS AddressId, a.LocationName, a.IsLocationOnly, a.Street, a.HouseNumber, a.PostalCode, a.City, a.Country
                 FROM Shoot s
                 LEFT JOIN Address a ON s.AddressId = a.Id
                 INNER JOIN Concept c ON s.Id = c.ShootId
@@ -889,12 +895,12 @@ namespace StudioManager
             {
                 Address? address = null;
 
-                // Check of het adres daadwerkelijk bestaat (a.Id is niet null)
                 if (!reader.IsDBNull(reader.GetOrdinal("AddressId")))
                 {
                     address = new Address(
                         id: reader.GetInt32(reader.GetOrdinal("AddressId")),
                         locationName: reader["LocationName"]?.ToString(),
+                        isLocationOnly: Convert.ToBoolean(reader["IsLocationOnly"]),
                         street: reader["Street"]?.ToString() ?? "",
                         houseNumber: reader["HouseNumber"]?.ToString() ?? "",
                         postalCode: reader["PostalCode"]?.ToString() ?? "",
