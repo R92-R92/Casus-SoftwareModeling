@@ -39,6 +39,7 @@ namespace StudioManager
         private Address? selectedNewConceptAddress = null;
         private Address? selectedEditConceptAddress = null;
         private string? addressReturnToView = null;
+        private Address? addressBeingEdited = null;
 
 
 
@@ -1525,6 +1526,93 @@ namespace StudioManager
         {
             HidePanels();
             AddressesView.Visibility = Visibility.Visible;
+        }
+
+        private void EditAddress_Click(object sender, RoutedEventArgs e)
+        {
+            Address? selected = AddressesDataGrid.SelectedItem as Address;
+
+            if (selected == null)
+            {
+                MessageBox.Show("Please select an address to edit.");
+                return;
+            }
+
+            addressBeingEdited = selected;
+
+            EditAddressLocationNameTextBox.Text = selected.LocationName;
+            EditAddressStreetTextBox.Text = selected.Street;
+            EditAddressHouseNumberTextBox.Text = selected.HouseNumber;
+            EditAddressPostalCodeTextBox.Text = selected.PostalCode;
+            EditAddressCityTextBox.Text = selected.City;
+            EditAddressCountryTextBox.Text = selected.Country;
+
+            EditAddressForm.Visibility = Visibility.Visible;
+            AddressesView.Visibility = Visibility.Collapsed;
+            ToggleEditLocationFields(null, null);
+
+        }
+
+        private void SaveEditAddress_Click(object sender, RoutedEventArgs e)
+        {
+            if (addressBeingEdited == null) return;
+
+            addressBeingEdited.LocationName = EditAddressLocationNameTextBox.Text;
+            addressBeingEdited.Street = EditAddressStreetTextBox.Text;
+            addressBeingEdited.HouseNumber = EditAddressHouseNumberTextBox.Text;
+            addressBeingEdited.PostalCode = EditAddressPostalCodeTextBox.Text;
+            addressBeingEdited.City = EditAddressCityTextBox.Text;
+            addressBeingEdited.Country = EditAddressCountryTextBox.Text;
+
+            addressBeingEdited.Update();
+            addressBeingEdited = null;
+
+            RefreshAddressOverview();
+            EditAddressForm.Visibility = Visibility.Collapsed;
+            AddressesView.Visibility = Visibility.Visible;
+        }
+
+        private void CancelEditAddress_Click(object sender, RoutedEventArgs e)
+        {
+            addressBeingEdited = null;
+            EditAddressForm.Visibility = Visibility.Collapsed;
+            AddressesView.Visibility = Visibility.Visible;
+        }
+
+        private void ToggleEditLocationFields(object sender, RoutedEventArgs e)
+        {
+            bool isLocationOnly = EditIsLocationOnlyCheckBox.IsChecked == true;
+
+            EditAddressLocationNameTextBox.IsEnabled = isLocationOnly;
+
+            EditAddressStreetTextBox.IsEnabled = !isLocationOnly;
+            EditAddressHouseNumberTextBox.IsEnabled = !isLocationOnly;
+            EditAddressPostalCodeTextBox.IsEnabled = !isLocationOnly;
+            EditAddressCityTextBox.IsEnabled = !isLocationOnly;
+            EditAddressCountryTextBox.IsEnabled = !isLocationOnly;
+        }
+
+
+
+        private void DeleteAddress_Click(object sender, RoutedEventArgs e)
+        {
+            Address? selected = AddressesDataGrid.SelectedItem as Address;
+
+            if (selected == null)
+            {
+                MessageBox.Show("Please select an address to delete.", "No Selection", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            MessageBoxResult result = MessageBox.Show(
+                $"Are you sure you want to delete the address \"{(string.IsNullOrWhiteSpace(selected.LocationName) ? selected.Street + " " + selected.HouseNumber : selected.LocationName)}\"?",
+                "Confirm Deletion", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                selected.Delete();
+                RefreshAddressOverview();
+            }
         }
 
 
