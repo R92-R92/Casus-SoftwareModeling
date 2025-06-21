@@ -1883,7 +1883,6 @@ namespace StudioManager
 
             if (dlg.ShowDialog() == true)
             {
-                // Verwijder oude tijdelijke/gekoppelde file als deze er is
                 if (!string.IsNullOrEmpty(selectedEditContractPath) && File.Exists(selectedEditContractPath))
                 {
                     try
@@ -1896,7 +1895,6 @@ namespace StudioManager
                     }
                 }
 
-                // Kopieer geselecteerde bestand naar temp zodat originele bestand niet geblokkeerd blijft
                 string tempPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), Guid.NewGuid().ToString() + System.IO.Path.GetExtension(dlg.FileName));
                 File.Copy(dlg.FileName, tempPath, true);
                 selectedEditContractPath = tempPath;
@@ -1999,10 +1997,6 @@ namespace StudioManager
             ShootsView.Visibility = Visibility.Visible;
         }
 
-
-
-
-
         private void CancelEditShoot_Click(object sender, RoutedEventArgs e)
         {
             if (editShootContractReplaced)
@@ -2086,14 +2080,94 @@ namespace StudioManager
             }
         }
 
+        private void QuickAddAddressFromNewShoot_Click(object sender, RoutedEventArgs e)
+        {
+            HidePanels();
+            addressReturnToView = "NewShoot";
+            ResetQuickAddressFormFromShoot();
+            QuickAddAddressFormFromShoot.Visibility = Visibility.Visible;
+        }
+
+        private void QuickAddAddressFromEditShoot_Click(object sender, RoutedEventArgs e)
+        {
+            HidePanels();
+            addressReturnToView = "EditShoot";
+            ResetQuickAddressFormFromShoot();
+            QuickAddAddressFormFromShoot.Visibility = Visibility.Visible;
+        }
+
+        private void CreateQuickAddressFromShoot_Click(object sender, RoutedEventArgs e)
+        {
+            bool isLocationOnly = ShootIsLocationOnlyCheckBox.IsChecked == true;
+
+            string? locationName = isLocationOnly ? ShootLocationNameTextBox.Text : null;
+
+            Address newAddress = new Address(
+                id: 0,
+                locationName: locationName,
+                isLocationOnly: isLocationOnly,
+                street: ShootStreetTextBox.Text,
+                houseNumber: ShootHouseNumberTextBox.Text,
+                postalCode: ShootPostalCodeTextBox.Text,
+                city: ShootCityTextBox.Text,
+                country: ShootCountryTextBox.Text
+            );
+
+            newAddress.Create();
+
+            if (addressReturnToView == "NewShoot")
+            {
+                NewShootAddressToggleList.ItemsSource = new DAL().GetAllAddresses();
+                NewShootForm.Visibility = Visibility.Visible;
+            }
+            else if (addressReturnToView == "EditShoot")
+            {
+                EditShootAddressToggleList.ItemsSource = new DAL().GetAllAddresses();
+                EditShootForm.Visibility = Visibility.Visible;
+            }
+
+            addressReturnToView = null;
+            ResetQuickAddressFormFromShoot();
+            QuickAddAddressFormFromShoot.Visibility = Visibility.Collapsed;
+        }
+
+        private void CancelQuickAddressFromShoot_Click(object sender, RoutedEventArgs e)
+        {
+            if (addressReturnToView == "NewShoot")
+                NewShootForm.Visibility = Visibility.Visible;
+            else if (addressReturnToView == "EditShoot")
+                EditShootForm.Visibility = Visibility.Visible;
+
+            addressReturnToView = null;
+            ResetQuickAddressFormFromShoot();
+            QuickAddAddressFormFromShoot.Visibility = Visibility.Collapsed;
+        }
+
+        private void ToggleQuickLocationFieldsFromShoot(object sender, RoutedEventArgs e)
+        {
+            bool isLocationOnly = ShootIsLocationOnlyCheckBox.IsChecked == true;
+
+            ShootLocationNameTextBox.IsEnabled = isLocationOnly;
+
+            ShootStreetTextBox.IsEnabled = !isLocationOnly;
+            ShootHouseNumberTextBox.IsEnabled = !isLocationOnly;
+            ShootPostalCodeTextBox.IsEnabled = !isLocationOnly;
+            ShootCityTextBox.IsEnabled = !isLocationOnly;
+            ShootCountryTextBox.IsEnabled = !isLocationOnly;
+        }
 
 
-
-
-
-
-
-
+        private void ResetQuickAddressFormFromShoot()
+        {
+            ShootIsLocationOnlyCheckBox.IsChecked = false;
+            ShootLocationNameTextBox.Text = "";
+            ShootStreetTextBox.Text = "";
+            ShootHouseNumberTextBox.Text = "";
+            ShootPostalCodeTextBox.Text = "";
+            ShootCityTextBox.Text = "";
+            ShootCountryTextBox.Text = "";
+            ToggleQuickLocationFieldsFromShoot(null, null);
+        }
 
 
 
