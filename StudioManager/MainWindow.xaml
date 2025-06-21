@@ -87,7 +87,7 @@
                             </Grid>
 
                             <!-- Tabel -->
-                            <DataGrid x:Name="DashboardConceptsDataGrid" Grid.Row="2" AutoGenerateColumns="False" CanUserAddRows="False" HeadersVisibility="Column" ScrollViewer.CanContentScroll="False" >
+                            <DataGrid x:Name="DashboardConceptsDataGrid" Grid.Row="2" AutoGenerateColumns="False" CanUserAddRows="False" HeadersVisibility="Column" ScrollViewer.CanContentScroll="False" IsReadOnly="True">
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*"/>
                                     <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="2*"/>
@@ -155,7 +155,7 @@
                  
 
                     <!-- Project Overview Table -->
-                        <DataGrid x:Name="ProjectsDataGrid" Grid.Row="2" AutoGenerateColumns="False" CanUserAddRows="False" HeadersVisibility="Column" RowHeaderWidth="0" Margin="0,0,0,10">
+                    <DataGrid x:Name="ProjectsDataGrid" Grid.Row="2" AutoGenerateColumns="False" CanUserAddRows="False" HeadersVisibility="Column" RowHeaderWidth="0" Margin="0,0,0,10" IsReadOnly="True">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*"/>
                             <DataGridTextColumn Header="Deadline" Binding="{Binding Description}" Width="2*"/>
@@ -225,7 +225,7 @@
 
 
                     <!-- Shoot Overview Table -->
-                    <DataGrid x:Name="ShootsDataGrid" Grid.Row="2" AutoGenerateColumns="False" CanUserAddRows="False" HeadersVisibility="Column" RowHeaderWidth="0" Margin="0,0,0,10">
+                    <DataGrid x:Name="ShootsDataGrid" Grid.Row="2" AutoGenerateColumns="False" CanUserAddRows="False" HeadersVisibility="Column" RowHeaderWidth="0" Margin="0,0,0,10" IsReadOnly="True">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Location" Binding="{Binding Location}" Width="*"/>
                             <DataGridTextColumn Header="Date" Binding="{Binding Date}" Width="*"/>
@@ -294,7 +294,7 @@
                     </Grid>
 
                     <!-- Concept Overview Table -->
-                    <DataGrid x:Name="ConceptsDataGrid" Grid.Row="2" AutoGenerateColumns="False" CanUserAddRows="False" HeadersVisibility="Column" RowHeaderWidth="0" Margin="0,0,0,10" ScrollViewer.CanContentScroll="False" SelectionChanged="ConceptsDataGrid_SelectionChanged">
+                    <DataGrid x:Name="ConceptsDataGrid" Grid.Row="2" AutoGenerateColumns="False" CanUserAddRows="False" HeadersVisibility="Column" RowHeaderWidth="0" Margin="0,0,0,10" ScrollViewer.CanContentScroll="False" SelectionChanged="ConceptsDataGrid_SelectionChanged" IsReadOnly="True">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*"/>
                             <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="2*"/>
@@ -428,7 +428,7 @@
                     </Grid>
 
                     <!-- Prop Overview Table -->
-                    <DataGrid x:Name="PropsDataGrid" Grid.Row="2" AutoGenerateColumns="False" CanUserAddRows="False" HeadersVisibility="Column" RowHeaderWidth="0" Margin="0,0,0,10" SelectionChanged="PropsDataGrid_SelectionChanged">
+                    <DataGrid x:Name="PropsDataGrid" Grid.Row="2" AutoGenerateColumns="False" CanUserAddRows="False" HeadersVisibility="Column" RowHeaderWidth="0" Margin="0,0,0,10" SelectionChanged="PropsDataGrid_SelectionChanged" IsReadOnly="True">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*"/>
                             <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="*"/>
@@ -506,7 +506,7 @@
                     </Grid>
 
                     <!-- Contact Overview Table -->
-                    <DataGrid x:Name="ContactsDataGrid" Grid.Row="2" AutoGenerateColumns="False" CanUserAddRows="False" HeadersVisibility="Column" RowHeaderWidth="0" Margin="0,0,0,10">
+                    <DataGrid x:Name="ContactsDataGrid" Grid.Row="2" AutoGenerateColumns="False" CanUserAddRows="False" HeadersVisibility="Column" RowHeaderWidth="0" Margin="0,0,0,10" IsReadOnly="True">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="First Name" Binding="{Binding FirstName}" Width="*"/>
                             <DataGridTextColumn Header="Last Name" Binding="{Binding LastName}" Width="*"/>
@@ -578,7 +578,7 @@
                     </Grid>
 
                     <!-- Address DataGrid -->
-                    <DataGrid x:Name="AddressesDataGrid" Grid.Row="2" AutoGenerateColumns="False" CanUserAddRows="False" HeadersVisibility="Column" RowHeaderWidth="0" Margin="0,0,0,10" SelectionChanged="AddressesDataGrid_SelectionChanged">
+                    <DataGrid x:Name="AddressesDataGrid" Grid.Row="2" AutoGenerateColumns="False" CanUserAddRows="False" HeadersVisibility="Column" RowHeaderWidth="0" Margin="0,0,0,10" SelectionChanged="AddressesDataGrid_SelectionChanged" IsReadOnly="True">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Location" Binding="{Binding LocationName}" Width="*"/>
                             <DataGridTextColumn Header="Street" Binding="{Binding Street}" Width="*"/>
