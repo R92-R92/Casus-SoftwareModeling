@@ -1167,7 +1167,7 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <Button Content="Save Changes" Width="100" HorizontalAlignment="Left" Grid.Column="0" Margin="110,10"
+                <Button Content="Save" Width="100" HorizontalAlignment="Left" Grid.Column="0" Margin="110,10"
                 Click="SaveEditConcept_Click"/>
                 <Button Content="Cancel" Width="100" HorizontalAlignment="Right" Grid.Column="1" Margin="110,10"
                 Click="CancelEditConcept_Click"/>
@@ -1375,10 +1375,18 @@
             </StackPanel>
 
             <!-- Knoppen -->
-            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,20,0,0">
-                <Button Content="Save" Width="100" Margin="10" Click="SaveNewAddress_Click"/>
-                <Button Content="Cancel" Width="100" Margin="10" Click="CancelNewAddress_Click"/>
-            </StackPanel>
+            <Grid Grid.Row="2" Margin="0,20">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Button Content="Create" Width="100" HorizontalAlignment="Left" Grid.Column="0" Margin="100,0"
+            Click="SaveNewAddress_Click"/>
+                <Button Content="Cancel" Width="100" HorizontalAlignment="Right" Grid.Column="1" Margin="100,0"
+            Click="CancelNewAddress_Click"/>
+            </Grid>
+
         </Grid>
 
         
@@ -1426,7 +1434,7 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <Button Content="Save" Width="100" HorizontalAlignment="Left" Grid.Column="0" Margin="110,10"
+                <Button Content="Create" Width="100" HorizontalAlignment="Left" Grid.Column="0" Margin="110,10"
                 Click="CreateQuickAddress_Click"/>
                 <Button Content="Cancel" Width="100" HorizontalAlignment="Right" Grid.Column="1" Margin="110,10"
                 Click="CancelQuickAddAddress_Click"/>
@@ -1480,10 +1488,18 @@
             </StackPanel>
 
             <!-- Knoppen -->
-            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,20,0,0">
-                <Button Content="Save" Width="100" Margin="10" Click="SaveEditAddress_Click"/>
-                <Button Content="Cancel" Width="100" Margin="10" Click="CancelEditAddress_Click"/>
-            </StackPanel>
+            <Grid Grid.Row="2" Margin="0,20">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Button Content="Save" Width="100" HorizontalAlignment="Left" Grid.Column="0" Margin="100,0"
+            Click="SaveEditAddress_Click"/>
+                <Button Content="Cancel" Width="100" HorizontalAlignment="Right" Grid.Column="1" Margin="100,0"
+            Click="CancelEditAddress_Click"/>
+            </Grid>
+
         </Grid>
 
 
