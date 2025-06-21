@@ -240,7 +240,7 @@
                             <DataGridTemplateColumn Header="Del" Width="Auto">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <Button Content="Delete" Width="60" Margin="2"/>
+                                        <Button Content="Delete" Width="60" Margin="2" Click="DeleteShoot_Click"/>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
@@ -1631,8 +1631,10 @@
                 <!-- Upload Contract -->
                 <StackPanel Orientation="Horizontal" Margin="0,20,0,5">
                     <TextBlock Text="Upload Contract:" Width="120"/>
-                    <Button Content="Upload" Width="100" Click="UploadContractForNewShoot_Click"/>
+                    <Button Content="Upload" Width="100" Click="UploadContractForNewShoot_Click" Margin="0,0,10,0"/>
+                    <TextBlock x:Name="SelectedContractFileNameTextBlock" VerticalAlignment="Center" FontStyle="Italic" Foreground="Gray"/>
                 </StackPanel>
+
 
             </StackPanel>
 

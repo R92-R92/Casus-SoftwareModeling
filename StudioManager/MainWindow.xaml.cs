@@ -47,6 +47,10 @@ namespace StudioManager
         private Contact? selectedNewShootContact = null;
 
 
+        private string? selectedContractPath;
+
+
+
 
         public MainWindow()
         {
@@ -1502,6 +1506,9 @@ namespace StudioManager
             NewShootContactToggleList.ItemsSource = new DAL().GetAllContacts();
             NewShootIsSignedCheckBox.IsChecked = false;
             NewShootSignedOnDatePicker.SelectedDate = null;
+            selectedContractPath = null;
+            SelectedContractFileNameTextBlock.Text = "No file selected.";
+
         }
 
         private void AddNewShootAddress_Click(object sender, RoutedEventArgs e)
@@ -1537,8 +1544,18 @@ namespace StudioManager
 
         private void UploadContractForNewShoot_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Contract uploaden is nog niet geïmplementeerd.");
+            var dlg = new Microsoft.Win32.OpenFileDialog
+            {
+                Filter = "PDF files (*.pdf)|*.pdf|Word documents (*.doc;*.docx)|*.doc;*.docx|All files (*.*)|*.*"
+            };
+
+            if (dlg.ShowDialog() == true)
+            {
+                selectedContractPath = dlg.FileName;
+                SelectedContractFileNameTextBlock.Text = System.IO.Path.GetFileName(selectedContractPath);
+            }
         }
+
 
         private void CancelNewShoot_Click(object sender, RoutedEventArgs e)
         {
@@ -1568,13 +1585,27 @@ namespace StudioManager
 
             Contract newContract = new Contract(
                 id: 0,
-                body: "", // Placeholder, wordt later geüpload
+                body: "",
                 signee: selectedNewShootContact,
                 isSigned: NewShootIsSignedCheckBox.IsChecked == true,
                 signedOn: NewShootSignedOnDatePicker.SelectedDate,
-                shoot: newShoot,
-                payment: false
+                shoot: newShoot
             );
+
+            if (!string.IsNullOrEmpty(selectedContractPath) && File.Exists(selectedContractPath))
+            {
+                string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+                string rootPath = Directory.GetParent(baseDir)!.Parent!.Parent!.Parent!.Parent!.FullName;
+                string shootFolder = System.IO.Path.Combine(rootPath, "ShootContract", $"{newShoot.Date:yyyy-MM-dd}_{newShoot.Id}");
+
+                Directory.CreateDirectory(shootFolder);
+
+                string fileName = System.IO.Path.GetFileName(selectedContractPath);
+                string destPath = System.IO.Path.Combine(shootFolder, fileName);
+
+                File.Copy(selectedContractPath, destPath, overwrite: true);
+                newContract.Body = destPath;
+            }
 
             newContract.Create();
             ShootsButton_Click(null, null);
@@ -1607,6 +1638,50 @@ namespace StudioManager
         {
             if (sender is Button btn && btn.Tag is Contact contact)
                 btn.IsEnabled = selectedNewShootContact != null && selectedNewShootContact.Id == contact.Id;
+        }
+
+        private void DeleteShoot_Click(object sender, RoutedEventArgs e)
+        {
+            Shoot? selected = ShootsDataGrid.SelectedItem as Shoot;
+
+            if (selected == null)
+            {
+                MessageBox.Show("Please select a shoot to delete.", "No Selection", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            MessageBoxResult result = MessageBox.Show(
+                $"Are you sure you want to delete the shoot on {selected.Date:yyyy-MM-dd}?",
+                "Confirm Deletion", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+
+            if (result != MessageBoxResult.Yes)
+                return;
+
+            // Verwijder de contractmap
+            string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+            string rootPath = Directory.GetParent(baseDir)!.Parent!.Parent!.Parent!.Parent!.FullName;
+            string shootFolder = System.IO.Path.Combine(rootPath, "ShootContract", $"{selected.Date:yyyy-MM-dd}_{selected.Id}");
+
+            if (Directory.Exists(shootFolder))
+            {
+                try
+                {
+                    Directory.Delete(shootFolder, recursive: true);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Could not delete contract folder: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+
+            // Verwijder shoot en bijbehorend contract uit database
+            foreach (var contract in new DAL().GetAllContracts().Where(c => c.Shoot?.Id == selected.Id))
+            {
+                contract.Delete();
+            }
+
+            selected.Delete();
+            RefreshShootOverview();
         }
 
 
