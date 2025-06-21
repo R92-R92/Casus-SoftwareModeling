@@ -52,10 +52,13 @@ namespace StudioManager
         private Address? selectedQuickShootAddress = null;
         private Contact? selectedQuickShootContact = null;
 
-
         private string? selectedContractPath;
 
-
+        private Shoot? shootBeingEdited = null;
+        private Address? selectedEditShootAddress = null;
+        private Contact? selectedEditShootContact = null;
+        private string? selectedEditContractPath = null;
+        private bool editShootContractReplaced = false;
 
 
         public MainWindow()
@@ -82,6 +85,7 @@ namespace StudioManager
             AddressesView.Visibility = Visibility.Collapsed;
             NewAddressForm.Visibility = Visibility.Collapsed;
             NewShootForm.Visibility = Visibility.Collapsed;
+            EditShootForm.Visibility= Visibility.Collapsed;
         }
 
         public void DashboardButton_Click(object sender, RoutedEventArgs e)
@@ -506,7 +510,6 @@ namespace StudioManager
             }
         }
 
-
         private void DeleteSketch_Click(object sender, RoutedEventArgs e)
         {
 
@@ -859,9 +862,6 @@ namespace StudioManager
             ConceptsDataGrid.IsEnabled = true;
         }
 
-
-
-
         private void ShowDetailPicture()
         {
             if (detailPicturePaths.Count > 0 && detailCurrentPictureIndex >= 0)
@@ -1057,7 +1057,6 @@ namespace StudioManager
             QuickAddPropForm.Visibility = Visibility.Collapsed;
         }
 
-
         private void AddProp_Click(object sender, RoutedEventArgs e)
         {
             if (sender is Button btn && btn.DataContext is Prop prop && !selectedProps.Contains(prop))
@@ -1202,13 +1201,6 @@ namespace StudioManager
             }
         }
 
-
-
-
-
-
-
-
         private void AddNewConceptAddress_Click(object sender, RoutedEventArgs e)
         {
             if (sender is Button btn && btn.Tag is Address address)
@@ -1232,17 +1224,11 @@ namespace StudioManager
             }
         }
 
-
         private void UpdateRemoveAddressButtonState(object sender, RoutedEventArgs e)
         {
             if (sender is Button btn && btn.Tag is Address address)
                 btn.IsEnabled = selectedNewConceptAddress != null && selectedNewConceptAddress.Id == address.Id;
         }
-
-
-
-
-
 
         private void AddEditConceptAddress_Click(object sender, RoutedEventArgs e)
         {
@@ -1270,11 +1256,6 @@ namespace StudioManager
             if (sender is Button btn && btn.Tag is Address address)
                 btn.IsEnabled = selectedEditConceptAddress != null && selectedEditConceptAddress.Id == address.Id;
         }
-
-
-
-
-
 
         private void QuickAddAddressFromNewConcept_Click(object sender, RoutedEventArgs e)
         {
@@ -1363,14 +1344,6 @@ namespace StudioManager
             QuickAddAddressForm.Visibility = Visibility.Collapsed;
         }
 
-
-
-
-
-
-
-
-
         private void QuickAddShootFromEditConcept_Click(object sender, RoutedEventArgs e)
         {
             HidePanels();
@@ -1391,9 +1364,6 @@ namespace StudioManager
             QuickAddShootForm.Visibility = Visibility.Visible;
         }
 
-
-
-
         private void UploadContractForQuickShoot_Click(object sender, RoutedEventArgs e)
         {
             var dlg = new Microsoft.Win32.OpenFileDialog
@@ -1407,7 +1377,6 @@ namespace StudioManager
                 QuickSelectedContractTextBlock.Text = System.IO.Path.GetFileName(quickShootContractPath);
             }
         }
-
 
         private void CreateQuickShoot_Click(object sender, RoutedEventArgs e)
         {
@@ -1458,8 +1427,6 @@ namespace StudioManager
             quickShootReturnToView = null;
         }
 
-
-
         private void CancelQuickAddShoot_Click(object sender, RoutedEventArgs e)
         {
             if (quickShootReturnToView == "EditConcept")
@@ -1468,7 +1435,6 @@ namespace StudioManager
             QuickAddShootForm.Visibility = Visibility.Collapsed;
             quickShootReturnToView = null;
         }
-
 
         private void AddQuickShootAddress_Click(object sender, RoutedEventArgs e)
         {
@@ -1531,31 +1497,6 @@ namespace StudioManager
                 btn.IsEnabled = selectedQuickShootContact?.Id == contact.Id;
             }
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
         // PROPS
 
@@ -1900,6 +1841,254 @@ namespace StudioManager
             selected.Delete();
             RefreshShootOverview();
         }
+
+
+
+        private void EditShoot_Click(object sender, RoutedEventArgs e)
+        {
+            if (ShootsDataGrid.SelectedItem is not Shoot selected) return;
+
+            shootBeingEdited = selected;
+            selectedEditShootAddress = selected.Location;
+
+            var contract = new DAL().GetContractByShootId(selected.Id);
+
+            selectedEditShootContact = contract?.Signee;
+            selectedEditContractPath = contract?.Body;
+            editShootContractReplaced = false;
+
+            EditShootDatePicker.SelectedDate = selected.Date;
+            EditShootIsSignedCheckBox.IsChecked = contract?.IsSigned ?? false;
+            EditShootSignedOnDatePicker.SelectedDate = contract?.SignedOn;
+
+            EditShootAddressToggleList.ItemsSource = new DAL().GetAllAddresses();
+            EditShootContactToggleList.ItemsSource = new DAL().GetAllContacts();
+
+            EditSelectedContractFileNameTextBlock.Text = string.IsNullOrEmpty(selectedEditContractPath)
+                ? "No file selected."
+                : System.IO.Path.GetFileName(selectedEditContractPath);
+
+            HidePanels();
+            EditShootForm.Visibility = Visibility.Visible;
+        }
+
+
+
+        private void UploadContractForEditShoot_Click(object sender, RoutedEventArgs e)
+        {
+            var dlg = new Microsoft.Win32.OpenFileDialog
+            {
+                Filter = "PDF files (*.pdf)|*.pdf|Word documents (*.doc;*.docx)|*.doc;*.docx|All files (*.*)|*.*"
+            };
+
+            if (dlg.ShowDialog() == true)
+            {
+                // Verwijder oude tijdelijke/gekoppelde file als deze er is
+                if (!string.IsNullOrEmpty(selectedEditContractPath) && File.Exists(selectedEditContractPath))
+                {
+                    try
+                    {
+                        File.Delete(selectedEditContractPath);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Could not delete old contract: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
+
+                // Kopieer geselecteerde bestand naar temp zodat originele bestand niet geblokkeerd blijft
+                string tempPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), Guid.NewGuid().ToString() + System.IO.Path.GetExtension(dlg.FileName));
+                File.Copy(dlg.FileName, tempPath, true);
+                selectedEditContractPath = tempPath;
+
+                EditSelectedContractFileNameTextBlock.Text = System.IO.Path.GetFileName(tempPath);
+                editShootContractReplaced = true;
+            }
+        }
+
+
+        private void SaveEditShoot_Click(object sender, RoutedEventArgs e)
+        {
+            if (shootBeingEdited == null) return;
+
+            string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+            string rootPath = Directory.GetParent(baseDir)!.Parent!.Parent!.Parent!.Parent!.FullName;
+
+            string oldLocationName = !string.IsNullOrWhiteSpace(shootBeingEdited.Location?.LocationName)
+                ? shootBeingEdited.Location.LocationName
+                : $"{shootBeingEdited.Location?.Street}_{shootBeingEdited.Location?.HouseNumber}";
+            foreach (char c in System.IO.Path.GetInvalidFileNameChars()) oldLocationName = oldLocationName.Replace(c, '_');
+            oldLocationName = oldLocationName.Replace(" ", "_");
+            string oldFolder = System.IO.Path.Combine(rootPath, "ShootContract", $"{shootBeingEdited.Date:yyyy-MM-dd}_{shootBeingEdited.Id}_{oldLocationName}");
+
+            string? oldContractPath = new DAL().GetContractByShootId(shootBeingEdited.Id)?.Body;
+
+            shootBeingEdited.Date = EditShootDatePicker.SelectedDate;
+            shootBeingEdited.Location = selectedEditShootAddress;
+            shootBeingEdited.Update();
+
+            string newLocationName = !string.IsNullOrWhiteSpace(shootBeingEdited.Location?.LocationName)
+                ? shootBeingEdited.Location.LocationName
+                : $"{shootBeingEdited.Location?.Street}_{shootBeingEdited.Location?.HouseNumber}";
+            foreach (char c in System.IO.Path.GetInvalidFileNameChars()) newLocationName = newLocationName.Replace(c, '_');
+            newLocationName = newLocationName.Replace(" ", "_");
+
+            string newFolder = System.IO.Path.Combine(rootPath, "ShootContract", $"{shootBeingEdited.Date:yyyy-MM-dd}_{shootBeingEdited.Id}_{newLocationName}");
+            Directory.CreateDirectory(newFolder);
+
+            Contract? contract = new DAL().GetContractByShootId(shootBeingEdited.Id);
+            if (contract != null)
+            {
+                contract.Signee = selectedEditShootContact;
+                contract.IsSigned = EditShootIsSignedCheckBox.IsChecked == true;
+                contract.SignedOn = EditShootSignedOnDatePicker.SelectedDate;
+
+                string? filename = selectedEditContractPath != null ? System.IO.Path.GetFileName(selectedEditContractPath) : null;
+
+                if (!string.IsNullOrEmpty(selectedEditContractPath))
+                {
+                    string destPath = System.IO.Path.Combine(newFolder, filename!);
+
+                    if (!string.Equals(selectedEditContractPath, destPath, StringComparison.OrdinalIgnoreCase))
+                    {
+                        File.Copy(selectedEditContractPath, destPath, true);
+                    }
+
+                    contract.Body = destPath;
+
+                    if (editShootContractReplaced && !string.IsNullOrEmpty(oldContractPath) && File.Exists(oldContractPath))
+                    {
+                        try { File.Delete(oldContractPath); } catch { }
+                    }
+                }
+                else if (!string.IsNullOrEmpty(oldContractPath) && oldFolder != newFolder && File.Exists(oldContractPath))
+                {
+                    string newPath = System.IO.Path.Combine(newFolder, System.IO.Path.GetFileName(oldContractPath));
+                    try
+                    {
+                        File.Copy(oldContractPath, newPath, true);
+                        File.Delete(oldContractPath);
+                        contract.Body = newPath;
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Kon contractbestand verplaatsen: {ex.Message}", "Fout", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    }
+                }
+
+                contract.Update();
+            }
+
+            if (oldFolder != newFolder && Directory.Exists(oldFolder))
+            {
+                try { Directory.Delete(oldFolder, true); }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Kon oude map niet verwijderen: {ex.Message}", "Fout", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+
+            shootBeingEdited = null;
+            selectedEditShootAddress = null;
+            selectedEditShootContact = null;
+            selectedEditContractPath = null;
+            editShootContractReplaced = false;
+
+            RefreshShootOverview();
+            HidePanels();
+            ShootsView.Visibility = Visibility.Visible;
+        }
+
+
+
+
+
+        private void CancelEditShoot_Click(object sender, RoutedEventArgs e)
+        {
+            if (editShootContractReplaced)
+            {
+                MessageBox.Show("You replaced the contract file. You must press 'Save' to finalize this change. Cancel is no longer allowed.", "Action Required", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            shootBeingEdited = null;
+            selectedEditShootAddress = null;
+            selectedEditShootContact = null;
+            selectedEditContractPath = null;
+            editShootContractReplaced = false;
+
+            HidePanels();
+            ShootsView.Visibility = Visibility.Visible;
+        }
+
+
+
+        private void AddEditShootAddress_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.Tag is Address address)
+            {
+                selectedEditShootAddress = address;
+                EditShootAddressToggleList.Items.Refresh();
+            }
+        }
+
+        private void RemoveEditShootAddress_Click(object sender, RoutedEventArgs e)
+        {
+            selectedEditShootAddress = null;
+            EditShootAddressToggleList.Items.Refresh();
+        }
+
+        private void UpdateAddEditShootAddressButtonState(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.Tag is Address)
+            {
+                btn.IsEnabled = selectedEditShootAddress == null;
+            }
+        }
+
+        private void UpdateRemoveEditShootAddressButtonState(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.Tag is Address address)
+            {
+                btn.IsEnabled = selectedEditShootAddress?.Id == address.Id;
+            }
+        }
+
+
+        private void AddEditShootContact_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.Tag is Contact contact)
+            {
+                selectedEditShootContact = contact;
+                EditShootContactToggleList.Items.Refresh();
+            }
+        }
+
+        private void RemoveEditShootContact_Click(object sender, RoutedEventArgs e)
+        {
+            selectedEditShootContact = null;
+            EditShootContactToggleList.Items.Refresh();
+        }
+
+        private void UpdateAddEditShootContactButtonState(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.Tag is Contact)
+            {
+                btn.IsEnabled = selectedEditShootContact == null;
+            }
+        }
+
+        private void UpdateRemoveEditShootContactButtonState(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.Tag is Contact contact)
+            {
+                btn.IsEnabled = selectedEditShootContact?.Id == contact.Id;
+            }
+        }
+
+
+
+
 
 
 
