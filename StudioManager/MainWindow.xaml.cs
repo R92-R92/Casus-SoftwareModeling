@@ -1844,11 +1844,12 @@ namespace StudioManager
             }
 
             MessageBoxResult result = MessageBox.Show(
-                $"Are you sure you want to delete the address \"{(string.IsNullOrWhiteSpace(selected.LocationName) ? selected.Street + " " + selected.HouseNumber : selected.LocationName)}\"?",
+                $"Are you sure you want to delete the address \"{(string.IsNullOrWhiteSpace(selected.LocationName) ? selected.Street + " " + selected.HouseNumber : selected.LocationName)}\"?\n\nAll references from contacts, shoots, and concepts will be removed.",
                 "Confirm Deletion", MessageBoxButton.YesNo, MessageBoxImage.Warning);
 
             if (result == MessageBoxResult.Yes)
             {
+                new DAL().UnlinkAddressReferences(selected.Id);
                 selected.Delete();
                 RefreshAddressOverview();
             }
