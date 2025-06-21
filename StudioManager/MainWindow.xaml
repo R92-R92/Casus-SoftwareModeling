@@ -41,6 +41,7 @@
                     <Button Content="Shoots" Margin="0,5" Padding="10" Click="ShootsButton_Click"/>
                     <Button Content="Props" Margin="0,5" Padding="10" Click="PropsButton_Click"/>
                     <Button Content="Contacts" Margin="0,5" Padding="10" Click="ContactsButton_Click"/>
+                    <Button Content="Addresses" Margin="0,5" Padding="10" Click="AddressesButton_Click"/>
                 </StackPanel>
 
                 <!-- Change Location -->
@@ -344,6 +345,8 @@
                             <TextBlock x:Name="DetailAddress" Grid.Row="1" Grid.Column="1" Margin="10,2"/>
                             <TextBlock x:Name="DetailProps" Grid.Row="2" Grid.Column="0" Margin="0,2"/>
                             <TextBlock x:Name="DetailShoot" Grid.Row="2" Grid.Column="1" Margin="10,2"/>
+                            <TextBlock x:Name="DetailShootAddress" Grid.Row="3" Grid.Column="0" Margin="0,2"/>
+
 
                             <!-- Sketch Preview -->
                             <Border x:Name="DetailSketchBorder" Grid.Row="0" Grid.RowSpan="4" Grid.Column="2" 
@@ -533,6 +536,76 @@
                         </StackPanel>
                     </Border>
                 </Grid>
+
+                <!-- ADDRESSES -->
+                <Grid x:Name="AddressesView" Visibility="Collapsed">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="0.6*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Address Overview Label -->
+                    <TextBlock Grid.Row="0" Text="Address Overview" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center" Margin="0,0,0,5"/>
+
+                    <!-- Search Field (left) + New Address Button (right) -->
+                    <Grid Grid.Row="1" Margin="0,0,0,5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Grid Grid.Column="0" Width="200" Height="25" Margin="0,0,10,0" HorizontalAlignment="Left" VerticalAlignment="Center">
+                            <TextBox x:Name="AddressesSearchTextBox" VerticalContentAlignment="Center" Padding="2,0,0,0" TextChanged="SearchBox_Addresses"/>
+                            <TextBlock x:Name="AddressesSearchPlaceholder" Text="Search addresses..." Foreground="Gray" Margin="5,0,0,0" VerticalAlignment="Center" IsHitTestVisible="False" Visibility="Visible"/>
+                        </Grid>
+
+                        <Button Grid.Column="1" Content="New Address" Width="100" HorizontalAlignment="Right" Click="NewAddressButton_Click"/>
+                    </Grid>
+
+                    <!-- Address DataGrid -->
+                    <DataGrid x:Name="AddressesDataGrid" Grid.Row="2" AutoGenerateColumns="False" CanUserAddRows="False" HeadersVisibility="Column" RowHeaderWidth="0" Margin="0,0,0,10">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Location" Binding="{Binding LocationName}" Width="*"/>
+                            <DataGridTextColumn Header="Street" Binding="{Binding Street}" Width="*"/>
+                            <DataGridTextColumn Header="House Number" Binding="{Binding HouseNumber}" Width="*"/>
+                            <DataGridTextColumn Header="Postal Code" Binding="{Binding PostalCode}" Width="*"/>
+                            <DataGridTextColumn Header="City" Binding="{Binding City}" Width="*"/>
+                            <DataGridTextColumn Header="Country" Binding="{Binding Country}" Width="*"/>
+                            <DataGridTemplateColumn Header="Edit" Width="Auto">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Content="Edit" Width="50" Margin="2"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn Header="Del" Width="Auto">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Content="Delete" Width="60" Margin="2"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                    <!-- Address Details Label -->
+                    <TextBlock Grid.Row="3" Text="Address Details" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center" Margin="0,0,0,5"/>
+
+                    <!-- Address Details -->
+                    <Border Grid.Row="4" BorderThickness="1" BorderBrush="Gray" Padding="10" Margin="0,0,0,10">
+                        <StackPanel>
+                            <TextBlock Text="- Street: [Street]"/>
+                            <TextBlock Text="- House Number: [House Number]"/>
+                            <TextBlock Text="- Postal Code: [Postal Code]"/>
+                            <TextBlock Text="- City: [City]"/>
+                            <TextBlock Text="- Country: [Country]"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+
             </Grid>
         </Border>
 
@@ -644,32 +717,70 @@
                     <TextBox x:Name="NewConceptDescriptionTextBox" Width="250" Height="100" AcceptsReturn="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"/>
                 </StackPanel>
 
-                <!-- Location -->
-                <StackPanel Grid.Row="1" Grid.Column="0" Margin="0,5">
-                    <TextBlock Text="Address Info:" FontWeight="Bold" Margin="0,0,0,5"/>
+                <!-- Select Location -->
+                <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="0" Margin="0,5,0,5">
+                    <TextBlock Text="Select Location:" Width="100" VerticalAlignment="Top"/>
+
                     <StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="0,2">
-                            <TextBlock Text="Street:" Width="100"/>
-                            <TextBox x:Name="NewAddressStreetTextBox" Width="150"/>
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="0,2">
-                            <TextBlock Text="House No.:" Width="100"/>
-                            <TextBox x:Name="NewAddressHouseNumberTextBox" Width="150"/>
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="0,2">
-                            <TextBlock Text="Postal Code:" Width="100"/>
-                            <TextBox x:Name="NewAddressPostalCodeTextBox" Width="150"/>
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="0,2">
-                            <TextBlock Text="City:" Width="100"/>
-                            <TextBox x:Name="NewAddressCityTextBox" Width="150"/>
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="0,2">
-                            <TextBlock Text="Country:" Width="100"/>
-                            <TextBox x:Name="NewAddressCountryTextBox" Width="150"/>
-                        </StackPanel>
+                        <Border BorderBrush="Gray" BorderThickness="1" Background="White" Width="250" Height="150" CornerRadius="5">
+                            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                <ItemsControl x:Name="NewConceptAddressToggleList">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <DockPanel Margin="4,2">
+                                                <TextBlock Width="160" VerticalAlignment="Center">
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="TextBlock">
+                                                            <Setter Property="Text" Value="{Binding LocationName}" />
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding LocationName}" Value="">
+                                                                    <Setter Property="Text">
+                                                                        <Setter.Value>
+                                                                            <MultiBinding StringFormat="{}{0} {1}, {2} {3}, {4}">
+                                                                                <Binding Path="Street"/>
+                                                                                <Binding Path="HouseNumber"/>
+                                                                                <Binding Path="PostalCode"/>
+                                                                                <Binding Path="City"/>
+                                                                                <Binding Path="Country"/>
+                                                                            </MultiBinding>
+                                                                        </Setter.Value>
+                                                                    </Setter>
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding LocationName}" Value="{x:Null}">
+                                                                    <Setter Property="Text">
+                                                                        <Setter.Value>
+                                                                            <MultiBinding StringFormat="{}{0} {1}, {2} {3}, {4}">
+                                                                                <Binding Path="Street"/>
+                                                                                <Binding Path="HouseNumber"/>
+                                                                                <Binding Path="PostalCode"/>
+                                                                                <Binding Path="City"/>
+                                                                                <Binding Path="Country"/>
+                                                                            </MultiBinding>
+                                                                        </Setter.Value>
+                                                                    </Setter>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+                                                </TextBlock>
+                                                <Button Content="–" Width="25" Margin="2,0"
+                                        Click="RemoveNewConceptAddress_Click"
+                                        Tag="{Binding}" Loaded="UpdateRemoveAddressButtonState"/>
+                                                <Button Content="+" Width="25" Margin="2,0"
+                                        Click="AddNewConceptAddress_Click"
+                                        Tag="{Binding}" Loaded="UpdateAddAddressButtonState"/>
+                                            </DockPanel>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+                        </Border>
+
+                        <Button Content="Add Address" Width="100" Margin="0,5,0,0"
+                HorizontalAlignment="Center" Click="QuickAddAddressFromNewConcept_Click"/>
                     </StackPanel>
                 </StackPanel>
+
 
 
                 <!-- Select Models -->
@@ -815,33 +926,71 @@
                     <TextBox x:Name="EditConceptDescriptionTextBox" Width="250" Height="100" AcceptsReturn="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"/>
                 </StackPanel>
 
-                <!-- Location -->
                 <!-- Address -->
-                <StackPanel Orientation="Vertical" Grid.Row="1" Grid.Column="0" Margin="0,5">
-                    <TextBlock Text="Address Info:" FontWeight="Bold" Margin="0,0,0,5"/>
+                <!-- Select Location -->
+                <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="0" Margin="0,5,0,5">
+                    <TextBlock Text="Select Location:" Width="100" VerticalAlignment="Top"/>
+
                     <StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="0,2">
-                            <TextBlock Text="Street:" Width="100"/>
-                            <TextBox x:Name="EditAddressStreetTextBox" Width="150"/>
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="0,2">
-                            <TextBlock Text="House No.:" Width="100"/>
-                            <TextBox x:Name="EditAddressHouseNumberTextBox" Width="150"/>
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="0,2">
-                            <TextBlock Text="Postal Code:" Width="100"/>
-                            <TextBox x:Name="EditAddressPostalCodeTextBox" Width="150"/>
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="0,2">
-                            <TextBlock Text="City:" Width="100"/>
-                            <TextBox x:Name="EditAddressCityTextBox" Width="150"/>
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="0,2">
-                            <TextBlock Text="Country:" Width="100"/>
-                            <TextBox x:Name="EditAddressCountryTextBox" Width="150"/>
-                        </StackPanel>
+                        <Border BorderBrush="Gray" BorderThickness="1" Background="White" Width="250" Height="150" CornerRadius="5">
+                            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                <ItemsControl x:Name="EditConceptAddressToggleList">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <DockPanel Margin="4,2">
+                                                <TextBlock Width="160" VerticalAlignment="Center">
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="TextBlock">
+                                                            <Setter Property="Text" Value="{Binding LocationName}" />
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding LocationName}" Value="">
+                                                                    <Setter Property="Text">
+                                                                        <Setter.Value>
+                                                                            <MultiBinding StringFormat="{}{0} {1}, {2} {3}, {4}">
+                                                                                <Binding Path="Street"/>
+                                                                                <Binding Path="HouseNumber"/>
+                                                                                <Binding Path="PostalCode"/>
+                                                                                <Binding Path="City"/>
+                                                                                <Binding Path="Country"/>
+                                                                            </MultiBinding>
+                                                                        </Setter.Value>
+                                                                    </Setter>
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding LocationName}" Value="{x:Null}">
+                                                                    <Setter Property="Text">
+                                                                        <Setter.Value>
+                                                                            <MultiBinding StringFormat="{}{0} {1}, {2} {3}, {4}">
+                                                                                <Binding Path="Street"/>
+                                                                                <Binding Path="HouseNumber"/>
+                                                                                <Binding Path="PostalCode"/>
+                                                                                <Binding Path="City"/>
+                                                                                <Binding Path="Country"/>
+                                                                            </MultiBinding>
+                                                                        </Setter.Value>
+                                                                    </Setter>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+                                                </TextBlock>
+                                                <Button Content="–" Width="25" Margin="2,0"
+                                    Click="RemoveEditConceptAddress_Click"
+                                    Tag="{Binding}" Loaded="EditUpdateRemoveAddressButtonState"/>
+                                                <Button Content="+" Width="25" Margin="2,0"
+                                    Click="AddEditConceptAddress_Click"
+                                    Tag="{Binding}" Loaded="EditUpdateAddAddressButtonState"/>
+                                            </DockPanel>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+                        </Border>
+
+                        <Button Content="Add Address" Width="100" Margin="0,5,0,0"
+            HorizontalAlignment="Center" Click="QuickAddAddressFromEditConcept_Click"/>
                     </StackPanel>
                 </StackPanel>
+
 
 
                 <!-- Models -->
@@ -898,8 +1047,6 @@
                     </StackPanel>
                 </StackPanel>
 
-
-                <!-- Shoot -->
                 <!-- Shoots -->
                 <StackPanel Orientation="Horizontal" Grid.Row="2" Grid.Column="1" Margin="10,5,0,5">
                     <TextBlock Text="Select Shoot:" Width="100" VerticalAlignment="Top"/>
@@ -1153,6 +1300,112 @@
         </Border>
         <!-- ==== END STARTUP OVERLAY ==== -->
 
+
+
+
+
+        <!-- New Address -->
+        <Grid x:Name="NewAddressForm" Visibility="Collapsed" Grid.Column="1" Background="#F5F5F5" Margin="10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Titel -->
+            <TextBlock Grid.Row="0" Text="Create New Address" FontWeight="Bold" FontSize="16"
+             HorizontalAlignment="Center" Margin="0,20,0,10"/>
+
+            <!-- Form -->
+            <StackPanel Grid.Row="1" Margin="40">
+                <CheckBox x:Name="IsLocationOnlyCheckBox" Content="Is this a location?" Margin="0,0,0,10"
+              Checked="ToggleLocationFields" Unchecked="ToggleLocationFields"/>
+
+                <StackPanel Orientation="Horizontal" Margin="0,5">
+                    <TextBlock Text="Location Name:" Width="120"/>
+                    <TextBox x:Name="NewAddressLocationNameTextBox" Width="250"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Margin="0,5">
+                    <TextBlock Text="Street:" Width="120"/>
+                    <TextBox x:Name="NewAddressStreetTextBox" Width="250"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,5">
+                    <TextBlock Text="House Number:" Width="120"/>
+                    <TextBox x:Name="NewAddressHouseNumberTextBox" Width="250"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,5">
+                    <TextBlock Text="Postal Code:" Width="120"/>
+                    <TextBox x:Name="NewAddressPostalCodeTextBox" Width="250"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,5">
+                    <TextBlock Text="City:" Width="120"/>
+                    <TextBox x:Name="NewAddressCityTextBox" Width="250"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,5">
+                    <TextBlock Text="Country:" Width="120"/>
+                    <TextBox x:Name="NewAddressCountryTextBox" Width="250"/>
+                </StackPanel>
+            </StackPanel>
+
+            <!-- Knoppen -->
+            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,20,0,0">
+                <Button Content="Save" Width="100" Margin="10" Click="SaveNewAddress_Click"/>
+                <Button Content="Cancel" Width="100" Margin="10" Click="CancelNewAddress_Click"/>
+            </StackPanel>
+        </Grid>
+
+        
+        <!-- Quick Address -->
+        <Grid x:Name="QuickAddAddressForm" Visibility="Collapsed" Grid.Column="1" Background="#F5F5F5" Margin="10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Row="0" Text="New Address" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center" Margin="0,20,0,10"/>
+
+            <StackPanel Grid.Row="1" Margin="20">
+                <CheckBox x:Name="QuickIsLocationOnlyCheckBox" Content="Location Only" Margin="0,0,0,10" Checked="ToggleQuickLocationFields" Unchecked="ToggleQuickLocationFields"/>
+                <StackPanel Orientation="Horizontal" Margin="0,5">
+                    <TextBlock Text="Location Name:" Width="100"/>
+                    <TextBox x:Name="QuickAddressLocationNameTextBox" Width="200"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,5">
+                    <TextBlock Text="Street:" Width="100"/>
+                    <TextBox x:Name="QuickAddressStreetTextBox" Width="200"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,5">
+                    <TextBlock Text="House Number:" Width="100"/>
+                    <TextBox x:Name="QuickAddressHouseNumberTextBox" Width="200"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,5">
+                    <TextBlock Text="Postal Code:" Width="100"/>
+                    <TextBox x:Name="QuickAddressPostalCodeTextBox" Width="200"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,5">
+                    <TextBlock Text="City:" Width="100"/>
+                    <TextBox x:Name="QuickAddressCityTextBox" Width="200"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,5">
+                    <TextBlock Text="Country:" Width="100"/>
+                    <TextBox x:Name="QuickAddressCountryTextBox" Width="200"/>
+                </StackPanel>
+            </StackPanel>
+
+            <Grid Grid.Row="2" Margin="0,10,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Button Content="Save" Width="100" HorizontalAlignment="Left" Grid.Column="0" Margin="110,10"
+                Click="CreateQuickAddress_Click"/>
+                <Button Content="Cancel" Width="100" HorizontalAlignment="Right" Grid.Column="1" Margin="110,10"
+                Click="CancelQuickAddAddress_Click"/>
+            </Grid>
+        </Grid>
 
 
     </Grid>

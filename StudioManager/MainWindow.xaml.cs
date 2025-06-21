@@ -36,6 +36,11 @@ namespace StudioManager
         private int detailCurrentPictureIndex = -1;
         private int overlayPictureIndex = -1;
 
+        private Address? selectedNewConceptAddress = null;
+        private Address? selectedEditConceptAddress = null;
+        private string? addressReturnToView = null;
+
+
 
 
 
@@ -60,206 +65,9 @@ namespace StudioManager
             NewPropForm.Visibility = Visibility.Collapsed;
             EditPropForm.Visibility = Visibility.Collapsed;
             StartUpWindow.Visibility = Visibility.Collapsed;
+            AddressesView.Visibility = Visibility.Collapsed;
+            NewAddressForm.Visibility = Visibility.Collapsed;
         }
-
-
-        private void ConceptsDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (ConceptsDataGrid.SelectedItem is Concept selected)
-            {
-                DetailName.Text = $"Name: {selected.Name}";
-                DetailDescription.Text = $"Description: {selected.Description}";
-                DetailProps.Text = $"Props: {selected.PropsText}";
-                DetailModels.Text = $"Models: {selected.ModelText}";
-
-                DetailAddress.Text = selected.Address != null
-                    ? $"Address: {selected.Address.Street} {selected.Address.HouseNumber}, {selected.Address.PostalCode} {selected.Address.City}, {selected.Address.Country}"
-                    : "Address: –";
-
-                DetailShoot.Text = selected.Shoot != null
-                    ? $"Shoot: {selected.Shoot.Date?.ToString("yyyy-MM-dd")}"
-                    : "Shoot: –";
-
-                // Sketch preview tonen of verbergen
-                if (!string.IsNullOrEmpty(selected.Sketch) && File.Exists(selected.Sketch))
-                {
-                    DetailSketchPreviewImage.Source = LoadImageWithoutLock(selected.Sketch);
-                    DetailSketchBorder.Visibility = Visibility.Visible;
-                }
-                else
-                {
-                    DetailSketchPreviewImage.Source = null;
-                    DetailSketchBorder.Visibility = Visibility.Collapsed;
-                }
-
-                // Eerste geldige afbeelding uit pictures tonen of verbergen
-                if (selected.Pictures != null && selected.Pictures.Count > 0)
-                {
-                    string firstPicture = selected.Pictures.FirstOrDefault(p => File.Exists(p));
-                    if (firstPicture != null)
-                    {
-                        detailPicturePaths = selected.Pictures.Where(File.Exists).ToList();
-                        detailCurrentPictureIndex = 0;
-                        ShowDetailPicture();
-                    }
-                    else
-                    {
-                        detailPicturePaths.Clear();
-                        detailCurrentPictureIndex = -1;
-                        ShowDetailPicture();
-                    }
-                }
-                else
-                {
-                    detailPicturePaths.Clear();
-                    detailCurrentPictureIndex = -1;
-                    ShowDetailPicture();
-                }
-            }
-            else
-            {
-                DetailName.Text = "";
-                DetailDescription.Text = "";
-                DetailProps.Text = "";
-                DetailModels.Text = "";
-                DetailAddress.Text = "";
-                DetailShoot.Text = "";
-
-                DetailSketchPreviewImage.Source = null;
-                DetailSketchBorder.Visibility = Visibility.Collapsed;
-
-                DetailPicturePreviewImage.Source = null;
-                DetailPictureBorder.Visibility = Visibility.Collapsed;
-            }
-        }
-
-        private void DetailSketchPreviewImage_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-        {
-            if (DetailSketchPreviewImage.Source != null)
-            {
-                OverlaySketchImage.Source = DetailSketchPreviewImage.Source;
-                DetailSketchOverlay.Visibility = Visibility.Visible;
-                ConceptsDataGrid.IsEnabled = false;
-            }
-        }
-
-        private void OverlaySketchClose_Click(object sender, RoutedEventArgs e)
-        {
-            DetailSketchOverlay.Visibility = Visibility.Collapsed;
-            ConceptsDataGrid.IsEnabled = true;
-        }
-
-
-
-
-        private void ShowDetailPicture()
-        {
-            if (detailPicturePaths.Count > 0 && detailCurrentPictureIndex >= 0)
-            {
-                string currentPath = detailPicturePaths[detailCurrentPictureIndex];
-                if (File.Exists(currentPath))
-                {
-                    DetailPicturePreviewImage.Source = LoadImageWithoutLock(currentPath);
-                    DetailPictureBorder.Visibility = Visibility.Visible;
-                    DetailPrevPictureButton.Visibility = detailPicturePaths.Count > 1 ? Visibility.Visible : Visibility.Collapsed;
-                    DetailNextPictureButton.Visibility = detailPicturePaths.Count > 1 ? Visibility.Visible : Visibility.Collapsed;
-                }
-                else
-                {
-                    DetailPicturePreviewImage.Source = null;
-                    DetailPictureBorder.Visibility = Visibility.Collapsed;
-                }
-            }
-            else
-            {
-                DetailPicturePreviewImage.Source = null;
-                DetailPictureBorder.Visibility = Visibility.Collapsed;
-                DetailPrevPictureButton.Visibility = Visibility.Collapsed;
-                DetailNextPictureButton.Visibility = Visibility.Collapsed;
-            }
-        }
-
-        private void DetailPrevPicture_Click(object sender, RoutedEventArgs e)
-        {
-            if (detailPicturePaths.Count > 0)
-            {
-                detailCurrentPictureIndex = (detailCurrentPictureIndex - 1 + detailPicturePaths.Count) % detailPicturePaths.Count;
-                ShowDetailPicture();
-            }
-        }
-
-        private void DetailNextPicture_Click(object sender, RoutedEventArgs e)
-        {
-            if (detailPicturePaths.Count > 0)
-            {
-                detailCurrentPictureIndex = (detailCurrentPictureIndex + 1) % detailPicturePaths.Count;
-                ShowDetailPicture();
-            }
-        }
-
-        private void DetailPicturePreviewImage_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-        {
-            if (detailPicturePaths.Count > 0 && detailCurrentPictureIndex >= 0)
-            {
-                overlayPictureIndex = detailCurrentPictureIndex;
-                ShowOverlayPicture();
-            }
-        }
-
-
-        private void ShowOverlayPicture()
-        {
-            if (overlayPictureIndex >= 0 && overlayPictureIndex < detailPicturePaths.Count)
-            {
-                string imagePath = detailPicturePaths[overlayPictureIndex];
-                if (File.Exists(imagePath))
-                {
-                    OverlayPictureImage.Source = LoadImageWithoutLock(imagePath);
-
-                    DetailPictureOverlay.Visibility = Visibility.Visible;
-                    ConceptsDataGrid.IsEnabled = false;
-                }
-            }
-        }
-
-        private void OverlayPrev_Click(object sender, RoutedEventArgs e)
-        {
-            if (detailPicturePaths.Count > 0)
-            {
-                overlayPictureIndex = (overlayPictureIndex - 1 + detailPicturePaths.Count) % detailPicturePaths.Count;
-                ShowOverlayPicture();
-            }
-        }
-
-        private void OverlayNext_Click(object sender, RoutedEventArgs e)
-        {
-            if (detailPicturePaths.Count > 0)
-            {
-                overlayPictureIndex = (overlayPictureIndex + 1) % detailPicturePaths.Count;
-                ShowOverlayPicture();
-            }
-        }
-
-        private void OverlayClose_Click(object sender, RoutedEventArgs e)
-        {
-            DetailPictureOverlay.Visibility = Visibility.Collapsed;
-            ConceptsDataGrid.IsEnabled = true;
-            overlayPictureIndex = -1;
-        }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
         public void DashboardButton_Click(object sender, RoutedEventArgs e)
         {
@@ -281,48 +89,6 @@ namespace StudioManager
             HidePanels();
             ShootsView.Visibility = Visibility.Visible;
         }
-
-        private void EditAddShoot_Click(object sender, RoutedEventArgs e)
-        {
-            if (sender is Button btn && btn.DataContext is Shoot shoot && editSelectedShoot == null)
-            {
-                editSelectedShoot = shoot;
-                EditShootToggleList.Items.Refresh();
-            }
-        }
-
-        private void EditRemoveShoot_Click(object sender, RoutedEventArgs e)
-        {
-            if (sender is Button btn && btn.DataContext is Shoot shoot && editSelectedShoot?.Id == shoot.Id)
-            {
-                editSelectedShoot = null;
-                EditShootToggleList.Items.Refresh();
-            }
-        }
-
-        private void EditUpdateAddShootButtonState(object sender, RoutedEventArgs e)
-        {
-            if (sender is Button btn && btn.Tag is Shoot shoot)
-            {
-                bool isEnabled = editSelectedShoot == null;
-                btn.IsEnabled = isEnabled;
-                btn.Visibility = Visibility.Visible;
-            }
-        }
-
-
-        private void EditUpdateRemoveShootButtonState(object sender, RoutedEventArgs e)
-        {
-            if (sender is Button btn && btn.Tag is Shoot shoot)
-            {
-                bool isSelected = editSelectedShoot?.Id == shoot.Id;
-                btn.IsEnabled = isSelected;
-                btn.Visibility = Visibility.Visible;
-            }
-        }
-
-
-
 
         public void ConceptsButton_Click(object sender, RoutedEventArgs e)
         {
@@ -350,11 +116,8 @@ namespace StudioManager
             HidePanels();
             NewConceptNameTextBox.Text = "";
             NewConceptDescriptionTextBox.Text = "";
-            NewAddressStreetTextBox.Text = "";
-            NewAddressHouseNumberTextBox.Text = "";
-            NewAddressPostalCodeTextBox.Text = "";
-            NewAddressCityTextBox.Text = "";
-            NewAddressCountryTextBox.Text = "";
+            selectedNewConceptAddress = null;
+            NewConceptAddressToggleList.ItemsSource = new DAL().GetAllAddresses();
             selectedProps.Clear();
             PropToggleList.ItemsSource = new DAL().GetAllProps().Where(p => p.IsAvailable).ToList();
             selectedModels.Clear();
@@ -375,143 +138,6 @@ namespace StudioManager
             PropsView.Visibility = Visibility.Visible;
         }
 
-        private void QuickAddPropFromNewConcept_Click(object sender, RoutedEventArgs e)
-        {
-            HidePanels();
-            NewQuickPropNameTextBox.Text = "";
-            NewQuickPropDescriptionTextBox.Text = "";
-            NewQuickPropAvailableCheckBox.IsChecked = true;
-            returnToView = "NewConcept";
-            QuickAddPropForm.Visibility = Visibility.Visible;
-        }
-
-        private void QuickAddPropFromEditConcept_Click(object sender, RoutedEventArgs e)
-        {
-            HidePanels();
-            NewQuickPropNameTextBox.Text = "";
-            NewQuickPropDescriptionTextBox.Text = "";
-            NewQuickPropAvailableCheckBox.IsChecked = true;
-            returnToView = "EditConcept";
-            QuickAddPropForm.Visibility = Visibility.Visible;
-        }
-
-        private void CreateQuickProp_Click(object sender, RoutedEventArgs e)
-        {
-            var name = NewQuickPropNameTextBox.Text;
-            var desc = NewQuickPropDescriptionTextBox.Text;
-            var avail = NewQuickPropAvailableCheckBox.IsChecked == true;
-
-            if (string.IsNullOrWhiteSpace(name) || new DAL().PropNameExists(name))
-            {
-                MessageBox.Show("Prop name is empty or already exists.");
-                return;
-            }
-
-            var prop = new Prop(0, name, desc, avail);
-            prop.Create();
-
-            if (returnToView == "NewConcept")
-            {
-                PropToggleList.ItemsSource = new DAL().GetAllProps().Where(p => p.IsAvailable).ToList();
-                NewConceptForm.Visibility = Visibility.Visible;
-            }
-            else if (returnToView == "EditConcept")
-            {
-                EditPropToggleList.ItemsSource = new DAL().GetAllProps().Where(p => p.IsAvailable).ToList();
-                EditConceptForm.Visibility = Visibility.Visible;
-            }
-
-            returnToView = null;
-            QuickAddPropForm.Visibility = Visibility.Collapsed;
-        }
-
-        private void CancelQuickAddProp_Click(object sender, RoutedEventArgs e)
-        {
-            if (returnToView == "NewConcept")
-                NewConceptForm.Visibility = Visibility.Visible;
-            else if (returnToView == "EditConcept")
-                EditConceptForm.Visibility = Visibility.Visible;
-
-            returnToView = null;
-            QuickAddPropForm.Visibility = Visibility.Collapsed;
-        }
-
-
-        private void AddProp_Click(object sender, RoutedEventArgs e)
-        {
-            if (sender is Button btn && btn.DataContext is Prop prop && !selectedProps.Contains(prop))
-            {
-                selectedProps.Add(prop);
-                PropToggleList.Items.Refresh();
-            }
-        }
-
-        private void RemoveProp_Click(object sender, RoutedEventArgs e)
-        {
-            if (sender is Button btn && btn.DataContext is Prop prop && selectedProps.Contains(prop))
-            {
-                selectedProps.Remove(prop);
-                PropToggleList.Items.Refresh();
-            }
-        }
-
-        private void UpdateAddButtonState(object sender, RoutedEventArgs e)
-        {
-            if (sender is Button btn && btn.Tag is Prop prop)
-            {
-                btn.IsEnabled = !selectedProps.Any(p => p.Id == prop.Id);
-            }
-        }
-
-        private void UpdateRemoveButtonState(object sender, RoutedEventArgs e)
-        {
-            if (sender is Button btn && btn.Tag is Prop prop)
-            {
-                btn.IsEnabled = selectedProps.Any(p => p.Id == prop.Id);
-            }
-        }
-
-        private void EditAddProp_Click(object sender, RoutedEventArgs e)
-        {
-            if (sender is Button btn && btn.DataContext is Prop prop && !editSelectedProps.Any(p => p.Id == prop.Id))
-            {
-                editSelectedProps.Add(prop);
-                EditPropToggleList.Items.Refresh();
-            }
-        }
-
-        private void EditRemoveProp_Click(object sender, RoutedEventArgs e)
-        {
-            if (sender is Button btn && btn.DataContext is Prop prop)
-            {
-                var match = editSelectedProps.FirstOrDefault(p => p.Id == prop.Id);
-                if (match != null)
-                {
-                    editSelectedProps.Remove(match);
-                    EditPropToggleList.Items.Refresh();
-                }
-            }
-        }
-
-        private void EditUpdateAddButtonState(object sender, RoutedEventArgs e)
-        {
-            if (sender is Button btn && btn.Tag is Prop prop)
-            {
-                btn.IsEnabled = !editSelectedProps.Any(p => p.Id == prop.Id);
-            }
-        }
-
-        private void EditUpdateRemoveButtonState(object sender, RoutedEventArgs e)
-        {
-            if (sender is Button btn && btn.Tag is Prop prop)
-            {
-                btn.IsEnabled = editSelectedProps.Any(p => p.Id == prop.Id);
-            }
-        }
-
-
-
-
         private void NewPropButton_Click(object sender, RoutedEventArgs e)
         {
             HidePanels();
@@ -528,83 +154,15 @@ namespace StudioManager
             ContactsView.Visibility = Visibility.Visible;
         }
 
-        private void AddContact_Click(object sender, RoutedEventArgs e)
+        public void AddressesButton_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is Button btn && btn.DataContext is Contact model && !selectedModels.Any(m => m.Id == model.Id))
-            {
-                selectedModels.Add(model);
-                ModelToggleList.Items.Refresh();
-            }
+            RefreshAddressOverview();
+            HidePanels();
+            AddressesView.Visibility = Visibility.Visible;
         }
-
-        private void RemovContact_Click(object sender, RoutedEventArgs e)
-        {
-            if (sender is Button btn && btn.DataContext is Contact model && selectedModels.Any(m => m.Id == model.Id))
-            {
-                selectedModels.Remove(model);
-                ModelToggleList.Items.Refresh();
-            }
-        }
-
-        private void UpdateAddContactButtonState(object sender, RoutedEventArgs e)
-        {
-            if (sender is Button btn && btn.Tag is Contact model)
-            {
-                btn.IsEnabled = !selectedModels.Any(m => m.Id == model.Id);
-            }
-        }
-
-        private void UpdateRemoveContactButtonState(object sender, RoutedEventArgs e)
-        {
-            if (sender is Button btn && btn.Tag is Contact model)
-            {
-                btn.IsEnabled = selectedModels.Any(m => m.Id == model.Id);
-            }
-        }
-
-        private void EditAddContact_Click(object sender, RoutedEventArgs e)
-        {
-            if (sender is Button btn && btn.DataContext is Contact model && !editSelectedModels.Any(m => m.Id == model.Id))
-            {
-                editSelectedModels.Add(model);
-                EditModelToggleList.Items.Refresh();
-            }
-        }
-
-        private void EditRemoveContact_Click(object sender, RoutedEventArgs e)
-        {
-            if (sender is Button btn && btn.DataContext is Contact model)
-            {
-                var match = editSelectedModels.FirstOrDefault(m => m.Id == model.Id);
-                if (match != null)
-                {
-                    editSelectedModels.Remove(match);
-                    EditModelToggleList.Items.Refresh();
-                }
-            }
-        }
-
-        private void EditUpdateAddContactButtonState(object sender, RoutedEventArgs e)
-        {
-            if (sender is Button btn && btn.Tag is Contact model)
-            {
-                btn.IsEnabled = !editSelectedModels.Any(m => m.Id == model.Id);
-            }
-        }
-
-        private void EditUpdateRemoveContactButtonState(object sender, RoutedEventArgs e)
-        {
-            if (sender is Button btn && btn.Tag is Contact model)
-            {
-                btn.IsEnabled = editSelectedModels.Any(m => m.Id == model.Id);
-            }
-        }
-
-
-
-
 
         // SEARCHBOXES
+
         private void SearchBox_Projects(object sender, TextChangedEventArgs e)
         {
             SearchPlaceholder.Visibility = string.IsNullOrEmpty(ProjectsSearchTextBox.Text)
@@ -647,6 +205,13 @@ namespace StudioManager
                 : Visibility.Collapsed;
         }
 
+        private void SearchBox_Addresses(object sender, TextChangedEventArgs e)
+        {
+            AddressesSearchPlaceholder.Visibility = string.IsNullOrEmpty(AddressesSearchTextBox.Text)
+                ? Visibility.Visible
+                : Visibility.Collapsed;
+        }
+
 
         // HOME LOCATION
         private void UpdateMapWithHomeAddress()
@@ -683,6 +248,7 @@ namespace StudioManager
         {
             Address updated = new Address(
                 id: 0,
+                locationName: null,
                 street: HomeStreetTextBox.Text,
                 houseNumber: HomeHouseNumberTextBox.Text,
                 postalCode: HomePostalCodeTextBox.Text,
@@ -693,13 +259,6 @@ namespace StudioManager
             new DAL().UpdateHomeAddress(updated);
             DashboardButton_Click(null, null);
         }
-
-
-
-
-
-
-
 
         // CONCEPT
         private void RefreshConceptOverview()
@@ -714,7 +273,8 @@ namespace StudioManager
         {
             string name = NewConceptNameTextBox.Text;
             string description = NewConceptDescriptionTextBox.Text;
-            Address newAddress = new Address( id: 0, street: NewAddressStreetTextBox.Text, houseNumber: NewAddressHouseNumberTextBox.Text, postalCode: NewAddressPostalCodeTextBox.Text, city: NewAddressCityTextBox.Text, country: NewAddressCountryTextBox.Text);
+            Address? newAddress = selectedNewConceptAddress;
+
 
             //newAddress.Create(); 
 
@@ -985,42 +545,14 @@ namespace StudioManager
             editSelectedModels = selected.Models.ToList();
             EditModelToggleList.ItemsSource = new DAL().GetAllContacts();
 
-            //EditModelSelectionListBox.ItemsSource = new DAL().GetAllContacts();
-            //EditShootSelectionComboBox.ItemsSource = new DAL().GetAllShoots();
             editSelectedShoot = selected.Shoot;
             EditShootToggleList.ItemsSource = new DAL().GetAllShoots();
 
             EditConceptNameTextBox.Text = selected.Name;
             EditConceptDescriptionTextBox.Text = selected.Description;
-            if (selected.Address != null)
-            {
-                EditAddressStreetTextBox.Text = selected.Address.Street;
-                EditAddressHouseNumberTextBox.Text = selected.Address.HouseNumber;
-                EditAddressPostalCodeTextBox.Text = selected.Address.PostalCode;
-                EditAddressCityTextBox.Text = selected.Address.City;
-                EditAddressCountryTextBox.Text = selected.Address.Country;
-            }
-            else
-            {
-                EditAddressStreetTextBox.Text = "";
-                EditAddressHouseNumberTextBox.Text = "";
-                EditAddressPostalCodeTextBox.Text = "";
-                EditAddressCityTextBox.Text = "";
-                EditAddressCountryTextBox.Text = "";
-            }
 
-            //EditModelSelectionListBox.SelectedItems.Clear();
-            //foreach (var model in selected.Models)
-            //{
-            //    var match = (EditModelSelectionListBox.ItemsSource as List<Contact>)?.FirstOrDefault(m => m.Id == model.Id);
-            //    if (match != null)
-            //        EditModelSelectionListBox.SelectedItems.Add(match);
-            //}
-
-
-            //var shootMatch = (EditShootSelectionComboBox.ItemsSource as List<Shoot>)?.FirstOrDefault(s => s.Id == selected.Shoot?.Id);
-            //EditShootSelectionComboBox.SelectedItem = shootMatch;
-
+            selectedEditConceptAddress = selected.Address;
+            EditConceptAddressToggleList.ItemsSource = new DAL().GetAllAddresses();
 
             if (!string.IsNullOrEmpty(selected.Sketch) && File.Exists(selected.Sketch))
             {
@@ -1070,20 +602,7 @@ namespace StudioManager
 
             conceptBeingEdited.Name = newName;
             conceptBeingEdited.Description = EditConceptDescriptionTextBox.Text;
-            Address updatedAddress = new Address(
-    id: conceptBeingEdited.Address?.Id ?? 0,
-    street: EditAddressStreetTextBox.Text,
-    houseNumber: EditAddressHouseNumberTextBox.Text,
-    postalCode: EditAddressPostalCodeTextBox.Text,
-    city: EditAddressCityTextBox.Text,
-    country: EditAddressCountryTextBox.Text
-);
-
-            // Als het een nieuw address is, maak hem aan. Anders update.
-            if (updatedAddress.Id == 0)
-                updatedAddress.Create();
-            else
-                updatedAddress.Update();
+            Address? updatedAddress = selectedEditConceptAddress;
 
             conceptBeingEdited.Address = updatedAddress;
             conceptBeingEdited.Props = editSelectedProps.ToList();
@@ -1221,6 +740,605 @@ namespace StudioManager
             }
         }
 
+        private void ConceptsDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (ConceptsDataGrid.SelectedItem is Concept selected)
+            {
+                DetailName.Text = $"Name: {selected.Name}";
+                DetailDescription.Text = $"Description: {selected.Description}";
+                DetailProps.Text = $"Props: {selected.PropsText}";
+                DetailModels.Text = $"Models: {selected.ModelText}";
+
+                DetailAddress.Text = selected.Address != null
+                    ? $"Location: {(string.IsNullOrWhiteSpace(selected.Address.LocationName) ? $"{selected.Address.Street} {selected.Address.HouseNumber}, {selected.Address.PostalCode} {selected.Address.City}, {selected.Address.Country}" : selected.Address.LocationName)}"
+                    : "Location: –";
+
+
+                DetailShoot.Text = selected.Shoot != null
+                    ? $"Shoot: {selected.Shoot.Date?.ToString("yyyy-MM-dd")}"
+                    : "Shoot: –";
+
+                DetailShootAddress.Text = selected.Shoot?.Location != null
+                    ? $"Shoot Address: {(string.IsNullOrWhiteSpace(selected.Shoot.Location.LocationName)
+                        ? $"{selected.Shoot.Location.Street} {selected.Shoot.Location.HouseNumber}, {selected.Shoot.Location.PostalCode} {selected.Shoot.Location.City}, {selected.Shoot.Location.Country}"
+                        : selected.Shoot.Location.LocationName)}"
+                    : "Shoot Address: –";
+
+
+                if (!string.IsNullOrEmpty(selected.Sketch) && File.Exists(selected.Sketch))
+                {
+                    DetailSketchPreviewImage.Source = LoadImageWithoutLock(selected.Sketch);
+                    DetailSketchBorder.Visibility = Visibility.Visible;
+                }
+                else
+                {
+                    DetailSketchPreviewImage.Source = null;
+                    DetailSketchBorder.Visibility = Visibility.Collapsed;
+                }
+
+                if (selected.Pictures != null && selected.Pictures.Count > 0)
+                {
+                    string firstPicture = selected.Pictures.FirstOrDefault(p => File.Exists(p));
+                    if (firstPicture != null)
+                    {
+                        detailPicturePaths = selected.Pictures.Where(File.Exists).ToList();
+                        detailCurrentPictureIndex = 0;
+                        ShowDetailPicture();
+                    }
+                    else
+                    {
+                        detailPicturePaths.Clear();
+                        detailCurrentPictureIndex = -1;
+                        ShowDetailPicture();
+                    }
+                }
+                else
+                {
+                    detailPicturePaths.Clear();
+                    detailCurrentPictureIndex = -1;
+                    ShowDetailPicture();
+                }
+            }
+            else
+            {
+                DetailName.Text = "";
+                DetailShootAddress.Text = "";
+                DetailDescription.Text = "";
+                DetailProps.Text = "";
+                DetailModels.Text = "";
+                DetailAddress.Text = "";
+                DetailShoot.Text = "";
+
+                DetailSketchPreviewImage.Source = null;
+                DetailSketchBorder.Visibility = Visibility.Collapsed;
+
+                DetailPicturePreviewImage.Source = null;
+                DetailPictureBorder.Visibility = Visibility.Collapsed;
+            }
+        }
+
+        private void DetailSketchPreviewImage_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            if (DetailSketchPreviewImage.Source != null)
+            {
+                OverlaySketchImage.Source = DetailSketchPreviewImage.Source;
+                DetailSketchOverlay.Visibility = Visibility.Visible;
+                ConceptsDataGrid.IsEnabled = false;
+            }
+        }
+
+        private void OverlaySketchClose_Click(object sender, RoutedEventArgs e)
+        {
+            DetailSketchOverlay.Visibility = Visibility.Collapsed;
+            ConceptsDataGrid.IsEnabled = true;
+        }
+
+
+
+
+        private void ShowDetailPicture()
+        {
+            if (detailPicturePaths.Count > 0 && detailCurrentPictureIndex >= 0)
+            {
+                string currentPath = detailPicturePaths[detailCurrentPictureIndex];
+                if (File.Exists(currentPath))
+                {
+                    DetailPicturePreviewImage.Source = LoadImageWithoutLock(currentPath);
+                    DetailPictureBorder.Visibility = Visibility.Visible;
+                    DetailPrevPictureButton.Visibility = detailPicturePaths.Count > 1 ? Visibility.Visible : Visibility.Collapsed;
+                    DetailNextPictureButton.Visibility = detailPicturePaths.Count > 1 ? Visibility.Visible : Visibility.Collapsed;
+                }
+                else
+                {
+                    DetailPicturePreviewImage.Source = null;
+                    DetailPictureBorder.Visibility = Visibility.Collapsed;
+                }
+            }
+            else
+            {
+                DetailPicturePreviewImage.Source = null;
+                DetailPictureBorder.Visibility = Visibility.Collapsed;
+                DetailPrevPictureButton.Visibility = Visibility.Collapsed;
+                DetailNextPictureButton.Visibility = Visibility.Collapsed;
+            }
+        }
+
+        private void DetailPrevPicture_Click(object sender, RoutedEventArgs e)
+        {
+            if (detailPicturePaths.Count > 0)
+            {
+                detailCurrentPictureIndex = (detailCurrentPictureIndex - 1 + detailPicturePaths.Count) % detailPicturePaths.Count;
+                ShowDetailPicture();
+            }
+        }
+
+        private void DetailNextPicture_Click(object sender, RoutedEventArgs e)
+        {
+            if (detailPicturePaths.Count > 0)
+            {
+                detailCurrentPictureIndex = (detailCurrentPictureIndex + 1) % detailPicturePaths.Count;
+                ShowDetailPicture();
+            }
+        }
+
+        private void DetailPicturePreviewImage_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            if (detailPicturePaths.Count > 0 && detailCurrentPictureIndex >= 0)
+            {
+                overlayPictureIndex = detailCurrentPictureIndex;
+                ShowOverlayPicture();
+            }
+        }
+
+
+        private void ShowOverlayPicture()
+        {
+            if (overlayPictureIndex >= 0 && overlayPictureIndex < detailPicturePaths.Count)
+            {
+                string imagePath = detailPicturePaths[overlayPictureIndex];
+                if (File.Exists(imagePath))
+                {
+                    OverlayPictureImage.Source = LoadImageWithoutLock(imagePath);
+
+                    DetailPictureOverlay.Visibility = Visibility.Visible;
+                    ConceptsDataGrid.IsEnabled = false;
+                }
+            }
+        }
+
+        private void OverlayPrev_Click(object sender, RoutedEventArgs e)
+        {
+            if (detailPicturePaths.Count > 0)
+            {
+                overlayPictureIndex = (overlayPictureIndex - 1 + detailPicturePaths.Count) % detailPicturePaths.Count;
+                ShowOverlayPicture();
+            }
+        }
+
+        private void OverlayNext_Click(object sender, RoutedEventArgs e)
+        {
+            if (detailPicturePaths.Count > 0)
+            {
+                overlayPictureIndex = (overlayPictureIndex + 1) % detailPicturePaths.Count;
+                ShowOverlayPicture();
+            }
+        }
+
+        private void OverlayClose_Click(object sender, RoutedEventArgs e)
+        {
+            DetailPictureOverlay.Visibility = Visibility.Collapsed;
+            ConceptsDataGrid.IsEnabled = true;
+            overlayPictureIndex = -1;
+        }
+
+        private void EditAddShoot_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.DataContext is Shoot shoot && editSelectedShoot == null)
+            {
+                editSelectedShoot = shoot;
+                EditShootToggleList.Items.Refresh();
+            }
+        }
+
+        private void EditRemoveShoot_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.DataContext is Shoot shoot && editSelectedShoot?.Id == shoot.Id)
+            {
+                editSelectedShoot = null;
+                EditShootToggleList.Items.Refresh();
+            }
+        }
+
+        private void EditUpdateAddShootButtonState(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.Tag is Shoot shoot)
+            {
+                bool isEnabled = editSelectedShoot == null;
+                btn.IsEnabled = isEnabled;
+                btn.Visibility = Visibility.Visible;
+            }
+        }
+
+
+        private void EditUpdateRemoveShootButtonState(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.Tag is Shoot shoot)
+            {
+                bool isSelected = editSelectedShoot?.Id == shoot.Id;
+                btn.IsEnabled = isSelected;
+                btn.Visibility = Visibility.Visible;
+            }
+        }
+
+        private void QuickAddPropFromNewConcept_Click(object sender, RoutedEventArgs e)
+        {
+            HidePanels();
+            NewQuickPropNameTextBox.Text = "";
+            NewQuickPropDescriptionTextBox.Text = "";
+            NewQuickPropAvailableCheckBox.IsChecked = true;
+            returnToView = "NewConcept";
+            QuickAddPropForm.Visibility = Visibility.Visible;
+        }
+
+        private void QuickAddPropFromEditConcept_Click(object sender, RoutedEventArgs e)
+        {
+            HidePanels();
+            NewQuickPropNameTextBox.Text = "";
+            NewQuickPropDescriptionTextBox.Text = "";
+            NewQuickPropAvailableCheckBox.IsChecked = true;
+            returnToView = "EditConcept";
+            QuickAddPropForm.Visibility = Visibility.Visible;
+        }
+
+        private void CreateQuickProp_Click(object sender, RoutedEventArgs e)
+        {
+            var name = NewQuickPropNameTextBox.Text;
+            var desc = NewQuickPropDescriptionTextBox.Text;
+            var avail = NewQuickPropAvailableCheckBox.IsChecked == true;
+
+            if (string.IsNullOrWhiteSpace(name) || new DAL().PropNameExists(name))
+            {
+                MessageBox.Show("Prop name is empty or already exists.");
+                return;
+            }
+
+            var prop = new Prop(0, name, desc, avail);
+            prop.Create();
+
+            if (returnToView == "NewConcept")
+            {
+                PropToggleList.ItemsSource = new DAL().GetAllProps().Where(p => p.IsAvailable).ToList();
+                NewConceptForm.Visibility = Visibility.Visible;
+            }
+            else if (returnToView == "EditConcept")
+            {
+                EditPropToggleList.ItemsSource = new DAL().GetAllProps().Where(p => p.IsAvailable).ToList();
+                EditConceptForm.Visibility = Visibility.Visible;
+            }
+
+            returnToView = null;
+            QuickAddPropForm.Visibility = Visibility.Collapsed;
+        }
+
+        private void CancelQuickAddProp_Click(object sender, RoutedEventArgs e)
+        {
+            if (returnToView == "NewConcept")
+                NewConceptForm.Visibility = Visibility.Visible;
+            else if (returnToView == "EditConcept")
+                EditConceptForm.Visibility = Visibility.Visible;
+
+            returnToView = null;
+            QuickAddPropForm.Visibility = Visibility.Collapsed;
+        }
+
+
+        private void AddProp_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.DataContext is Prop prop && !selectedProps.Contains(prop))
+            {
+                selectedProps.Add(prop);
+                PropToggleList.Items.Refresh();
+            }
+        }
+
+        private void RemoveProp_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.DataContext is Prop prop && selectedProps.Contains(prop))
+            {
+                selectedProps.Remove(prop);
+                PropToggleList.Items.Refresh();
+            }
+        }
+
+        private void UpdateAddButtonState(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.Tag is Prop prop)
+            {
+                btn.IsEnabled = !selectedProps.Any(p => p.Id == prop.Id);
+            }
+        }
+
+        private void UpdateRemoveButtonState(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.Tag is Prop prop)
+            {
+                btn.IsEnabled = selectedProps.Any(p => p.Id == prop.Id);
+            }
+        }
+
+        private void EditAddProp_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.DataContext is Prop prop && !editSelectedProps.Any(p => p.Id == prop.Id))
+            {
+                editSelectedProps.Add(prop);
+                EditPropToggleList.Items.Refresh();
+            }
+        }
+
+        private void EditRemoveProp_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.DataContext is Prop prop)
+            {
+                var match = editSelectedProps.FirstOrDefault(p => p.Id == prop.Id);
+                if (match != null)
+                {
+                    editSelectedProps.Remove(match);
+                    EditPropToggleList.Items.Refresh();
+                }
+            }
+        }
+
+        private void EditUpdateAddButtonState(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.Tag is Prop prop)
+            {
+                btn.IsEnabled = !editSelectedProps.Any(p => p.Id == prop.Id);
+            }
+        }
+
+        private void EditUpdateRemoveButtonState(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.Tag is Prop prop)
+            {
+                btn.IsEnabled = editSelectedProps.Any(p => p.Id == prop.Id);
+            }
+        }
+
+        private void AddContact_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.DataContext is Contact model && !selectedModels.Any(m => m.Id == model.Id))
+            {
+                selectedModels.Add(model);
+                ModelToggleList.Items.Refresh();
+            }
+        }
+
+        private void RemovContact_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.DataContext is Contact model && selectedModels.Any(m => m.Id == model.Id))
+            {
+                selectedModels.Remove(model);
+                ModelToggleList.Items.Refresh();
+            }
+        }
+
+        private void UpdateAddContactButtonState(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.Tag is Contact model)
+            {
+                btn.IsEnabled = !selectedModels.Any(m => m.Id == model.Id);
+            }
+        }
+
+        private void UpdateRemoveContactButtonState(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.Tag is Contact model)
+            {
+                btn.IsEnabled = selectedModels.Any(m => m.Id == model.Id);
+            }
+        }
+
+        private void EditAddContact_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.DataContext is Contact model && !editSelectedModels.Any(m => m.Id == model.Id))
+            {
+                editSelectedModels.Add(model);
+                EditModelToggleList.Items.Refresh();
+            }
+        }
+
+        private void EditRemoveContact_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.DataContext is Contact model)
+            {
+                var match = editSelectedModels.FirstOrDefault(m => m.Id == model.Id);
+                if (match != null)
+                {
+                    editSelectedModels.Remove(match);
+                    EditModelToggleList.Items.Refresh();
+                }
+            }
+        }
+
+        private void EditUpdateAddContactButtonState(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.Tag is Contact model)
+            {
+                btn.IsEnabled = !editSelectedModels.Any(m => m.Id == model.Id);
+            }
+        }
+
+        private void EditUpdateRemoveContactButtonState(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.Tag is Contact model)
+            {
+                btn.IsEnabled = editSelectedModels.Any(m => m.Id == model.Id);
+            }
+        }
+
+
+
+
+
+
+
+
+        private void AddNewConceptAddress_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.Tag is Address address)
+            {
+                selectedNewConceptAddress = address;
+                NewConceptAddressToggleList.Items.Refresh();
+            }
+        }
+
+        private void RemoveNewConceptAddress_Click(object sender, RoutedEventArgs e)
+        {
+            selectedNewConceptAddress = null;
+            NewConceptAddressToggleList.Items.Refresh();
+        }
+
+        private void UpdateAddAddressButtonState(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.Tag is Address)
+            {
+                btn.IsEnabled = selectedNewConceptAddress == null;
+            }
+        }
+
+
+        private void UpdateRemoveAddressButtonState(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.Tag is Address address)
+                btn.IsEnabled = selectedNewConceptAddress != null && selectedNewConceptAddress.Id == address.Id;
+        }
+
+
+
+
+
+
+        private void AddEditConceptAddress_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.Tag is Address address)
+            {
+                selectedEditConceptAddress = address;
+                EditConceptAddressToggleList.Items.Refresh();
+            }
+        }
+
+        private void RemoveEditConceptAddress_Click(object sender, RoutedEventArgs e)
+        {
+            selectedEditConceptAddress = null;
+            EditConceptAddressToggleList.Items.Refresh();
+        }
+
+        private void EditUpdateAddAddressButtonState(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.Tag is Address)
+                btn.IsEnabled = selectedEditConceptAddress == null;
+        }
+
+        private void EditUpdateRemoveAddressButtonState(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.Tag is Address address)
+                btn.IsEnabled = selectedEditConceptAddress != null && selectedEditConceptAddress.Id == address.Id;
+        }
+
+
+
+
+
+
+        private void QuickAddAddressFromNewConcept_Click(object sender, RoutedEventArgs e)
+        {
+            HidePanels();
+            addressReturnToView = "NewConcept";
+            ResetQuickAddressForm();
+            QuickAddAddressForm.Visibility = Visibility.Visible;
+        }
+
+        private void QuickAddAddressFromEditConcept_Click(object sender, RoutedEventArgs e)
+        {
+            HidePanels();
+            addressReturnToView = "EditConcept";
+            ResetQuickAddressForm();
+            QuickAddAddressForm.Visibility = Visibility.Visible;
+        }
+
+        private void ResetQuickAddressForm()
+        {
+            QuickIsLocationOnlyCheckBox.IsChecked = false;
+            QuickAddressLocationNameTextBox.Text = "";
+            QuickAddressStreetTextBox.Text = "";
+            QuickAddressHouseNumberTextBox.Text = "";
+            QuickAddressPostalCodeTextBox.Text = "";
+            QuickAddressCityTextBox.Text = "";
+            QuickAddressCountryTextBox.Text = "";
+            ToggleQuickLocationFields(null, null);
+        }
+
+        private void ToggleQuickLocationFields(object sender, RoutedEventArgs e)
+        {
+            bool isLocationOnly = QuickIsLocationOnlyCheckBox.IsChecked == true;
+            QuickAddressLocationNameTextBox.IsEnabled = isLocationOnly;
+
+            QuickAddressStreetTextBox.IsEnabled = !isLocationOnly;
+            QuickAddressHouseNumberTextBox.IsEnabled = !isLocationOnly;
+            QuickAddressPostalCodeTextBox.IsEnabled = !isLocationOnly;
+            QuickAddressCityTextBox.IsEnabled = !isLocationOnly;
+            QuickAddressCountryTextBox.IsEnabled = !isLocationOnly;
+        }
+
+        private void CreateQuickAddress_Click(object sender, RoutedEventArgs e)
+        {
+            string? locationName = QuickIsLocationOnlyCheckBox.IsChecked == true
+                ? QuickAddressLocationNameTextBox.Text
+                : null;
+
+            Address newAddress = new Address(
+                id: 0,
+                locationName: locationName,
+                street: QuickAddressStreetTextBox.Text,
+                houseNumber: QuickAddressHouseNumberTextBox.Text,
+                postalCode: QuickAddressPostalCodeTextBox.Text,
+                city: QuickAddressCityTextBox.Text,
+                country: QuickAddressCountryTextBox.Text
+            );
+
+            newAddress.Create();
+
+            if (addressReturnToView == "NewConcept")
+            {
+                //selectedNewConceptAddress = newAddress;
+                NewConceptAddressToggleList.ItemsSource = new DAL().GetAllAddresses();
+                NewConceptForm.Visibility = Visibility.Visible;
+            }
+            else if (addressReturnToView == "EditConcept")
+            {
+                //selectedEditConceptAddress = newAddress;
+                EditConceptAddressToggleList.ItemsSource = new DAL().GetAllAddresses();
+                EditConceptForm.Visibility = Visibility.Visible;
+            }
+
+            addressReturnToView = null;
+            QuickAddAddressForm.Visibility = Visibility.Collapsed;
+        }
+
+        private void CancelQuickAddAddress_Click(object sender, RoutedEventArgs e)
+        {
+            if (addressReturnToView == "NewConcept")
+                NewConceptForm.Visibility = Visibility.Visible;
+            else if (addressReturnToView == "EditConcept")
+                EditConceptForm.Visibility = Visibility.Visible;
+
+            addressReturnToView = null;
+            QuickAddAddressForm.Visibility = Visibility.Collapsed;
+        }
+
+
+
+
 
 
         // PROPS
@@ -1339,6 +1457,77 @@ namespace StudioManager
         {
             ShootsDataGrid.ItemsSource = new DAL().GetAllShoots();
         }
+
+        // ADDRESSES - R
+
+        private void RefreshAddressOverview()
+        {
+            AddressesDataGrid.ItemsSource = new DAL().GetAllAddresses();
+        }
+
+        private void NewAddressButton_Click(object sender, RoutedEventArgs e)
+        {
+            HidePanels();
+            NewAddressForm.Visibility = Visibility.Visible;
+
+            // Reset velden
+            IsLocationOnlyCheckBox.IsChecked = false;
+            NewAddressLocationNameTextBox.Text = "";
+            NewAddressStreetTextBox.Text = "";
+            NewAddressHouseNumberTextBox.Text = "";
+            NewAddressPostalCodeTextBox.Text = "";
+            NewAddressCityTextBox.Text = "";
+            NewAddressCountryTextBox.Text = "";
+
+            // Reset velden activeren
+            ToggleLocationFields(null, null);
+        }
+
+
+
+        private void ToggleLocationFields(object sender, RoutedEventArgs e)
+        {
+            bool isLocationOnly = IsLocationOnlyCheckBox.IsChecked == true;
+
+            NewAddressLocationNameTextBox.IsEnabled = isLocationOnly;
+
+            NewAddressStreetTextBox.IsEnabled = !isLocationOnly;
+            NewAddressHouseNumberTextBox.IsEnabled = !isLocationOnly;
+            NewAddressPostalCodeTextBox.IsEnabled = !isLocationOnly;
+            NewAddressCityTextBox.IsEnabled = !isLocationOnly;
+            NewAddressCountryTextBox.IsEnabled = !isLocationOnly;
+        }
+
+        private void SaveNewAddress_Click(object sender, RoutedEventArgs e)
+        {
+            string? locationName = IsLocationOnlyCheckBox.IsChecked == true
+                ? NewAddressLocationNameTextBox.Text
+                : null;
+
+            Address newAddress = new Address(
+                id: 0,
+                locationName: locationName,
+                street: NewAddressStreetTextBox.Text,
+                houseNumber: NewAddressHouseNumberTextBox.Text,
+                postalCode: NewAddressPostalCodeTextBox.Text,
+                city: NewAddressCityTextBox.Text,
+                country: NewAddressCountryTextBox.Text
+            );
+
+            newAddress.Create();
+
+            RefreshAddressOverview();
+            HidePanels();
+            AddressesView.Visibility = Visibility.Visible;
+        }
+
+        private void CancelNewAddress_Click(object sender, RoutedEventArgs e)
+        {
+            HidePanels();
+            AddressesView.Visibility = Visibility.Visible;
+        }
+
+
 
 
         // CONTACTS
