@@ -1583,6 +1583,23 @@ namespace StudioManager
             Shoot newShoot = new Shoot(0, selectedDate, selectedNewShootAddress);
             newShoot.Create();
 
+            string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+            string rootPath = Directory.GetParent(baseDir)!.Parent!.Parent!.Parent!.Parent!.FullName;
+
+            string locationName = !string.IsNullOrWhiteSpace(newShoot.Location?.LocationName)
+                ? newShoot.Location.LocationName
+                : $"{newShoot.Location?.Street}_{newShoot.Location?.HouseNumber}";
+
+            foreach (char c in System.IO.Path.GetInvalidFileNameChars())
+            {
+                locationName = locationName.Replace(c, '_');
+            }
+            locationName = locationName.Replace(" ", "_");
+
+            string shootFolder = System.IO.Path.Combine(rootPath, "ShootContract", $"{newShoot.Date:yyyy-MM-dd}_{newShoot.Id}_{locationName}");
+
+            Directory.CreateDirectory(shootFolder);
+
             Contract newContract = new Contract(
                 id: 0,
                 body: "",
@@ -1594,12 +1611,6 @@ namespace StudioManager
 
             if (!string.IsNullOrEmpty(selectedContractPath) && File.Exists(selectedContractPath))
             {
-                string baseDir = AppDomain.CurrentDomain.BaseDirectory;
-                string rootPath = Directory.GetParent(baseDir)!.Parent!.Parent!.Parent!.Parent!.FullName;
-                string shootFolder = System.IO.Path.Combine(rootPath, "ShootContract", $"{newShoot.Date:yyyy-MM-dd}_{newShoot.Id}");
-
-                Directory.CreateDirectory(shootFolder);
-
                 string fileName = System.IO.Path.GetFileName(selectedContractPath);
                 string destPath = System.IO.Path.Combine(shootFolder, fileName);
 
@@ -1610,6 +1621,8 @@ namespace StudioManager
             newContract.Create();
             ShootsButton_Click(null, null);
         }
+
+
 
 
 
@@ -1657,10 +1670,20 @@ namespace StudioManager
             if (result != MessageBoxResult.Yes)
                 return;
 
-            // Verwijder de contractmap
             string baseDir = AppDomain.CurrentDomain.BaseDirectory;
             string rootPath = Directory.GetParent(baseDir)!.Parent!.Parent!.Parent!.Parent!.FullName;
-            string shootFolder = System.IO.Path.Combine(rootPath, "ShootContract", $"{selected.Date:yyyy-MM-dd}_{selected.Id}");
+
+            string locationName = !string.IsNullOrWhiteSpace(selected.Location?.LocationName)
+                ? selected.Location.LocationName
+                : $"{selected.Location?.Street}_{selected.Location?.HouseNumber}";
+
+            foreach (char c in System.IO.Path.GetInvalidFileNameChars())
+            {
+                locationName = locationName.Replace(c, '_');
+            }
+            locationName = locationName.Replace(" ", "_");
+
+            string shootFolder = System.IO.Path.Combine(rootPath, "ShootContract", $"{selected.Date:yyyy-MM-dd}_{selected.Id}_{locationName}");
 
             if (Directory.Exists(shootFolder))
             {
@@ -1674,7 +1697,6 @@ namespace StudioManager
                 }
             }
 
-            // Verwijder shoot en bijbehorend contract uit database
             foreach (var contract in new DAL().GetAllContracts().Where(c => c.Shoot?.Id == selected.Id))
             {
                 contract.Delete();
@@ -1683,6 +1705,7 @@ namespace StudioManager
             selected.Delete();
             RefreshShootOverview();
         }
+
 
 
 
