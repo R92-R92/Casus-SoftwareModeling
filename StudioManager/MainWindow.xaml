@@ -227,9 +227,9 @@
                     <!-- Shoot Overview Table -->
                     <DataGrid x:Name="ShootsDataGrid" Grid.Row="2" AutoGenerateColumns="False" CanUserAddRows="False" HeadersVisibility="Column" RowHeaderWidth="0" Margin="0,0,0,10" IsReadOnly="True">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Location" Binding="{Binding Location}" Width="*"/>
+                            <DataGridTextColumn Header="Location" Binding="{Binding LocationText}" Width="*"/>
                             <DataGridTextColumn Header="Date" Binding="{Binding Date}" Width="*"/>
-                            <DataGridTextColumn Header="Concepts" Binding="{Binding Concepts}" Width="2*"/>
+                            <DataGridTextColumn Header="Concepts" Binding="{Binding ConceptText}" Width="2*"/>
                             <DataGridTemplateColumn Header="Edit" Width="Auto">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
