@@ -1168,5 +1168,33 @@ namespace StudioManager
             cmd.Parameters.AddWithValue("@ProjectId", projectId);
             cmd.ExecuteNonQuery();
         }
+
+
+
+
+
+
+
+
+
+        public void UnlinkAddressReferences(int addressId)
+        {
+            using SqlConnection conn = new(connectionString);
+            conn.Open();
+
+            string[] queries =
+            {
+        "UPDATE Contact SET AddressId = NULL WHERE AddressId = @AddressId",
+        "UPDATE Shoot SET AddressId = NULL WHERE AddressId = @AddressId",
+        "UPDATE Concept SET AddressId = NULL WHERE AddressId = @AddressId"
+    };
+
+            foreach (var query in queries)
+            {
+                using SqlCommand cmd = new(query, conn);
+                cmd.Parameters.AddWithValue("@AddressId", addressId);
+                cmd.ExecuteNonQuery();
+            }
+        }
     }
 }
