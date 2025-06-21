@@ -46,6 +46,12 @@ namespace StudioManager
 
         private Contact? selectedNewShootContact = null;
 
+        private string? quickShootContractPath = null;
+        private string? quickShootReturnToView = null;
+
+        private Address? selectedQuickShootAddress = null;
+        private Contact? selectedQuickShootContact = null;
+
 
         private string? selectedContractPath;
 
@@ -1356,6 +1362,195 @@ namespace StudioManager
             addressReturnToView = null;
             QuickAddAddressForm.Visibility = Visibility.Collapsed;
         }
+
+
+
+
+
+
+
+
+
+        private void QuickAddShootFromEditConcept_Click(object sender, RoutedEventArgs e)
+        {
+            HidePanels();
+
+            QuickShootDatePicker.SelectedDate = null;
+            selectedQuickShootAddress = null;
+            selectedQuickShootContact = null;
+
+            QuickShootAddressToggleList.ItemsSource = new DAL().GetAllAddresses();
+            QuickShootContactToggleList.ItemsSource = new DAL().GetAllContacts();
+
+            QuickShootIsSignedCheckBox.IsChecked = false;
+            QuickShootSignedOnDatePicker.SelectedDate = null;
+            QuickSelectedContractTextBlock.Text = "No file selected.";
+            quickShootContractPath = null;
+
+            quickShootReturnToView = "EditConcept";
+            QuickAddShootForm.Visibility = Visibility.Visible;
+        }
+
+
+
+
+        private void UploadContractForQuickShoot_Click(object sender, RoutedEventArgs e)
+        {
+            var dlg = new Microsoft.Win32.OpenFileDialog
+            {
+                Filter = "PDF files (*.pdf)|*.pdf|Word documents (*.doc;*.docx)|*.doc;*.docx|All files (*.*)|*.*"
+            };
+
+            if (dlg.ShowDialog() == true)
+            {
+                quickShootContractPath = dlg.FileName;
+                QuickSelectedContractTextBlock.Text = System.IO.Path.GetFileName(quickShootContractPath);
+            }
+        }
+
+
+        private void CreateQuickShoot_Click(object sender, RoutedEventArgs e)
+        {
+            DateTime? shootDate = QuickShootDatePicker.SelectedDate;
+            Address? location = selectedQuickShootAddress;
+            Contact? signee = selectedQuickShootContact;
+            bool isSigned = QuickShootIsSignedCheckBox.IsChecked == true;
+            DateTime? signedOn = QuickShootSignedOnDatePicker.SelectedDate;
+
+            if (shootDate == null || location == null)
+            {
+                MessageBox.Show("Please select both a date and a location.");
+                return;
+            }
+
+            Shoot newShoot = new Shoot(0, shootDate, location);
+            newShoot.Create();
+
+            string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+            string rootPath = Directory.GetParent(baseDir)!.Parent!.Parent!.Parent!.Parent!.FullName;
+
+            string locationName = !string.IsNullOrWhiteSpace(location.LocationName)
+                ? location.LocationName
+                : $"{location.Street}_{location.HouseNumber}";
+
+            foreach (char c in System.IO.Path.GetInvalidFileNameChars())
+                locationName = locationName.Replace(c, '_');
+            locationName = locationName.Replace(" ", "_");
+
+            string shootFolder = System.IO.Path.Combine(rootPath, "ShootContract", $"{shootDate:yyyy-MM-dd}_{newShoot.Id}_{locationName}");
+            Directory.CreateDirectory(shootFolder);
+
+            Contract newContract = new Contract(0, "", signee, isSigned, signedOn, newShoot);
+
+            if (!string.IsNullOrEmpty(quickShootContractPath) && File.Exists(quickShootContractPath))
+            {
+                string fileName = System.IO.Path.GetFileName(quickShootContractPath);
+                string destPath = System.IO.Path.Combine(shootFolder, fileName);
+                File.Copy(quickShootContractPath, destPath, true);
+                newContract.Body = destPath;
+            }
+
+            newContract.Create();
+
+            EditShootToggleList.ItemsSource = new DAL().GetAllShoots();
+            EditConceptForm.Visibility = Visibility.Visible;
+            QuickAddShootForm.Visibility = Visibility.Collapsed;
+            quickShootReturnToView = null;
+        }
+
+
+
+        private void CancelQuickAddShoot_Click(object sender, RoutedEventArgs e)
+        {
+            if (quickShootReturnToView == "EditConcept")
+                EditConceptForm.Visibility = Visibility.Visible;
+
+            QuickAddShootForm.Visibility = Visibility.Collapsed;
+            quickShootReturnToView = null;
+        }
+
+
+        private void AddQuickShootAddress_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.Tag is Address address)
+            {
+                selectedQuickShootAddress = address;
+                QuickShootAddressToggleList.Items.Refresh();
+            }
+        }
+
+        private void RemoveQuickShootAddress_Click(object sender, RoutedEventArgs e)
+        {
+            selectedQuickShootAddress = null;
+            QuickShootAddressToggleList.Items.Refresh();
+        }
+
+        private void UpdateAddQuickShootAddressButtonState(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.Tag is Address address)
+            {
+                btn.IsEnabled = selectedQuickShootAddress == null;
+            }
+        }
+
+        private void UpdateRemoveQuickShootAddressButtonState(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.Tag is Address address)
+            {
+                btn.IsEnabled = selectedQuickShootAddress?.Id == address.Id;
+            }
+        }
+
+        private void AddQuickShootContact_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.Tag is Contact contact)
+            {
+                selectedQuickShootContact = contact;
+                QuickShootContactToggleList.Items.Refresh();
+            }
+        }
+
+        private void RemoveQuickShootContact_Click(object sender, RoutedEventArgs e)
+        {
+            selectedQuickShootContact = null;
+            QuickShootContactToggleList.Items.Refresh();
+        }
+
+        private void UpdateAddQuickShootContactButtonState(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.Tag is Contact contact)
+            {
+                btn.IsEnabled = selectedQuickShootContact == null;
+            }
+        }
+
+        private void UpdateRemoveQuickShootContactButtonState(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.Tag is Contact contact)
+            {
+                btn.IsEnabled = selectedQuickShootContact?.Id == contact.Id;
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
