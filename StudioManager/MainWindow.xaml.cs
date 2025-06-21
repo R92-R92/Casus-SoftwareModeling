@@ -135,6 +135,11 @@ namespace StudioManager
             RefreshPropOverview();
             HidePanels();
             PropsView.Visibility = Visibility.Visible;
+
+            PropsDataGrid.SelectedItem = null;
+            DetailPropName.Text = "";
+            DetailPropDescription.Text = "";
+            DetailPropAvailable.Text = "";
         }
 
         private void NewPropButton_Click(object sender, RoutedEventArgs e)
@@ -158,6 +163,14 @@ namespace StudioManager
             RefreshAddressOverview();
             HidePanels();
             AddressesView.Visibility = Visibility.Visible;
+
+            AddressesDataGrid.SelectedItem = null;
+            DetailAddressLocation.Text = "";
+            DetailAddressStreet.Text = "";
+            DetailAddressHouseNumber.Text = "";
+            DetailAddressPostalCode.Text = "";
+            DetailAddressCity.Text = "";
+            DetailAddressCountry.Text = "";
         }
 
         // SEARCHBOXES
@@ -1447,6 +1460,22 @@ namespace StudioManager
             }
         }
 
+        private void PropsDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (PropsDataGrid.SelectedItem is Prop selected)
+            {
+                DetailPropName.Text = $"Name: {selected.Name}";
+                DetailPropDescription.Text = $"Description: {(string.IsNullOrWhiteSpace(selected.Description) ? "–" : selected.Description)}";
+                DetailPropAvailable.Text = $"Available: {(selected.IsAvailable ? "Yes" : "No")}";
+            }
+            else
+            {
+                DetailPropName.Text = "Name:";
+                DetailPropDescription.Text = "Description:";
+                DetailPropAvailable.Text = "Available:";
+            }
+        }
+
 
 
         // SHOOTS - R
@@ -1615,6 +1644,34 @@ namespace StudioManager
                 RefreshAddressOverview();
             }
         }
+
+        private void AddressesDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            DetailAddressLocation.Text = "";
+            DetailAddressStreet.Text = "";
+            DetailAddressHouseNumber.Text = "";
+            DetailAddressPostalCode.Text = "";
+            DetailAddressCity.Text = "";
+            DetailAddressCountry.Text = "";
+
+            if (AddressesDataGrid.SelectedItem is Address selected)
+            {
+                if (selected.IsLocationOnly)
+                {
+                    DetailAddressLocation.Text = $"Location: {selected.LocationName}";
+                }
+                else
+                {
+                    DetailAddressStreet.Text = $"Street: {selected.Street}";
+                    DetailAddressHouseNumber.Text = $"House Number: {selected.HouseNumber}";
+                    DetailAddressPostalCode.Text = $"Postal Code: {selected.PostalCode}";
+                    DetailAddressCity.Text = $"City: {selected.City}";
+                    DetailAddressCountry.Text = $"Country: {selected.Country}";
+                }
+            }
+
+        }
+
 
 
 
