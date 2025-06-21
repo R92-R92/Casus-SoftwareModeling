@@ -1125,7 +1125,7 @@
                                 </ItemsControl>
                             </ScrollViewer>
                         </Border>
-                        <Button Content="Add Shoot" Width="100" Margin="0,5,0,0"/>
+                        <Button Content="Add Shoot" Width="100" Margin="0,5,0,0" Click="QuickAddShootFromEditConcept_Click"/>
                     </StackPanel>
                 </StackPanel>
 
@@ -1202,6 +1202,151 @@
             </Grid>
         </Grid>
 
+
+        <!-- QUICK ADD SHOOT (VANUIT EDIT CONCEPT) -->
+        <Grid x:Name="QuickAddShootForm" Visibility="Collapsed" Grid.Column="1" Background="#F5F5F5" Margin="10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Titel -->
+            <TextBlock Grid.Row="0" Text="New Shoot" FontWeight="Bold" FontSize="16"
+               HorizontalAlignment="Center" Margin="0,20,0,10"/>
+
+            <!-- Formulier -->
+            <StackPanel Grid.Row="1" Margin="20">
+
+                <!-- Datum -->
+                <StackPanel Orientation="Horizontal" Margin="0,5">
+                    <TextBlock Text="Date:" Width="120"/>
+                    <DatePicker x:Name="QuickShootDatePicker" Width="300"/>
+                </StackPanel>
+
+                <!-- Address selectie -->
+                <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                    <TextBlock Text="Select Location:" Width="120" VerticalAlignment="Top"/>
+                    <StackPanel>
+                        <Border BorderBrush="Gray" BorderThickness="1" Background="White" Width="300" Height="150" CornerRadius="5">
+                            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                <ItemsControl x:Name="QuickShootAddressToggleList">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <DockPanel Margin="4,2" LastChildFill="False">
+                                                <TextBlock Width="200" VerticalAlignment="Center">
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="TextBlock">
+                                                            <Setter Property="Text" Value="{Binding LocationName}" />
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding LocationName}" Value="">
+                                                                    <Setter Property="Text">
+                                                                        <Setter.Value>
+                                                                            <MultiBinding StringFormat="{}{0} {1}, {2} {3}, {4}">
+                                                                                <Binding Path="Street"/>
+                                                                                <Binding Path="HouseNumber"/>
+                                                                                <Binding Path="PostalCode"/>
+                                                                                <Binding Path="City"/>
+                                                                                <Binding Path="Country"/>
+                                                                            </MultiBinding>
+                                                                        </Setter.Value>
+                                                                    </Setter>
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding LocationName}" Value="{x:Null}">
+                                                                    <Setter Property="Text">
+                                                                        <Setter.Value>
+                                                                            <MultiBinding StringFormat="{}{0} {1}, {2} {3}, {4}">
+                                                                                <Binding Path="Street"/>
+                                                                                <Binding Path="HouseNumber"/>
+                                                                                <Binding Path="PostalCode"/>
+                                                                                <Binding Path="City"/>
+                                                                                <Binding Path="Country"/>
+                                                                            </MultiBinding>
+                                                                        </Setter.Value>
+                                                                    </Setter>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+                                                </TextBlock>
+
+                                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                                    <Button Content="–" Width="25" Margin="5,0,0,0"
+                                                    Click="RemoveQuickShootAddress_Click"
+                                                    Tag="{Binding}" Loaded="UpdateRemoveQuickShootAddressButtonState"/>
+                                                    <Button Content="+" Width="25" Margin="5,0,0,0"
+                                                    Click="AddQuickShootAddress_Click"
+                                                    Tag="{Binding}" Loaded="UpdateAddQuickShootAddressButtonState"/>
+                                                </StackPanel>
+                                            </DockPanel>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+                        </Border>
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- Signee selectie -->
+                <StackPanel Orientation="Horizontal" Margin="0,20,0,0">
+                    <TextBlock Text="Select Signee:" Width="120" VerticalAlignment="Top"/>
+                    <StackPanel>
+                        <Border BorderBrush="Gray" BorderThickness="1" Background="White" Width="300" Height="150" CornerRadius="5">
+                            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                <ItemsControl x:Name="QuickShootContactToggleList">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <DockPanel Margin="4,2" LastChildFill="False">
+                                                <TextBlock Text="{Binding FullName}" Width="200" VerticalAlignment="Center"/>
+                                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                                    <Button Content="–" Width="25" Margin="5,0,0,0"
+                                                    Click="RemoveQuickShootContact_Click"
+                                                    Tag="{Binding}" Loaded="UpdateRemoveQuickShootContactButtonState"/>
+                                                    <Button Content="+" Width="25" Margin="5,0,0,0"
+                                                    Click="AddQuickShootContact_Click"
+                                                    Tag="{Binding}" Loaded="UpdateAddQuickShootContactButtonState"/>
+                                                </StackPanel>
+                                            </DockPanel>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+                        </Border>
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- Signed info -->
+                <StackPanel Orientation="Horizontal" Margin="0,10">
+                    <TextBlock Text="Is Signed:" Width="120"/>
+                    <CheckBox x:Name="QuickShootIsSignedCheckBox"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Margin="0,5">
+                    <TextBlock Text="Signed On:" Width="120"/>
+                    <DatePicker x:Name="QuickShootSignedOnDatePicker" Width="300"/>
+                </StackPanel>
+
+                <!-- Contract Upload -->
+                <StackPanel Orientation="Horizontal" Margin="0,20,0,5">
+                    <TextBlock Text="Upload Contract:" Width="120"/>
+                    <Button Content="Upload" Width="100" Click="UploadContractForQuickShoot_Click" Margin="0,0,10,0"/>
+                    <TextBlock x:Name="QuickSelectedContractTextBlock" VerticalAlignment="Center" FontStyle="Italic" Foreground="Gray"/>
+                </StackPanel>
+            </StackPanel>
+
+            <!-- Knoppen -->
+            <Grid Grid.Row="2" Margin="0,20">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Button Content="Create" Width="100" HorizontalAlignment="Left" Grid.Column="0" Margin="100,0"
+                Click="CreateQuickShoot_Click"/>
+                <Button Content="Cancel" Width="100" HorizontalAlignment="Right" Grid.Column="1" Margin="100,0"
+                Click="CancelQuickAddShoot_Click"/>
+            </Grid>
+        </Grid>
 
 
         <!-- NEW PROP -->
@@ -1549,7 +1694,7 @@
                 <!-- Datum -->
                 <StackPanel Orientation="Horizontal" Margin="0,5">
                     <TextBlock Text="Date:" Width="120"/>
-                    <DatePicker x:Name="NewShootDatePicker" Width="200"/>
+                    <DatePicker x:Name="NewShootDatePicker" Width="300"/>
                 </StackPanel>
 
                 <!-- Address selectie -->
@@ -1660,7 +1805,7 @@
 
                 <StackPanel Orientation="Horizontal" Margin="0,5">
                     <TextBlock Text="Signed On:" Width="120"/>
-                    <DatePicker x:Name="NewShootSignedOnDatePicker" Width="200"/>
+                    <DatePicker x:Name="NewShootSignedOnDatePicker" Width="300"/>
                 </StackPanel>
 
                 <!-- Upload Contract -->
@@ -1686,5 +1831,14 @@
                 Click="CancelNewShoot_Click"/>
             </Grid>
         </Grid>
+
+
+
+
+
+
+
+
+
     </Grid>
 </Window>
