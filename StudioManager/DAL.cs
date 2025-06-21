@@ -1184,10 +1184,10 @@ namespace StudioManager
 
             string[] queries =
             {
-        "UPDATE Contact SET AddressId = NULL WHERE AddressId = @AddressId",
-        "UPDATE Shoot SET AddressId = NULL WHERE AddressId = @AddressId",
-        "UPDATE Concept SET AddressId = NULL WHERE AddressId = @AddressId"
-    };
+            "UPDATE Contact SET AddressId = NULL WHERE AddressId = @AddressId",
+            "UPDATE Shoot SET AddressId = NULL WHERE AddressId = @AddressId",
+            "UPDATE Concept SET AddressId = NULL WHERE AddressId = @AddressId"
+        };
 
             foreach (var query in queries)
             {
@@ -1195,6 +1195,42 @@ namespace StudioManager
                 cmd.Parameters.AddWithValue("@AddressId", addressId);
                 cmd.ExecuteNonQuery();
             }
+        }
+
+        public Contract? GetContractByShootId(int shootId)
+        {
+            using SqlConnection conn = new(connectionString);
+            conn.Open();
+
+            string query = @"
+        SELECT Id, Body, SigneeContactId, SignedOn, IsSigned, ShootId
+        FROM Contract
+        WHERE ShootId = @ShootId";
+
+            using SqlCommand cmd = new(query, conn);
+            cmd.Parameters.AddWithValue("@ShootId", shootId);
+
+            using SqlDataReader reader = cmd.ExecuteReader();
+            if (reader.Read())
+            {
+                int id = reader.GetInt32(reader.GetOrdinal("Id"));
+                string body = reader["Body"]?.ToString() ?? "";
+                bool isSigned = reader.GetBoolean(reader.GetOrdinal("IsSigned"));
+                DateTime? signedOn = reader.IsDBNull(reader.GetOrdinal("SignedOn"))
+                    ? null
+                    : reader.GetDateTime(reader.GetOrdinal("SignedOn"));
+
+                int? signeeId = reader.IsDBNull(reader.GetOrdinal("SigneeContactId"))
+                    ? null
+                    : reader.GetInt32(reader.GetOrdinal("SigneeContactId"));
+
+                Contact? signee = signeeId.HasValue ? GetContactById(signeeId.Value) : null;
+                Shoot? shoot = GetShootById(shootId);
+
+                return new Contract(id, body, signee, isSigned, signedOn, shoot);
+            }
+
+            return null;
         }
     }
 }
