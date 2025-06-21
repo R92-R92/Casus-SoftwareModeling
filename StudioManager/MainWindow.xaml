@@ -1651,10 +1651,5 @@
                 Click="CancelNewShoot_Click"/>
             </Grid>
         </Grid>
-
-
-
-
-
     </Grid>
 </Window>
