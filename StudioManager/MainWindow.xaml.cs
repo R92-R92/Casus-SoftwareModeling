@@ -41,6 +41,11 @@ namespace StudioManager
         private string? addressReturnToView = null;
         private Address? addressBeingEdited = null;
 
+        private Address? selectedNewShootAddress = null;
+        private string? shootAddressReturnToView = null;
+
+        private Contact? selectedNewShootContact = null;
+
 
 
         public MainWindow()
@@ -66,6 +71,7 @@ namespace StudioManager
             StartUpWindow.Visibility = Visibility.Collapsed;
             AddressesView.Visibility = Visibility.Collapsed;
             NewAddressForm.Visibility = Visibility.Collapsed;
+            NewShootForm.Visibility = Visibility.Collapsed;
         }
 
         public void DashboardButton_Click(object sender, RoutedEventArgs e)
@@ -1485,6 +1491,134 @@ namespace StudioManager
             ShootsDataGrid.ItemsSource = new DAL().GetAllShoots();
         }
 
+        private void NewShootButton_Click(object sender, RoutedEventArgs e)
+        {
+            HidePanels();
+            selectedNewShootAddress = null;
+            NewShootAddressToggleList.ItemsSource = new DAL().GetAllAddresses();
+            NewShootDatePicker.SelectedDate = null;
+            NewShootForm.Visibility = Visibility.Visible;
+            selectedNewShootContact = null;
+            NewShootContactToggleList.ItemsSource = new DAL().GetAllContacts();
+            NewShootIsSignedCheckBox.IsChecked = false;
+            NewShootSignedOnDatePicker.SelectedDate = null;
+        }
+
+        private void AddNewShootAddress_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.Tag is Address address)
+            {
+                selectedNewShootAddress = address;
+                NewShootAddressToggleList.Items.Refresh();
+            }
+        }
+
+        private void RemoveNewShootAddress_Click(object sender, RoutedEventArgs e)
+        {
+            selectedNewShootAddress = null;
+            NewShootAddressToggleList.Items.Refresh();
+        }
+
+        private void UpdateAddShootAddressButtonState(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.Tag is Address)
+            {
+                btn.IsEnabled = selectedNewShootAddress == null;
+            }
+        }
+
+
+        private void UpdateRemoveShootAddressButtonState(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.Tag is Address address)
+                btn.IsEnabled = selectedNewShootAddress != null && selectedNewShootAddress.Id == address.Id;
+        }
+
+
+        private void UploadContractForNewShoot_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("Contract uploaden is nog niet geïmplementeerd.");
+        }
+
+        private void CancelNewShoot_Click(object sender, RoutedEventArgs e)
+        {
+            HidePanels();
+            RefreshShootOverview();
+            ShootsView.Visibility = Visibility.Visible;
+        }
+
+
+        private void CreateNewShoot_Click(object sender, RoutedEventArgs e)
+        {
+            DateTime? selectedDate = NewShootDatePicker.SelectedDate;
+            if (selectedDate == null)
+            {
+                MessageBox.Show("Please select a date.");
+                return;
+            }
+
+            if (selectedNewShootAddress == null)
+            {
+                MessageBox.Show("Please select a location.");
+                return;
+            }
+
+            Shoot newShoot = new Shoot(0, selectedDate, selectedNewShootAddress);
+            newShoot.Create();
+
+            Contract newContract = new Contract(
+                id: 0,
+                body: "", // Placeholder, wordt later geüpload
+                signee: selectedNewShootContact,
+                isSigned: NewShootIsSignedCheckBox.IsChecked == true,
+                signedOn: NewShootSignedOnDatePicker.SelectedDate,
+                shoot: newShoot,
+                payment: false
+            );
+
+            newContract.Create();
+            ShootsButton_Click(null, null);
+        }
+
+
+
+        private void AddNewShootContact_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.Tag is Contact contact)
+            {
+                selectedNewShootContact = contact;
+                NewShootContactToggleList.Items.Refresh();
+            }
+        }
+
+        private void RemoveNewShootContact_Click(object sender, RoutedEventArgs e)
+        {
+            selectedNewShootContact = null;
+            NewShootContactToggleList.Items.Refresh();
+        }
+
+        private void UpdateAddShootContactButtonState(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.Tag is Contact)
+                btn.IsEnabled = selectedNewShootContact == null;
+        }
+
+        private void UpdateRemoveShootContactButtonState(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.Tag is Contact contact)
+                btn.IsEnabled = selectedNewShootContact != null && selectedNewShootContact.Id == contact.Id;
+        }
+
+
+
+
+
+
+
+
+
+
+
         // ADDRESSES - R
 
         private void RefreshAddressOverview()
@@ -1523,7 +1657,7 @@ namespace StudioManager
             NewAddressCountryTextBox.IsEnabled = !isLocationOnly;
         }
 
-        private void SaveNewAddress_Click(object sender, RoutedEventArgs e)
+        private void CreateNewAddress_Click(object sender, RoutedEventArgs e)
         {
             bool isLocationOnly = IsLocationOnlyCheckBox.IsChecked == true;
 
