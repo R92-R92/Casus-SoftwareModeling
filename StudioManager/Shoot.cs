@@ -37,5 +37,19 @@ namespace StudioManager
         {
             dal.DeleteShoot(this.Id);
         }
+
+
+
+
+        public string LocationText => Location != null
+            ? (string.IsNullOrWhiteSpace(Location.LocationName)
+                ? $"{Location.Street} {Location.HouseNumber}, {Location.PostalCode} {Location.City}"
+                : Location.LocationName)
+            : "–";
+
+        public string ConceptText => Concepts != null && Concepts.Count > 0
+            ? string.Join(", ", Concepts.Select(c => c.Name))
+            : "–";
+
     }
 }

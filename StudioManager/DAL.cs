@@ -660,6 +660,7 @@ namespace StudioManager
                     location: reader.IsDBNull(2) ? null! : GetAddressById(reader.GetInt32(2))
                 );
 
+                shoot.Concepts = GetConceptsByShootId(shootId);
                 shoots.Add(shoot);
             }
 
@@ -1027,6 +1028,40 @@ namespace StudioManager
 
             return concepts;
         }
+
+        private List<Concept> GetConceptsByShootId(int shootId)
+        {
+            List<Concept> concepts = new();
+            using SqlConnection conn = new(connectionString);
+            conn.Open();
+
+            string query = @"
+        SELECT Id, Name, Description, Sketch, AddressId
+        FROM Concept
+        WHERE ShootId = @ShootId";
+
+            using SqlCommand cmd = new(query, conn);
+            cmd.Parameters.AddWithValue("@ShootId", shootId);
+
+            using SqlDataReader reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                Concept concept = new Concept(
+                    id: reader.GetInt32(0),
+                    name: reader["Name"].ToString(),
+                    address: reader["AddressId"] != DBNull.Value ? GetAddressById((int)reader["AddressId"]) : null,
+                    description: reader["Description"]?.ToString(),
+                    sketch: reader["Sketch"]?.ToString(),
+                    props: new List<Prop>(),  
+                    shoot: null
+                );
+
+                concepts.Add(concept);
+            }
+
+            return concepts;
+        }
+
 
         public bool ConceptNameExists(string name)
         {
