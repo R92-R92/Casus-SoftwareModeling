@@ -23,7 +23,7 @@ namespace StudioManager
             using SqlConnection conn = new(connectionString);
             conn.Open();
 
-            string query = "SELECT Id, LocationName, IsLocationOnly, Street, HouseNumber, PostalCode, City, Country FROM Address";
+            string query = "SELECT Id, LocationName, IsLocationOnly, Street, HouseNumber, PostalCode, City, Country FROM Address WHERE IsHome = 0";
             using SqlCommand cmd = new(query, conn);
             using SqlDataReader reader = cmd.ExecuteReader();
 
