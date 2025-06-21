@@ -8,7 +8,7 @@
         xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
         mc:Ignorable="d"
         Title="Milo's Document and Media Assistant / Milo's Digital Management App"
-        Height="800" Width="1100" WindowStartupLocation="CenterScreen">
+        Height="800" Width="1200" WindowStartupLocation="CenterScreen">
 
     <Grid>
         <Grid.ColumnDefinitions>
@@ -733,28 +733,27 @@
 
                 <!-- Name -->
                 <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="0" Margin="0,5" VerticalAlignment="Top">
-                    <TextBlock Text="Name:" Width="100" VerticalAlignment="Top"/>
-                    <TextBox x:Name="NewConceptNameTextBox" Width="250" Height="25" VerticalAlignment="Top" MaxLength="37"/>
+                    <TextBlock Text="Name:" Width="120" VerticalAlignment="Top"/>
+                    <TextBox x:Name="NewConceptNameTextBox" Width="300" Height="25" VerticalAlignment="Top" MaxLength="37"/>
                 </StackPanel>
 
                 <!-- Description -->
                 <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="1" Margin="10,5,0,5">
-                    <TextBlock Text="Description:" Width="100"/>
-                    <TextBox x:Name="NewConceptDescriptionTextBox" Width="250" Height="100" AcceptsReturn="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"/>
+                    <TextBlock Text="Description:" Width="120"/>
+                    <TextBox x:Name="NewConceptDescriptionTextBox" Width="300" Height="100" AcceptsReturn="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"/>
                 </StackPanel>
 
                 <!-- Select Location -->
                 <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="0" Margin="0,5,0,5">
-                    <TextBlock Text="Select Location:" Width="100" VerticalAlignment="Top"/>
-
+                    <TextBlock Text="Select Location:" Width="120" VerticalAlignment="Top"/>
                     <StackPanel>
-                        <Border BorderBrush="Gray" BorderThickness="1" Background="White" Width="250" Height="150" CornerRadius="5">
+                        <Border BorderBrush="Gray" BorderThickness="1" Background="White" Width="300" Height="150" CornerRadius="5">
                             <ScrollViewer VerticalScrollBarVisibility="Auto">
                                 <ItemsControl x:Name="NewConceptAddressToggleList">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
-                                            <DockPanel Margin="4,2">
-                                                <TextBlock Width="160" VerticalAlignment="Center">
+                                            <DockPanel Margin="4,2" LastChildFill="False">
+                                                <TextBlock Width="200" VerticalAlignment="Center">
                                                     <TextBlock.Style>
                                                         <Style TargetType="TextBlock">
                                                             <Setter Property="Text" Value="{Binding LocationName}" />
@@ -789,12 +788,14 @@
                                                         </Style>
                                                     </TextBlock.Style>
                                                 </TextBlock>
-                                                <Button Content="–" Width="25" Margin="2,0"
-                                        Click="RemoveNewConceptAddress_Click"
-                                        Tag="{Binding}" Loaded="UpdateRemoveAddressButtonState"/>
-                                                <Button Content="+" Width="25" Margin="2,0"
-                                        Click="AddNewConceptAddress_Click"
-                                        Tag="{Binding}" Loaded="UpdateAddAddressButtonState"/>
+                                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                                    <Button Content="–" Width="25" Margin="5,0,0,0"
+                                            Click="RemoveNewConceptAddress_Click"
+                                            Tag="{Binding}" Loaded="UpdateRemoveAddressButtonState"/>
+                                                    <Button Content="+" Width="25" Margin="5,0,0,0"
+                                            Click="AddNewConceptAddress_Click"
+                                            Tag="{Binding}" Loaded="UpdateAddAddressButtonState"/>
+                                                </StackPanel>
                                             </DockPanel>
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
@@ -809,53 +810,68 @@
 
 
 
+
                 <!-- Select Models -->
                 <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="1" Margin="10,5,0,5">
-                    <TextBlock Text="Select Models:" Width="100" VerticalAlignment="Top"/>
+                    <TextBlock Text="Select Models:" Width="120" VerticalAlignment="Top"/>
                     <StackPanel>
-                        <Border BorderBrush="Gray" BorderThickness="1" Background="White" Width="250" Height="150" CornerRadius="5">
+                        <Border BorderBrush="Gray" BorderThickness="1" Background="White" Width="300" Height="150" CornerRadius="5">
                             <ScrollViewer VerticalScrollBarVisibility="Auto">
                                 <ItemsControl x:Name="ModelToggleList">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
-                                            <DockPanel Margin="4,2">
-                                                <TextBlock Text="{Binding FullName}" Width="160" VerticalAlignment="Center"/>
-                                                <Button Content="–" Width="25" Margin="2,0" Click="RemovContact_Click" Tag="{Binding}" Loaded="UpdateRemoveContactButtonState"/>
-                                                <Button Content="+" Width="25" Margin="2,0" Click="AddContact_Click" Tag="{Binding}" Loaded="UpdateAddContactButtonState"/>
+                                            <DockPanel Margin="4,2" LastChildFill="False">
+                                                <TextBlock Text="{Binding FullName}" Width="200" VerticalAlignment="Center"/>
+                                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                                    <Button Content="–" Width="25" Margin="5,0,0,0"
+                                            Click="RemovContact_Click"
+                                            Tag="{Binding}" Loaded="UpdateRemoveContactButtonState"/>
+                                                    <Button Content="+" Width="25" Margin="5,0,0,0"
+                                            Click="AddContact_Click"
+                                            Tag="{Binding}" Loaded="UpdateAddContactButtonState"/>
+                                                </StackPanel>
                                             </DockPanel>
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
                             </ScrollViewer>
                         </Border>
-                        <Button Content="Add Model" Width="100" Margin="0,5,0,0"/>
+                        <Button Content="Add Model" Width="100" Margin="0,5,0,0" HorizontalAlignment="Center"/>
                     </StackPanel>
                 </StackPanel>
+
 
 
 
                 <!-- Select Props -->
                 <StackPanel Orientation="Horizontal" Grid.Row="2" Grid.Column="0" Margin="0,5">
-                    <TextBlock Text="Select Props:" Width="100" VerticalAlignment="Top"/>
+                    <TextBlock Text="Select Props:" Width="120" VerticalAlignment="Top"/>
                     <StackPanel>
-                        <Border BorderBrush="Gray" BorderThickness="1" Background="White" Width="250" Height="150" CornerRadius="5">
+                        <Border BorderBrush="Gray" BorderThickness="1" Background="White" Width="300" Height="150" CornerRadius="5">
                             <ScrollViewer VerticalScrollBarVisibility="Auto">
                                 <ItemsControl x:Name="PropToggleList">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
-                                            <DockPanel Margin="4,2">
-                                                <TextBlock Text="{Binding Name}" Width="160" VerticalAlignment="Center"/>
-                                                <Button Content="–" Width="25" Margin="2,0" Click="RemoveProp_Click" Tag="{Binding}" Loaded="UpdateRemoveButtonState"/>
-                                                <Button Content="+" Width="25" Margin="2,0" Click="AddProp_Click" Tag="{Binding}" Loaded="UpdateAddButtonState"/>
+                                            <DockPanel Margin="4,2" LastChildFill="False">
+                                                <TextBlock Text="{Binding Name}" Width="200" VerticalAlignment="Center"/>
+                                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                                    <Button Content="–" Width="25" Margin="5,0,0,0"
+                                            Click="RemoveProp_Click"
+                                            Tag="{Binding}" Loaded="UpdateRemoveButtonState"/>
+                                                    <Button Content="+" Width="25" Margin="5,0,0,0"
+                                            Click="AddProp_Click"
+                                            Tag="{Binding}" Loaded="UpdateAddButtonState"/>
+                                                </StackPanel>
                                             </DockPanel>
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
                             </ScrollViewer>
                         </Border>
-                        <Button Content="Add Prop" Width="100" Margin="0,5,0,0" Click="QuickAddPropFromNewConcept_Click"/>
+                        <Button Content="Add Prop" Width="100" Margin="0,5,0,0" HorizontalAlignment="Center" Click="QuickAddPropFromNewConcept_Click"/>
                     </StackPanel>
                 </StackPanel>
+
 
 
             </Grid>
@@ -942,29 +958,27 @@
 
                 <!-- Name -->
                 <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="0" Margin="0,5" VerticalAlignment="Top">
-                    <TextBlock Text="Name:" Width="100" VerticalAlignment="Top"/>
-                    <TextBox x:Name="EditConceptNameTextBox" Width="250" Height="25" MaxLength="37"/>
+                    <TextBlock Text="Name:" Width="120" VerticalAlignment="Top"/>
+                    <TextBox x:Name="EditConceptNameTextBox" Width="300" Height="25" MaxLength="37"/>
                 </StackPanel>
 
                 <!-- Description -->
                 <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="1" Margin="10,5,0,5">
-                    <TextBlock Text="Description:" Width="100"/>
-                    <TextBox x:Name="EditConceptDescriptionTextBox" Width="250" Height="100" AcceptsReturn="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"/>
+                    <TextBlock Text="Description:" Width="120"/>
+                    <TextBox x:Name="EditConceptDescriptionTextBox" Width="300" Height="100" AcceptsReturn="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"/>
                 </StackPanel>
 
-                <!-- Address -->
                 <!-- Select Location -->
                 <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="0" Margin="0,5,0,5">
-                    <TextBlock Text="Select Location:" Width="100" VerticalAlignment="Top"/>
-
+                    <TextBlock Text="Select Location:" Width="120" VerticalAlignment="Top"/>
                     <StackPanel>
-                        <Border BorderBrush="Gray" BorderThickness="1" Background="White" Width="250" Height="150" CornerRadius="5">
+                        <Border BorderBrush="Gray" BorderThickness="1" Background="White" Width="300" Height="150" CornerRadius="5">
                             <ScrollViewer VerticalScrollBarVisibility="Auto">
                                 <ItemsControl x:Name="EditConceptAddressToggleList">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
-                                            <DockPanel Margin="4,2">
-                                                <TextBlock Width="160" VerticalAlignment="Center">
+                                            <DockPanel Margin="4,2" LastChildFill="False">
+                                                <TextBlock Width="200" VerticalAlignment="Center">
                                                     <TextBlock.Style>
                                                         <Style TargetType="TextBlock">
                                                             <Setter Property="Text" Value="{Binding LocationName}" />
@@ -999,39 +1013,48 @@
                                                         </Style>
                                                     </TextBlock.Style>
                                                 </TextBlock>
-                                                <Button Content="–" Width="25" Margin="2,0"
-                                    Click="RemoveEditConceptAddress_Click"
-                                    Tag="{Binding}" Loaded="EditUpdateRemoveAddressButtonState"/>
-                                                <Button Content="+" Width="25" Margin="2,0"
-                                    Click="AddEditConceptAddress_Click"
-                                    Tag="{Binding}" Loaded="EditUpdateAddAddressButtonState"/>
+                                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                                    <Button Content="–" Width="25" Margin="5,0,0,0"
+                                            Click="RemoveEditConceptAddress_Click"
+                                            Tag="{Binding}" Loaded="EditUpdateRemoveAddressButtonState"/>
+                                                    <Button Content="+" Width="25" Margin="5,0,0,0"
+                                            Click="AddEditConceptAddress_Click"
+                                            Tag="{Binding}" Loaded="EditUpdateAddAddressButtonState"/>
+                                                </StackPanel>
                                             </DockPanel>
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
                             </ScrollViewer>
                         </Border>
-
                         <Button Content="Add Address" Width="100" Margin="0,5,0,0"
-            HorizontalAlignment="Center" Click="QuickAddAddressFromEditConcept_Click"/>
+                HorizontalAlignment="Center"
+                Click="QuickAddAddressFromEditConcept_Click"/>
                     </StackPanel>
                 </StackPanel>
 
 
 
+
                 <!-- Models -->
                 <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="1" Margin="10,5,0,5">
-                    <TextBlock Text="Select Models:" Width="100" VerticalAlignment="Top"/>
+                    <TextBlock Text="Select Models:" Width="120" VerticalAlignment="Top"/>
                     <StackPanel>
-                        <Border BorderBrush="Gray" BorderThickness="1" Background="White" Width="250" Height="150" CornerRadius="5">
+                        <Border BorderBrush="Gray" BorderThickness="1" Background="White" Width="300" Height="150" CornerRadius="5">
                             <ScrollViewer VerticalScrollBarVisibility="Auto">
                                 <ItemsControl x:Name="EditModelToggleList">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
-                                            <DockPanel Margin="4,2">
-                                                <TextBlock Text="{Binding FullName}" Width="160" VerticalAlignment="Center"/>
-                                                <Button Content="–" Width="25" Margin="2,0" Click="EditRemoveContact_Click" Tag="{Binding}" Loaded="EditUpdateRemoveContactButtonState"/>
-                                                <Button Content="+" Width="25" Margin="2,0" Click="EditAddContact_Click" Tag="{Binding}" Loaded="EditUpdateAddContactButtonState"/>
+                                            <DockPanel Margin="4,2" LastChildFill="False">
+                                                <TextBlock Text="{Binding FullName}" Width="200" VerticalAlignment="Center"/>
+                                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                                    <Button Content="–" Width="25" Margin="5,0,0,0"
+                                            Click="EditRemoveContact_Click"
+                                            Tag="{Binding}" Loaded="EditUpdateRemoveContactButtonState"/>
+                                                    <Button Content="+" Width="25" Margin="5,0,0,0"
+                                            Click="EditAddContact_Click"
+                                            Tag="{Binding}" Loaded="EditUpdateAddContactButtonState"/>
+                                                </StackPanel>
                                             </DockPanel>
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
@@ -1044,25 +1067,26 @@
 
 
 
+
                 <!-- Props -->
                 <StackPanel Orientation="Horizontal" Grid.Row="2" Grid.Column="0" Margin="0,5">
-                    <TextBlock Text="Select Props:" Width="100" VerticalAlignment="Top"/>
+                    <TextBlock Text="Select Props:" Width="120" VerticalAlignment="Top"/>
                     <StackPanel>
-                        <Border BorderBrush="Gray" BorderThickness="1" Background="White" Width="250" Height="150" CornerRadius="5">
+                        <Border BorderBrush="Gray" BorderThickness="1" Background="White" Width="300" Height="150" CornerRadius="5">
                             <ScrollViewer VerticalScrollBarVisibility="Auto">
                                 <ItemsControl x:Name="EditPropToggleList">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
-                                            <DockPanel Margin="4,2">
-                                                <TextBlock Text="{Binding Name}" Width="160" VerticalAlignment="Center"/>
-                                                <Button Content="–" Width="25" Margin="2,0"
-                                    Click="EditRemoveProp_Click"
-                                    Tag="{Binding}"
-                                    Loaded="EditUpdateRemoveButtonState"/>
-                                                <Button Content="+" Width="25" Margin="2,0"
-                                    Click="EditAddProp_Click"
-                                    Tag="{Binding}"
-                                    Loaded="EditUpdateAddButtonState"/>
+                                            <DockPanel Margin="4,2" LastChildFill="False">
+                                                <TextBlock Text="{Binding Name}" Width="200" VerticalAlignment="Center"/>
+                                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                                    <Button Content="–" Width="25" Margin="5,0,0,0"
+                                            Click="EditRemoveProp_Click"
+                                            Tag="{Binding}" Loaded="EditUpdateRemoveButtonState"/>
+                                                    <Button Content="+" Width="25" Margin="5,0,0,0"
+                                            Click="EditAddProp_Click"
+                                            Tag="{Binding}" Loaded="EditUpdateAddButtonState"/>
+                                                </StackPanel>
                                             </DockPanel>
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
@@ -1073,25 +1097,28 @@
                     </StackPanel>
                 </StackPanel>
 
+
                 <!-- Shoots -->
                 <StackPanel Orientation="Horizontal" Grid.Row="2" Grid.Column="1" Margin="10,5,0,5">
-                    <TextBlock Text="Select Shoot:" Width="100" VerticalAlignment="Top"/>
+                    <TextBlock Text="Select Shoot:" Width="120" VerticalAlignment="Top"/>
                     <StackPanel>
-                        <Border BorderBrush="Gray" BorderThickness="1" Background="White" Width="250" Height="150" CornerRadius="5">
+                        <Border BorderBrush="Gray" BorderThickness="1" Background="White" Width="300" Height="150" CornerRadius="5">
                             <ScrollViewer VerticalScrollBarVisibility="Auto">
                                 <ItemsControl x:Name="EditShootToggleList">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
-                                            <DockPanel Margin="4,2">
-                                                <TextBlock Text="{Binding Date}" Width="160" VerticalAlignment="Center"/>
-                                                <Button Content="–" Width="25" Margin="2,0" 
-                                        Click="EditRemoveShoot_Click" 
-                                        Tag="{Binding}" 
-                                        Loaded="EditUpdateRemoveShootButtonState"/>
-                                                <Button Content="+" Width="25" Margin="2,0" 
-                                        Click="EditAddShoot_Click" 
-                                        Tag="{Binding}" 
-                                        Loaded="EditUpdateAddShootButtonState"/>
+                                            <DockPanel Margin="4,2" LastChildFill="False">
+                                                <TextBlock Text="{Binding Date}" Width="200" VerticalAlignment="Center"/>
+                                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                                    <Button Content="–" Width="25" Margin="5,0,0,0"
+                                            Click="EditRemoveShoot_Click"
+                                            Tag="{Binding}"
+                                            Loaded="EditUpdateRemoveShootButtonState"/>
+                                                    <Button Content="+" Width="25" Margin="5,0,0,0"
+                                            Click="EditAddShoot_Click"
+                                            Tag="{Binding}"
+                                            Loaded="EditUpdateAddShootButtonState"/>
+                                                </StackPanel>
                                             </DockPanel>
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
@@ -1101,6 +1128,7 @@
                         <Button Content="Add Shoot" Width="100" Margin="0,5,0,0"/>
                     </StackPanel>
                 </StackPanel>
+
 
 
             </Grid>
@@ -1525,97 +1553,104 @@
                 </StackPanel>
 
                 <!-- Address selectie -->
-                <TextBlock Text="Select Location:" FontWeight="Bold" Margin="0,20,0,5"/>
-                <StackPanel>
-                    <Border BorderBrush="Gray" BorderThickness="1" Background="White" Width="350" Height="150" CornerRadius="5">
-                        <ScrollViewer VerticalScrollBarVisibility="Auto">
-                            <ItemsControl x:Name="NewShootAddressToggleList">
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <DockPanel Margin="4,2">
-                                            <TextBlock Width="180" VerticalAlignment="Center">
-                                                <TextBlock.Style>
-                                                    <Style TargetType="TextBlock">
-                                                        <Setter Property="Text" Value="{Binding LocationName}" />
-                                                        <Style.Triggers>
-                                                            <DataTrigger Binding="{Binding LocationName}" Value="">
-                                                                <Setter Property="Text">
-                                                                    <Setter.Value>
-                                                                        <MultiBinding StringFormat="{}{0} {1}, {2} {3}, {4}">
-                                                                            <Binding Path="Street"/>
-                                                                            <Binding Path="HouseNumber"/>
-                                                                            <Binding Path="PostalCode"/>
-                                                                            <Binding Path="City"/>
-                                                                            <Binding Path="Country"/>
-                                                                        </MultiBinding>
-                                                                    </Setter.Value>
-                                                                </Setter>
-                                                            </DataTrigger>
-                                                            <DataTrigger Binding="{Binding LocationName}" Value="{x:Null}">
-                                                                <Setter Property="Text">
-                                                                    <Setter.Value>
-                                                                        <MultiBinding StringFormat="{}{0} {1}, {2} {3}, {4}">
-                                                                            <Binding Path="Street"/>
-                                                                            <Binding Path="HouseNumber"/>
-                                                                            <Binding Path="PostalCode"/>
-                                                                            <Binding Path="City"/>
-                                                                            <Binding Path="Country"/>
-                                                                        </MultiBinding>
-                                                                    </Setter.Value>
-                                                                </Setter>
-                                                            </DataTrigger>
-                                                        </Style.Triggers>
-                                                    </Style>
-                                                </TextBlock.Style>
-                                            </TextBlock>
-                                            <Button Content="–" Width="25" Margin="2,0"
-                                    Click="RemoveNewShootAddress_Click"
-                                    Tag="{Binding}"
-                                    Loaded="UpdateRemoveShootAddressButtonState"/>
-                                            <Button Content="+" Width="25" Margin="2,0"
-                                    Click="AddNewShootAddress_Click"
-                                    Tag="{Binding}"
-                                    Loaded="UpdateAddShootAddressButtonState"/>
-                                        </DockPanel>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </ScrollViewer>
-                    </Border>
+                <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                    <TextBlock Text="Select Location:" Width="120" VerticalAlignment="Top"/>
+                    <StackPanel>
+                        <Border BorderBrush="Gray" BorderThickness="1" Background="White" Width="300" Height="150" CornerRadius="5">
+                            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                <ItemsControl x:Name="NewShootAddressToggleList">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <DockPanel Margin="4,2" LastChildFill="False">
+                                                <TextBlock Width="200" VerticalAlignment="Center">
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="TextBlock">
+                                                            <Setter Property="Text" Value="{Binding LocationName}" />
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding LocationName}" Value="">
+                                                                    <Setter Property="Text">
+                                                                        <Setter.Value>
+                                                                            <MultiBinding StringFormat="{}{0} {1}, {2} {3}, {4}">
+                                                                                <Binding Path="Street"/>
+                                                                                <Binding Path="HouseNumber"/>
+                                                                                <Binding Path="PostalCode"/>
+                                                                                <Binding Path="City"/>
+                                                                                <Binding Path="Country"/>
+                                                                            </MultiBinding>
+                                                                        </Setter.Value>
+                                                                    </Setter>
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding LocationName}" Value="{x:Null}">
+                                                                    <Setter Property="Text">
+                                                                        <Setter.Value>
+                                                                            <MultiBinding StringFormat="{}{0} {1}, {2} {3}, {4}">
+                                                                                <Binding Path="Street"/>
+                                                                                <Binding Path="HouseNumber"/>
+                                                                                <Binding Path="PostalCode"/>
+                                                                                <Binding Path="City"/>
+                                                                                <Binding Path="Country"/>
+                                                                            </MultiBinding>
+                                                                        </Setter.Value>
+                                                                    </Setter>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+                                                </TextBlock>
 
-                    <!-- Add Address knop -->
-                    <Button Content="Add Address" Width="100" Margin="0,5,0,0" HorizontalAlignment="Center"/>
+                                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                                    <Button Content="–" Width="25" Margin="5,0,0,0"
+                                            Click="RemoveNewShootAddress_Click"
+                                            Tag="{Binding}" Loaded="UpdateRemoveShootAddressButtonState"/>
+                                                    <Button Content="+" Width="25" Margin="5,0,0,0"
+                                            Click="AddNewShootAddress_Click"
+                                            Tag="{Binding}" Loaded="UpdateAddShootAddressButtonState"/>
+                                                </StackPanel>
+                                            </DockPanel>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+                        </Border>
+
+                        <!-- Add Address knop -->
+                        <Button Content="Add Address" Width="100" Margin="0,5,0,0" HorizontalAlignment="Center"/>
+                    </StackPanel>
                 </StackPanel>
 
 
                 <!-- Signee selectie -->
-                <TextBlock Text="Select Signee (Contact):" FontWeight="Bold" Margin="0,20,0,5"/>
-                <StackPanel>
-                    <Border BorderBrush="Gray" BorderThickness="1" Background="White" Width="350" Height="150" CornerRadius="5">
-                        <ScrollViewer VerticalScrollBarVisibility="Auto">
-                            <ItemsControl x:Name="NewShootContactToggleList">
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <DockPanel Margin="4,2">
-                                            <TextBlock Text="{Binding FullName}" Width="180" VerticalAlignment="Center"/>
-                                            <Button Content="–" Width="25" Margin="2,0"
-                                    Click="RemoveNewShootContact_Click"
-                                    Tag="{Binding}"
-                                    Loaded="UpdateRemoveShootContactButtonState"/>
-                                            <Button Content="+" Width="25" Margin="2,0"
-                                    Click="AddNewShootContact_Click"
-                                    Tag="{Binding}"
-                                    Loaded="UpdateAddShootContactButtonState"/>
-                                        </DockPanel>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </ScrollViewer>
-                    </Border>
+                <StackPanel Orientation="Horizontal" Margin="0,20,0,0">
+                    <TextBlock Text="Select Signee:" Width="120" VerticalAlignment="Top"/>
+                    <StackPanel>
+                        <Border BorderBrush="Gray" BorderThickness="1" Background="White" Width="300" Height="150" CornerRadius="5">
+                            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                <ItemsControl x:Name="NewShootContactToggleList">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <DockPanel Margin="4,2" LastChildFill="False">
+                                                <TextBlock Text="{Binding FullName}" Width="200" VerticalAlignment="Center"/>
+                                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                                    <Button Content="–" Width="25" Margin="5,0,0,0"
+                                            Click="RemoveNewShootContact_Click"
+                                            Tag="{Binding}" Loaded="UpdateRemoveShootContactButtonState"/>
+                                                    <Button Content="+" Width="25" Margin="5,0,0,0"
+                                            Click="AddNewShootContact_Click"
+                                            Tag="{Binding}" Loaded="UpdateAddShootContactButtonState"/>
+                                                </StackPanel>
+                                            </DockPanel>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+                        </Border>
 
-                    <!-- Add Contact knop -->
-                    <Button Content="Add Contact" Width="100" Margin="0,5,0,0" HorizontalAlignment="Center"/>
+                        <!-- Add Contact knop -->
+                        <Button Content="Add Contact" Width="100" Margin="0,5,0,0" HorizontalAlignment="Center"/>
+                    </StackPanel>
                 </StackPanel>
+
+
 
                 <!-- Checkbox en datum voor contract -->
                 <StackPanel Orientation="Horizontal" Margin="0,10">
