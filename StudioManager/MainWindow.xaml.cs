@@ -60,6 +60,9 @@ namespace StudioManager
         private string? selectedEditContractPath = null;
         private bool editShootContractReplaced = false;
 
+        private string? selectedContractPathForDetail;
+
+
 
         public MainWindow()
         {
@@ -1436,6 +1439,40 @@ namespace StudioManager
             quickShootReturnToView = null;
         }
 
+        private void DetailConceptShoot_Click(object sender, MouseButtonEventArgs e)
+        {
+            if (ConceptsDataGrid.SelectedItem is Concept concept && concept.Shoot != null)
+            {
+
+                RefreshShootOverview();
+
+                var shoots = new DAL().GetAllShoots().Where(s => s.Id == concept.Shoot.Id).ToList();
+
+                if (shoots.Count == 0)
+                {
+                    return;
+                }
+
+                var selectedShootId = shoots.First().Id;
+
+                HidePanels();
+                ShootsView.Visibility = Visibility.Visible;
+
+                var matchingShoot = (ShootsDataGrid.ItemsSource as IEnumerable<Shoot>)?
+                    .FirstOrDefault(s => s.Id == selectedShootId);
+
+                if (matchingShoot != null)
+                {
+                    ShootsDataGrid.SelectedItem = null;
+                    ShootsDataGrid.Items.Refresh();
+                    ShootsDataGrid.SelectedItem = matchingShoot;
+                    ShootsDataGrid.ScrollIntoView(matchingShoot);
+
+                    ShootsDataGrid_SelectionChanged(ShootsDataGrid, null);
+                }
+            }
+        }
+
         private void AddQuickShootAddress_Click(object sender, RoutedEventArgs e)
         {
             if (sender is Button btn && btn.Tag is Address address)
@@ -2168,6 +2205,103 @@ namespace StudioManager
             ShootCountryTextBox.Text = "";
             ToggleQuickLocationFieldsFromShoot(null, null);
         }
+
+        private void ShootsDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (ShootsDataGrid.SelectedItem is Shoot selected)
+            {
+                DetailShootDate.Text = $"Date: {selected.Date?.ToString("yyyy-MM-dd") ?? "–"}";
+
+                DetailShootLocation.Text = "Location: " + (
+                    selected.Location?.IsLocationOnly == true
+                        ? selected.Location.LocationName
+                        : $"{selected.Location?.Street} {selected.Location?.HouseNumber}, {selected.Location?.PostalCode} {selected.Location?.City}, {selected.Location?.Country}"
+                );
+
+                var contract = new DAL().GetContractByShootId(selected.Id);
+
+                DetailShootSignee.Text = "Signee: " + (contract?.Signee?.FullName ?? "–");
+                DetailShootSigned.Text = "Contract Signed: " + (contract?.IsSigned == true ? "Yes" : "No");
+                DetailShootSignedOn.Text = "Signed On: " + (contract?.SignedOn?.ToString("yyyy-MM-dd") ?? "–");
+                
+                selectedContractPathForDetail = contract?.Body;
+
+                DetailShootContract.Text = "Contract: " +
+                    (string.IsNullOrWhiteSpace(contract?.Body) ? "–" : System.IO.Path.GetFileName(contract.Body));
+
+                string linkedConcepts = string.Join(", ", new DAL().GetAllConcepts()
+                    .Where(c => c.Shoot?.Id == selected.Id)
+                    .Select(c => c.Name));
+
+                DetailShootConcepts.Text = "Linked Concepts: " + (string.IsNullOrWhiteSpace(linkedConcepts) ? "–" : linkedConcepts);
+            }
+            else
+            {
+                DetailShootDate.Text = "";
+                DetailShootLocation.Text = "";
+                DetailShootSignee.Text = "";
+                DetailShootSigned.Text = "";
+                DetailShootSignedOn.Text = "";
+                DetailShootContract.Text = "";
+                DetailShootConcepts.Text = "";
+                selectedContractPathForDetail = null;
+            }
+        }
+
+        private void DetailShootContract_Click(object sender, MouseButtonEventArgs e)
+        {
+            if (!string.IsNullOrWhiteSpace(selectedContractPathForDetail) && File.Exists(selectedContractPathForDetail))
+            {
+                try
+                {
+                    System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                    {
+                        FileName = selectedContractPathForDetail,
+                        UseShellExecute = true
+                    });
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Could not open file: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+        }
+
+        private void DetailShootConcepts_Click(object sender, MouseButtonEventArgs e)
+        {
+            if (ShootsDataGrid.SelectedItem is Shoot shoot)
+            {
+                var concepts = new DAL().GetAllConcepts().Where(c => c.Shoot?.Id == shoot.Id).ToList();
+
+                if (concepts.Count == 0)
+                {
+                    return;
+                }
+
+                var selectedConceptId = concepts.First().Id;
+
+                HidePanels();
+                ConceptsView.Visibility = Visibility.Visible;
+
+                var matchingConcept = (ConceptsDataGrid.ItemsSource as IEnumerable<Concept>)?
+                    .FirstOrDefault(c => c.Id == selectedConceptId);
+
+                if (matchingConcept != null)
+                {
+                    ConceptsDataGrid.SelectedItem = null;
+                    ConceptsDataGrid.Items.Refresh();
+                    ConceptsDataGrid.SelectedItem = matchingConcept;
+                    ConceptsDataGrid.ScrollIntoView(matchingConcept);
+
+                    ConceptsDataGrid_SelectionChanged(ConceptsDataGrid, null);
+                }
+            }
+        }
+
+
+
+
+
 
 
 
