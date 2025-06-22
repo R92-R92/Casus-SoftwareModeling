@@ -1371,7 +1371,8 @@ namespace StudioManager
         {
             var dlg = new Microsoft.Win32.OpenFileDialog
             {
-                Filter = "PDF files (*.pdf)|*.pdf|Word documents (*.doc;*.docx)|*.doc;*.docx|All files (*.*)|*.*"
+                Filter = "PDF files (*.pdf)|*.pdf|Word documents (*.doc;*.docx)|*.doc;*.docx|All files (*.*)|*.*",
+                FilterIndex = 3
             };
 
             if (dlg.ShowDialog() == true)
@@ -1719,7 +1720,8 @@ namespace StudioManager
         {
             var dlg = new Microsoft.Win32.OpenFileDialog
             {
-                Filter = "PDF files (*.pdf)|*.pdf|Word documents (*.doc;*.docx)|*.doc;*.docx|All files (*.*)|*.*"
+                Filter = "PDF files (*.pdf)|*.pdf|Word documents (*.doc;*.docx)|*.doc;*.docx|All files (*.*)|*.*",
+                FilterIndex = 3
             };
 
             if (dlg.ShowDialog() == true)
@@ -1915,7 +1917,8 @@ namespace StudioManager
         {
             var dlg = new Microsoft.Win32.OpenFileDialog
             {
-                Filter = "PDF files (*.pdf)|*.pdf|Word documents (*.doc;*.docx)|*.doc;*.docx|All files (*.*)|*.*"
+                Filter = "PDF files (*.pdf)|*.pdf|Word documents (*.doc;*.docx)|*.doc;*.docx|All files (*.*)|*.*",
+                FilterIndex = 3
             };
 
             if (dlg.ShowDialog() == true)

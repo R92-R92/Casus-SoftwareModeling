@@ -83,8 +83,11 @@ namespace StudioManager
         public string ShootDateText => Shoot?.Date?.ToString("yyyy-MM-dd") ?? "–";
 
         public string Location => Shoot?.Location != null
-            ? $"{Shoot.Location.Street} {Shoot.Location.HouseNumber}, {Shoot.Location.PostalCode} {Shoot.Location.City}"
+            ? (Shoot.Location.IsLocationOnly && !string.IsNullOrWhiteSpace(Shoot.Location.LocationName)
+                ? Shoot.Location.LocationName
+                : $"{Shoot.Location.Street} {Shoot.Location.HouseNumber}, {Shoot.Location.PostalCode} {Shoot.Location.City}")
             : "–";
+
     }
 
 }
