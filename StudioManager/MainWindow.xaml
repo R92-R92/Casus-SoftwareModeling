@@ -525,9 +525,9 @@
                             <DataGridTextColumn Header="First Name" Binding="{Binding FirstName}" Width="*"/>
                             <DataGridTextColumn Header="Last Name" Binding="{Binding LastName}" Width="*"/>
                             <DataGridTextColumn Header="Role" Binding="{Binding Role}" Width="*"/>
-                            <DataGridTextColumn Header="Address" Binding="{Binding Address}" Width="2*"/>
+                            <DataGridTextColumn Header="Social Media" Binding="{Binding SocialMedia}" Width="2*"/>
                             <DataGridTextColumn Header="Phone" Binding="{Binding Phone}" Width="*"/>
-                            <DataGridTextColumn Header="Pay" Binding="{Binding Pay}" Width="*"/>
+                            <DataGridCheckBoxColumn Header="Pay" Binding="{Binding Payment}" Width="*"/>
                             <DataGridTemplateColumn Header="Edit" Width="Auto">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
