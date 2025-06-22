@@ -63,6 +63,11 @@ namespace StudioManager
         private string? selectedContractPathForDetail;
         private Contact? contactBeingEdited = null;
 
+        private List<Concept> contactLinkedConcepts = new();
+        private List<Shoot> contactLinkedShoots = new();
+        private List<Concept> shootLinkedConcepts = new();
+
+
 
 
         public MainWindow()
@@ -182,6 +187,15 @@ namespace StudioManager
             RefreshContactOverview();
             HidePanels();
             ContactsView.Visibility = Visibility.Visible;
+
+            DetailContactName.Text = "";
+            DetailContactEmail.Text = "";
+            DetailContactPhone.Text = "";
+            DetailContactSocial.Text = "";
+            DetailContactRole.Text = "";
+            DetailContactPayment.Text = "";
+            DetailContactConceptList.ItemsSource = null;
+            DetailContactShootList.ItemsSource = null;
         }
 
         public void AddressesButton_Click(object sender, RoutedEventArgs e)
@@ -2235,11 +2249,14 @@ namespace StudioManager
                 DetailShootContract.Text = "Contract: " +
                     (string.IsNullOrWhiteSpace(contract?.Body) ? "–" : System.IO.Path.GetFileName(contract.Body));
 
-                string linkedConcepts = string.Join(", ", new DAL().GetAllConcepts()
-                    .Where(c => c.Shoot?.Id == selected.Id)
-                    .Select(c => c.Name));
 
-                DetailShootConcepts.Text = "Linked Concepts: " + (string.IsNullOrWhiteSpace(linkedConcepts) ? "–" : linkedConcepts);
+                shootLinkedConcepts = new DAL().GetAllConcepts()
+                    .Where(c => c.Shoot?.Id == selected.Id)
+                    .ToList();
+
+                DetailShootConceptList.ItemsSource = shootLinkedConcepts;
+                ShootLinkedConceptsPanel.Visibility = shootLinkedConcepts.Any() ? Visibility.Visible : Visibility.Collapsed;
+
             }
             else
             {
@@ -2249,7 +2266,8 @@ namespace StudioManager
                 DetailShootSigned.Text = "";
                 DetailShootSignedOn.Text = "";
                 DetailShootContract.Text = "";
-                DetailShootConcepts.Text = "";
+                DetailShootConceptList.ItemsSource = null;
+                ShootLinkedConceptsPanel.Visibility = Visibility.Collapsed;
                 selectedContractPathForDetail = null;
             }
         }
@@ -2656,6 +2674,166 @@ namespace StudioManager
             selected.Delete();
 
             RefreshContactOverview();
+        }
+
+
+
+
+
+
+
+        private void ContactsDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (ContactsDataGrid.SelectedItem is Contact selected)
+            {
+                DetailContactName.Text = $"Name: {selected.FullName}";
+                DetailContactEmail.Text = $"Email: {selected.Email}";
+                DetailContactPhone.Text = $"Phone: {selected.Phone}";
+                DetailContactSocial.Text = $"Social Media: {selected.SocialMedia}";
+                DetailContactRole.Text = $"Role: {selected.Role}";
+                DetailContactPayment.Text = $"Payment: {(selected.Payment ? "Yes" : "No")}";
+
+                contactLinkedConcepts = new DAL().GetAllConcepts()
+                    .Where(c => c.Models.Any(m => m.Id == selected.Id)).ToList();
+
+                DetailContactConceptList.ItemsSource = contactLinkedConcepts;
+
+                string linkedShoots = string.Join(", ", contactLinkedConcepts
+                    .Where(c => c.Shoot != null)
+                    .Select(c => $"{c.Shoot.Date?.ToShortDateString()}  {c.Shoot.Location?.LocationName ?? c.Shoot.Location?.Street}"));
+
+                
+                contactLinkedShoots = contactLinkedConcepts
+                    .Where(c => c.Shoot != null)
+                    .Select(c => c.Shoot!)
+                    .DistinctBy(s => s.Id)
+                    .ToList();
+
+                DetailContactShootList.ItemsSource = contactLinkedShoots;
+                ContactLinkedShootsPanel.Visibility = contactLinkedShoots.Any() ? Visibility.Visible : Visibility.Collapsed;
+
+                ContactLinkedConceptsPanel.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                DetailContactName.Text = "";
+                DetailContactEmail.Text = "";
+                DetailContactPhone.Text = "";
+                DetailContactSocial.Text = "";
+                DetailContactRole.Text = "";
+                DetailContactPayment.Text = "";
+                DetailContactConceptList.ItemsSource = null;
+                DetailContactShootList.ItemsSource = null;
+                ContactLinkedShootsPanel.Visibility = Visibility.Collapsed;
+
+                ContactLinkedConceptsPanel.Visibility = Visibility.Collapsed;
+            }
+        }
+
+        private void LinkedConcept_Click(object sender, MouseButtonEventArgs e)
+        {
+            if (sender is TextBlock tb && tb.DataContext is Concept concept)
+            {
+                HidePanels();
+                ConceptsView.Visibility = Visibility.Visible;
+
+                var matching = (ConceptsDataGrid.ItemsSource as IEnumerable<Concept>)?
+                    .FirstOrDefault(c => c.Id == concept.Id);
+
+                if (matching != null)
+                {
+                    ConceptsDataGrid.SelectedItem = null;
+                    ConceptsDataGrid.Items.Refresh();
+                    ConceptsDataGrid.SelectedItem = matching;
+                    ConceptsDataGrid.ScrollIntoView(matching);
+                    ConceptsDataGrid_SelectionChanged(ConceptsDataGrid, null);
+                }
+            }
+        }
+
+
+
+        private void DetailContactConcepts_Click(object sender, MouseButtonEventArgs e)
+        {
+            if (ContactsDataGrid.SelectedItem is Contact contact)
+            {
+                var concepts = new DAL().GetAllConcepts()
+                    .Where(c => c.Models.Any(m => m.Id == contact.Id)).ToList();
+
+                if (concepts.Count == 0)
+                    return;
+
+                var firstConcept = concepts.First();
+                HidePanels();
+                ConceptsView.Visibility = Visibility.Visible;
+
+                var matchingConcept = (ConceptsDataGrid.ItemsSource as IEnumerable<Concept>)?
+                    .FirstOrDefault(c => c.Id == firstConcept.Id);
+
+                if (matchingConcept != null)
+                {
+                    ConceptsDataGrid.SelectedItem = null;
+                    ConceptsDataGrid.Items.Refresh();
+                    ConceptsDataGrid.SelectedItem = matchingConcept;
+                    ConceptsDataGrid.ScrollIntoView(matchingConcept);
+                    ConceptsDataGrid_SelectionChanged(ConceptsDataGrid, null);
+                }
+            }
+        }
+
+        private void DetailContactShoots_Click(object sender, MouseButtonEventArgs e)
+        {
+            if (ContactsDataGrid.SelectedItem is Contact contact)
+            {
+                var concepts = new DAL().GetAllConcepts()
+                    .Where(c => c.Models.Any(m => m.Id == contact.Id)).ToList();
+
+                var shoot = concepts
+                    .Where(c => c.Shoot != null)
+                    .Select(c => c.Shoot)
+                    .FirstOrDefault();
+
+                if (shoot == null)
+                    return;
+
+                HidePanels();
+                ShootsView.Visibility = Visibility.Visible;
+                RefreshShootOverview();
+
+                var matchingShoot = (ShootsDataGrid.ItemsSource as IEnumerable<Shoot>)?
+                    .FirstOrDefault(s => s.Id == shoot.Id);
+
+                if (matchingShoot != null)
+                {
+                    ShootsDataGrid.SelectedItem = null;
+                    ShootsDataGrid.Items.Refresh();
+                    ShootsDataGrid.SelectedItem = matchingShoot;
+                    ShootsDataGrid.ScrollIntoView(matchingShoot);
+                    ShootsDataGrid_SelectionChanged(ShootsDataGrid, null);
+                }
+            }
+        }
+
+        private void LinkedShoot_Click(object sender, MouseButtonEventArgs e)
+        {
+            if (sender is TextBlock tb && tb.DataContext is Shoot shoot)
+            {
+                HidePanels();
+                ShootsView.Visibility = Visibility.Visible;
+                RefreshShootOverview();
+
+                var matchingShoot = (ShootsDataGrid.ItemsSource as IEnumerable<Shoot>)?
+                    .FirstOrDefault(s => s.Id == shoot.Id);
+
+                if (matchingShoot != null)
+                {
+                    ShootsDataGrid.SelectedItem = null;
+                    ShootsDataGrid.Items.Refresh();
+                    ShootsDataGrid.SelectedItem = matchingShoot;
+                    ShootsDataGrid.ScrollIntoView(matchingShoot);
+                    ShootsDataGrid_SelectionChanged(ShootsDataGrid, null);
+                }
+            }
         }
 
 
