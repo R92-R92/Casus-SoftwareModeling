@@ -1176,6 +1176,25 @@ namespace StudioManager
 
 
 
+        public void UnlinkContactReferences(int contactId)
+        {
+            using SqlConnection conn = new(connectionString);
+            conn.Open();
+
+            string deleteConceptLinks = "DELETE FROM ConceptContact WHERE ContactId = @ContactId";
+            string nullifyContractSignee = "UPDATE Contract SET SigneeContactId = NULL WHERE SigneeContactId = @ContactId";
+
+            foreach (var query in new[] { deleteConceptLinks, nullifyContractSignee })
+            {
+                using SqlCommand cmd = new(query, conn);
+                cmd.Parameters.AddWithValue("@ContactId", contactId);
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+
+
+
         public void UnlinkAddressReferences(int addressId)
         {
             using SqlConnection conn = new(connectionString);

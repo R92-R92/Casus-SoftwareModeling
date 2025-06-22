@@ -531,14 +531,14 @@
                             <DataGridTemplateColumn Header="Edit" Width="Auto">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <Button Content="Edit" Width="50" Margin="2"/>
+                                        <Button Content="Edit" Width="50" Margin="2" Click="EditContact_Click"/>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
                             <DataGridTemplateColumn Header="Del" Width="Auto">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <Button Content="Delete" Width="60" Margin="2"/>
+                                        <Button Content="Delete" Width="60" Margin="2" Click="DeleteContact_Click"/>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
@@ -2051,7 +2051,7 @@
 
 
 
-
+        <!-- New contact Form-->
         <Grid x:Name="NewContactForm" Visibility="Collapsed" Grid.Column="1" Background="#F5F5F5" Margin="10">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
@@ -2113,6 +2113,71 @@
                 Click="CreateNewContact_Click"/>
                 <Button Content="Cancel" Width="100" HorizontalAlignment="Right" Grid.Column="1" Margin="110,10"
                 Click="CancelNewContact_Click"/>
+            </Grid>
+        </Grid>
+
+
+
+        <!-- Edit Contact Form -->
+        <Grid x:Name="EditContactForm" Visibility="Collapsed" Grid.Column="1" Background="#F5F5F5" Margin="10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Row="0" Text="Edit Contact" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center" Margin="0,20,0,10"/>
+
+            <StackPanel Grid.Row="1" Margin="20">
+                <StackPanel Orientation="Horizontal" Margin="0,5">
+                    <TextBlock Text="First Name:" Width="100"/>
+                    <TextBox x:Name="EditContactFirstNameTextBox" Width="200"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Margin="0,5">
+                    <TextBlock Text="Last Name:" Width="100"/>
+                    <TextBox x:Name="EditContactLastNameTextBox" Width="200"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Margin="0,5">
+                    <TextBlock Text="Phone:" Width="100"/>
+                    <TextBox x:Name="EditContactPhoneTextBox" Width="200"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Margin="0,5">
+                    <TextBlock Text="Email:" Width="100"/>
+                    <TextBox x:Name="EditContactEmailTextBox" Width="200"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Margin="0,5">
+                    <TextBlock Text="Social Media:" Width="100"/>
+                    <TextBox x:Name="EditContactSocialTextBox" Width="200"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Margin="0,5">
+                    <TextBlock Text="Role:" Width="100"/>
+                    <ComboBox x:Name="EditContactRoleComboBox" Width="200">
+                        <ComboBoxItem Content="Model" />
+                        <ComboBoxItem Content="Visagist" />
+                    </ComboBox>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Margin="0,5">
+                    <TextBlock Text="Payment:" Width="100"/>
+                    <CheckBox x:Name="EditContactPayCheckBox" VerticalAlignment="Center"/>
+                </StackPanel>
+            </StackPanel>
+
+            <Grid Grid.Row="2" Margin="0,10,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Button Content="Save" Width="100" HorizontalAlignment="Left" Grid.Column="0" Margin="110,10"
+                Click="SaveEditContact_Click"/>
+                <Button Content="Cancel" Width="100" HorizontalAlignment="Right" Grid.Column="1" Margin="110,10"
+                Click="CancelEditContact_Click"/>
             </Grid>
         </Grid>
 
