@@ -61,6 +61,7 @@ namespace StudioManager
         private bool editShootContractReplaced = false;
 
         private string? selectedContractPathForDetail;
+        private Contact? contactBeingEdited = null;
 
 
 
@@ -90,6 +91,7 @@ namespace StudioManager
             NewShootForm.Visibility = Visibility.Collapsed;
             EditShootForm.Visibility= Visibility.Collapsed;
             NewContactForm.Visibility = Visibility.Collapsed;
+            EditContactForm.Visibility= Visibility.Collapsed;
         }
 
         public void DashboardButton_Click(object sender, RoutedEventArgs e)
@@ -2579,7 +2581,82 @@ namespace StudioManager
             ContactsView.Visibility = Visibility.Visible;
         }
 
+        private void EditContact_Click(object sender, RoutedEventArgs e)
+        {
+            if (ContactsDataGrid.SelectedItem is not Contact selected)
+            {
+                MessageBox.Show("Please select a contact to edit.");
+                return;
+            }
 
+            contactBeingEdited = selected;
+
+            EditContactFirstNameTextBox.Text = selected.FirstName;
+            EditContactLastNameTextBox.Text = selected.LastName;
+            EditContactPhoneTextBox.Text = selected.Phone;
+            EditContactEmailTextBox.Text = selected.Email;
+            EditContactSocialTextBox.Text = selected.SocialMedia;
+            EditContactRoleComboBox.SelectedIndex = selected.Role == "Model" ? 0 : 1;
+            EditContactPayCheckBox.IsChecked = selected.Payment;
+
+            HidePanels();
+            EditContactForm.Visibility = Visibility.Visible;
+        }
+
+        private void SaveEditContact_Click(object sender, RoutedEventArgs e)
+        {
+            if (contactBeingEdited == null)
+            {
+                MessageBox.Show("No contact selected.");
+                return;
+            }
+
+            contactBeingEdited.FirstName = EditContactFirstNameTextBox.Text;
+            contactBeingEdited.LastName = EditContactLastNameTextBox.Text;
+            contactBeingEdited.Phone = EditContactPhoneTextBox.Text;
+            contactBeingEdited.Email = EditContactEmailTextBox.Text;
+            contactBeingEdited.SocialMedia = EditContactSocialTextBox.Text;
+            contactBeingEdited.Role = (EditContactRoleComboBox.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "";
+            contactBeingEdited.Payment = EditContactPayCheckBox.IsChecked == true;
+
+            contactBeingEdited.Update();
+
+            contactBeingEdited = null;
+            RefreshContactOverview();
+            HidePanels();
+            ContactsView.Visibility = Visibility.Visible;
+        }
+
+        private void CancelEditContact_Click(object sender, RoutedEventArgs e)
+        {
+            contactBeingEdited = null;
+            HidePanels();
+            ContactsView.Visibility = Visibility.Visible;
+        }
+
+
+
+        private void DeleteContact_Click(object sender, RoutedEventArgs e)
+        {
+            if (ContactsDataGrid.SelectedItem is not Contact selected)
+            {
+                MessageBox.Show("Please select a contact to delete.", "No Selection", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            MessageBoxResult result = MessageBox.Show(
+                $"Are you sure you want to delete the contact \"{selected.FullName}\"?\n\n" +
+                "This contact will also be removed from any linked concepts and contracts. The shoots, concepts and addresses themselves will not be deleted.",
+                "Confirm Deletion", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+
+            if (result != MessageBoxResult.Yes)
+                return;
+
+            new DAL().UnlinkContactReferences(selected.Id);
+            selected.Delete();
+
+            RefreshContactOverview();
+        }
 
 
 
