@@ -842,7 +842,7 @@
             </Grid.RowDefinitions>
 
             <!-- Titel -->
-            <TextBlock Grid.Row="0" Text="Create New Concept" FontWeight="Bold" FontSize="16"
+            <TextBlock Grid.Row="0" Text="New Concept" FontWeight="Bold" FontSize="16"
                HorizontalAlignment="Center" Margin="0,20,0,10"/>
 
             <!-- Info Formulier -->
@@ -965,7 +965,7 @@
                                 </ItemsControl>
                             </ScrollViewer>
                         </Border>
-                        <Button Content="Add Model" Width="100" Margin="0,5,0,0" HorizontalAlignment="Center"/>
+                        <Button Content="Add Contact" Width="100" Margin="0,5,0,0" HorizontalAlignment="Center" Click="QuickAddContactFromNewConcept_Click"/>
                     </StackPanel>
                 </StackPanel>
 
@@ -1190,7 +1190,7 @@
                                 </ItemsControl>
                             </ScrollViewer>
                         </Border>
-                        <Button Content="Add Model" Width="100" Margin="0,5,0,0"/>
+                        <Button Content="Add Contact" Width="100" Margin="0,5,0,0" Click="QuickAddContactFromEditConcept_Click"/>
                     </StackPanel>
                 </StackPanel>
 
@@ -1487,7 +1487,7 @@
             </Grid.RowDefinitions>
 
             <!-- Titel -->
-            <TextBlock Grid.Row="0" Text="Create New Prop" FontWeight="Bold" FontSize="16"
+            <TextBlock Grid.Row="0" Text="New Prop" FontWeight="Bold" FontSize="16"
                HorizontalAlignment="Center" Margin="0,20,0,10"/>
 
             <!-- Invoervelden -->
@@ -1528,7 +1528,7 @@
             </Grid.RowDefinitions>
 
             <!-- Titel -->
-            <TextBlock Grid.Row="0" Text="Add New Prop" FontWeight="Bold" FontSize="16"
+            <TextBlock Grid.Row="0" Text="New Prop" FontWeight="Bold" FontSize="16"
                HorizontalAlignment="Center" Margin="0,20,0,10"/>
 
             <!-- Invoervelden -->
@@ -1641,7 +1641,7 @@
             </Grid.RowDefinitions>
 
             <!-- Titel -->
-            <TextBlock Grid.Row="0" Text="Create New Address" FontWeight="Bold" FontSize="16"
+            <TextBlock Grid.Row="0" Text="New Address" FontWeight="Bold" FontSize="16"
              HorizontalAlignment="Center" Margin="0,20,0,10"/>
 
             <!-- Form -->
@@ -1814,7 +1814,7 @@
             </Grid.RowDefinitions>
 
             <!-- Titel -->
-            <TextBlock Grid.Row="0" Text="Create New Shoot" FontWeight="Bold" FontSize="16"
+            <TextBlock Grid.Row="0" Text="New Shoot" FontWeight="Bold" FontSize="16"
                HorizontalAlignment="Center" Margin="0,20,0,10"/>
 
             <!-- Formulier -->
@@ -1920,7 +1920,7 @@
                         </Border>
 
                         <!-- Add Contact knop -->
-                        <Button Content="Add Contact" Width="100" Margin="0,5,0,0" HorizontalAlignment="Center"/>
+                        <Button Content="Add Contact" Width="100" Margin="0,5,0,0" HorizontalAlignment="Center" Click="QuickAddContactFromNewShoot_Click"/>
                     </StackPanel>
                 </StackPanel>
 
@@ -2069,7 +2069,7 @@
                         </Border>
 
                         <!-- Add Contact knop -->
-                        <Button Content="Add Contact" Width="100" Margin="0,5,0,0" HorizontalAlignment="Center"/>
+                        <Button Content="Add Contact" Width="100" Margin="0,5,0,0" HorizontalAlignment="Center" Click="QuickAddContactFromEditShoot_Click"/>
                     </StackPanel>
                 </StackPanel>
 
@@ -2298,5 +2298,124 @@
 
 
 
+
+        <!--Qucik add contact concept -->
+        <Grid x:Name="QuickAddContactForm" Visibility="Collapsed" Grid.Column="1" Background="#F5F5F5" Margin="10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Row="0" Text="New Contact" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center" Margin="0,20,0,10"/>
+
+            <StackPanel Grid.Row="1" Margin="20">
+
+                <StackPanel Orientation="Horizontal" Margin="0,5">
+                    <TextBlock Text="First Name:" Width="100"/>
+                    <TextBox x:Name="QuickContactFirstNameTextBox" Width="200"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Margin="0,5">
+                    <TextBlock Text="Last Name:" Width="100"/>
+                    <TextBox x:Name="QuickContactLastNameTextBox" Width="200"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Margin="0,5">
+                    <TextBlock Text="Phone:" Width="100"/>
+                    <TextBox x:Name="QuickContactPhoneTextBox" Width="200"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Margin="0,5">
+                    <TextBlock Text="Email:" Width="100"/>
+                    <TextBox x:Name="QuickContactEmailTextBox" Width="200"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Margin="0,5">
+                    <TextBlock Text="Social Media:" Width="100"/>
+                    <TextBox x:Name="QuickContactSocialTextBox" Width="200"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Margin="0,5">
+                    <TextBlock Text="Role:" Width="100"/>
+                    <ComboBox x:Name="QuickContactRoleComboBox" Width="200">
+                        <ComboBoxItem Content="Model" />
+                        <ComboBoxItem Content="Visagist" />
+                    </ComboBox>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Margin="0,5">
+                    <TextBlock Text="Payment:" Width="100"/>
+                    <CheckBox x:Name="QuickContactPayCheckBox" VerticalAlignment="Center"/>
+                </StackPanel>
+
+            </StackPanel>
+
+            <Grid Grid.Row="2" Margin="0,10,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Button Content="Create" Width="100" HorizontalAlignment="Left" Grid.Column="0" Margin="110,10" Click="CreateQuickContact_Click"/>
+                <Button Content="Cancel" Width="100" HorizontalAlignment="Right" Grid.Column="1" Margin="110,10" Click="CancelQuickContact_Click"/>
+            </Grid>
+        </Grid>
+
+
+        <!-- Quick Add Contact from Shoot -->
+        <Grid x:Name="QuickAddContactFromShootForm" Visibility="Collapsed" Grid.Column="1" Background="#F5F5F5" Margin="10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Row="0" Text="New Contact" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center" Margin="0,20,0,10"/>
+
+            <StackPanel Grid.Row="1" Margin="20">
+                <StackPanel Orientation="Horizontal" Margin="0,5">
+                    <TextBlock Text="First Name:" Width="100"/>
+                    <TextBox x:Name="QuickShootContactFirstNameTextBox" Width="200"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,5">
+                    <TextBlock Text="Last Name:" Width="100"/>
+                    <TextBox x:Name="QuickShootContactLastNameTextBox" Width="200"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,5">
+                    <TextBlock Text="Phone:" Width="100"/>
+                    <TextBox x:Name="QuickShootContactPhoneTextBox" Width="200"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,5">
+                    <TextBlock Text="Email:" Width="100"/>
+                    <TextBox x:Name="QuickShootContactEmailTextBox" Width="200"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,5">
+                    <TextBlock Text="Social Media:" Width="100"/>
+                    <TextBox x:Name="QuickShootContactSocialTextBox" Width="200"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,5">
+                    <TextBlock Text="Role:" Width="100"/>
+                    <ComboBox x:Name="QuickShootContactRoleComboBox" Width="200">
+                        <ComboBoxItem Content="Model" />
+                        <ComboBoxItem Content="Visagist" />
+                    </ComboBox>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,5">
+                    <TextBlock Text="Payment:" Width="100"/>
+                    <CheckBox x:Name="QuickShootContactPayCheckBox" VerticalAlignment="Center"/>
+                </StackPanel>
+            </StackPanel>
+
+            <Grid Grid.Row="2" Margin="0,10,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Button Content="Create" Width="100" HorizontalAlignment="Left" Grid.Column="0" Margin="110,10" Click="CreateQuickShootContact_Click"/>
+                <Button Content="Cancel" Width="100" HorizontalAlignment="Right" Grid.Column="1" Margin="110,10" Click="CancelQuickShootContact_Click"/>
+            </Grid>
+        </Grid>
     </Grid>
 </Window>

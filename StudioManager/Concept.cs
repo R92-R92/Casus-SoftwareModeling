@@ -61,7 +61,7 @@ namespace StudioManager
 
 
 
-        // EVENTUEEL ANDERE OPLOSSING - WEERGAVEN NAAM + PROPS + ADDRESS EN SHOOT IN CONCEPT OVERVIEW
+        
         public string PropsText
         {
             get
