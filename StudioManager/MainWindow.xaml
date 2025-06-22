@@ -374,7 +374,24 @@
                             <TextBlock x:Name="DetailModels" Grid.Row="1" Grid.Column="0" Margin="0,2"/>
                             <TextBlock x:Name="DetailAddress" Grid.Row="1" Grid.Column="1" Margin="10,2"/>
                             <TextBlock x:Name="DetailProps" Grid.Row="2" Grid.Column="0" Margin="0,2"/>
-                            <TextBlock x:Name="DetailShoot" Grid.Row="2" Grid.Column="1" Margin="10,2" Foreground="Blue" TextDecorations="Underline" Cursor="Hand" MouseLeftButtonUp="DetailConceptShoot_Click"/>
+                            <StackPanel x:Name="ConceptLinkedShootPanel" Grid.Row="2" Grid.Column="1" Orientation="Horizontal" Margin="10,2" Visibility="Collapsed">
+                                <TextBlock Text="Shoot: " Margin="0,0,0,0"/>
+                                <ItemsControl x:Name="DetailConceptShootList" ItemsSource="{Binding}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel Orientation="Horizontal"/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding DateText}" Foreground="Blue" TextDecorations="Underline" Cursor="Hand" Margin="2,0"
+                           MouseLeftButtonUp="LinkedShoot_Click"/>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+
+
                             <TextBlock x:Name="DetailShootAddress" Grid.Row="3" Grid.Column="0" Margin="0,2"/>
 
 

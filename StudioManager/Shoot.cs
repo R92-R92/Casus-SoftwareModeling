@@ -13,6 +13,8 @@ namespace StudioManager
         public Address? Location { get; set; }
         public List<Concept> Concepts { get; set; } = new List<Concept>();
         public List<Contract> Contracts { get; set; } = new List<Contract>();
+        public string DateText => $"{Date?.ToString("yyyy-MM-dd")}";
+
         DAL dal = new DAL();
 
 
