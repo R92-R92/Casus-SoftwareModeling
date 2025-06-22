@@ -803,16 +803,10 @@ namespace StudioManager
                     : "Location: –";
 
 
-                if (selected.Shoot != null)
-                {
-                    DetailConceptShootList.ItemsSource = new List<Shoot> { selected.Shoot };
-                    ConceptLinkedShootPanel.Visibility = Visibility.Visible;
-                }
-                else
-                {
-                    DetailConceptShootList.ItemsSource = null;
-                    ConceptLinkedShootPanel.Visibility = Visibility.Collapsed;
-                }
+                ConceptLinkedShootPanel.Visibility = Visibility.Visible;
+                DetailConceptShootList.ItemsSource = selected.Shoot != null
+                    ? new List<Shoot> { selected.Shoot }
+                    : new List<Shoot>(); 
 
 
                 DetailShootAddress.Text = selected.Shoot?.Location != null
@@ -2220,11 +2214,14 @@ namespace StudioManager
                 DetailShootSignee.Text = "Signee: " + (contract?.Signee?.FullName ?? "–");
                 DetailShootSigned.Text = "Contract Signed: " + (contract?.IsSigned == true ? "Yes" : "No");
                 DetailShootSignedOn.Text = "Signed On: " + (contract?.SignedOn?.ToString("yyyy-MM-dd") ?? "–");
-                
+
                 selectedContractPathForDetail = contract?.Body;
 
-                DetailShootContract.Text = "Contract: " +
-                    (string.IsNullOrWhiteSpace(contract?.Body) ? "–" : System.IO.Path.GetFileName(contract.Body));
+                ShootContractPanel.Visibility = Visibility.Visible;
+                DetailShootContract.Text = !string.IsNullOrWhiteSpace(contract?.Body)
+                    ? System.IO.Path.GetFileName(contract.Body)
+                    : "";
+
 
 
                 shootLinkedConcepts = new DAL().GetAllConcepts()
@@ -2232,7 +2229,7 @@ namespace StudioManager
                     .ToList();
 
                 DetailShootConceptList.ItemsSource = shootLinkedConcepts;
-                ShootLinkedConceptsPanel.Visibility = shootLinkedConcepts.Any() ? Visibility.Visible : Visibility.Collapsed;
+                ShootLinkedConceptsPanel.Visibility = Visibility.Visible;
 
             }
             else
@@ -2243,6 +2240,7 @@ namespace StudioManager
                 DetailShootSigned.Text = "";
                 DetailShootSignedOn.Text = "";
                 DetailShootContract.Text = "";
+                ShootContractPanel.Visibility = Visibility.Collapsed;
                 DetailShootConceptList.ItemsSource = null;
                 ShootLinkedConceptsPanel.Visibility = Visibility.Collapsed;
                 selectedContractPathForDetail = null;
@@ -2682,8 +2680,7 @@ namespace StudioManager
                     .ToList();
 
                 DetailContactShootList.ItemsSource = contactLinkedShoots;
-                ContactLinkedShootsPanel.Visibility = contactLinkedShoots.Any() ? Visibility.Visible : Visibility.Collapsed;
-
+                ContactLinkedShootsPanel.Visibility = Visibility.Visible;
                 ContactLinkedConceptsPanel.Visibility = Visibility.Visible;
             }
             else
