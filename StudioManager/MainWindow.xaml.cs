@@ -67,6 +67,8 @@ namespace StudioManager
         private List<Shoot> contactLinkedShoots = new();
         private List<Concept> shootLinkedConcepts = new();
 
+        private string? quickContactReturnToView = null;
+        private string? quickShootContactReturnToView = null;
 
 
 
@@ -98,6 +100,39 @@ namespace StudioManager
             NewContactForm.Visibility = Visibility.Collapsed;
             EditContactForm.Visibility= Visibility.Collapsed;
         }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         public void DashboardButton_Click(object sender, RoutedEventArgs e)
         {
@@ -1108,6 +1143,89 @@ namespace StudioManager
             returnToView = null;
             QuickAddPropForm.Visibility = Visibility.Collapsed;
         }
+
+
+
+        private void QuickAddContactFromNewConcept_Click(object sender, RoutedEventArgs e)
+        {
+            HidePanels();
+            quickContactReturnToView = "NewConcept";
+            ResetQuickContactForm();
+            QuickAddContactForm.Visibility = Visibility.Visible;
+        }
+
+        private void QuickAddContactFromEditConcept_Click(object sender, RoutedEventArgs e)
+        {
+            HidePanels();
+            quickContactReturnToView = "EditConcept";
+            ResetQuickContactForm();
+            QuickAddContactForm.Visibility = Visibility.Visible;
+        }
+
+
+        private void ResetQuickContactForm()
+        {
+            QuickContactFirstNameTextBox.Text = "";
+            QuickContactLastNameTextBox.Text = "";
+            QuickContactPhoneTextBox.Text = "";
+            QuickContactEmailTextBox.Text = "";
+            QuickContactSocialTextBox.Text = "";
+            QuickContactRoleComboBox.SelectedIndex = -1;
+            QuickContactPayCheckBox.IsChecked = false;
+        }
+
+        private void CreateQuickContact_Click(object sender, RoutedEventArgs e)
+        {
+            string firstName = QuickContactFirstNameTextBox.Text;
+            string lastName = QuickContactLastNameTextBox.Text;
+            string phone = QuickContactPhoneTextBox.Text;
+            string email = QuickContactEmailTextBox.Text;
+            string social = QuickContactSocialTextBox.Text;
+            string role = (QuickContactRoleComboBox.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "";
+            bool payment = QuickContactPayCheckBox.IsChecked == true;
+
+            if (string.IsNullOrWhiteSpace(firstName) || string.IsNullOrWhiteSpace(lastName) || string.IsNullOrWhiteSpace(role))
+            {
+                MessageBox.Show("Please fill in at least First Name, Last Name and Role.");
+                return;
+            }
+
+            if (new DAL().ContactNameExists(firstName, lastName))
+            {
+                MessageBox.Show("A contact with this name already exists.");
+                return;
+            }
+
+            Contact newContact = new Contact(0, firstName, lastName, phone, email, social, null, role, payment, null);
+            newContact.Create();
+
+            if (quickContactReturnToView == "NewConcept")
+            {
+                ModelToggleList.ItemsSource = new DAL().GetAllContacts();
+                NewConceptForm.Visibility = Visibility.Visible;
+            }
+            else if (quickContactReturnToView == "EditConcept")
+            {
+                EditModelToggleList.ItemsSource = new DAL().GetAllContacts();
+                EditConceptForm.Visibility = Visibility.Visible;
+            }
+
+            quickContactReturnToView = null;
+            QuickAddContactForm.Visibility = Visibility.Collapsed;
+        }
+
+        private void CancelQuickContact_Click(object sender, RoutedEventArgs e)
+        {
+            if (quickContactReturnToView == "NewConcept")
+                NewConceptForm.Visibility = Visibility.Visible;
+            else if (quickContactReturnToView == "EditConcept")
+                EditConceptForm.Visibility = Visibility.Visible;
+
+            quickContactReturnToView = null;
+            QuickAddContactForm.Visibility = Visibility.Collapsed;
+        }
+
+
 
         private void AddProp_Click(object sender, RoutedEventArgs e)
         {
@@ -2246,7 +2364,7 @@ namespace StudioManager
                 }
                 else
                 {
-                    DetailShootSigneeName.Text = "–";
+                    DetailShootSigneeName.Text = "";
                     DetailShootSigneeName.DataContext = null;
                 }
 
@@ -2361,6 +2479,85 @@ namespace StudioManager
                 }
             }
         }
+
+        private void QuickAddContactFromNewShoot_Click(object sender, RoutedEventArgs e)
+        {
+            HidePanels();
+            quickShootContactReturnToView = "NewShoot";
+            ResetQuickShootContactForm();
+            QuickAddContactFromShootForm.Visibility = Visibility.Visible;
+        }
+
+        private void QuickAddContactFromEditShoot_Click(object sender, RoutedEventArgs e)
+        {
+            HidePanels();
+            quickShootContactReturnToView = "EditShoot";
+            ResetQuickShootContactForm();
+            QuickAddContactFromShootForm.Visibility = Visibility.Visible;
+        }
+
+        private void ResetQuickShootContactForm()
+        {
+            QuickShootContactFirstNameTextBox.Text = "";
+            QuickShootContactLastNameTextBox.Text = "";
+            QuickShootContactPhoneTextBox.Text = "";
+            QuickShootContactEmailTextBox.Text = "";
+            QuickShootContactSocialTextBox.Text = "";
+            QuickShootContactRoleComboBox.SelectedIndex = -1;
+            QuickShootContactPayCheckBox.IsChecked = false;
+        }
+
+        private void CreateQuickShootContact_Click(object sender, RoutedEventArgs e)
+        {
+            string firstName = QuickShootContactFirstNameTextBox.Text;
+            string lastName = QuickShootContactLastNameTextBox.Text;
+            string phone = QuickShootContactPhoneTextBox.Text;
+            string email = QuickShootContactEmailTextBox.Text;
+            string social = QuickShootContactSocialTextBox.Text;
+            string role = (QuickShootContactRoleComboBox.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "";
+            bool payment = QuickShootContactPayCheckBox.IsChecked == true;
+
+            if (string.IsNullOrWhiteSpace(firstName) || string.IsNullOrWhiteSpace(lastName) || string.IsNullOrWhiteSpace(role))
+            {
+                MessageBox.Show("Please fill in at least First Name, Last Name and Role.");
+                return;
+            }
+
+            if (new DAL().ContactNameExists(firstName, lastName))
+            {
+                MessageBox.Show("A contact with this name already exists.");
+                return;
+            }
+
+            Contact newContact = new Contact(0, firstName, lastName, phone, email, social, null, role, payment, null);
+            newContact.Create();
+
+            if (quickShootContactReturnToView == "NewShoot")
+            {
+                NewShootContactToggleList.ItemsSource = new DAL().GetAllContacts();
+                NewShootForm.Visibility = Visibility.Visible;
+            }
+            else if (quickShootContactReturnToView == "EditShoot")
+            {
+                EditShootContactToggleList.ItemsSource = new DAL().GetAllContacts();
+                EditShootForm.Visibility = Visibility.Visible;
+            }
+
+            quickShootContactReturnToView = null;
+            QuickAddContactFromShootForm.Visibility = Visibility.Collapsed;
+        }
+
+        private void CancelQuickShootContact_Click(object sender, RoutedEventArgs e)
+        {
+            if (quickShootContactReturnToView == "NewShoot")
+                NewShootForm.Visibility = Visibility.Visible;
+            else if (quickShootContactReturnToView == "EditShoot")
+                EditShootForm.Visibility = Visibility.Visible;
+
+            quickShootContactReturnToView = null;
+            QuickAddContactFromShootForm.Visibility = Visibility.Collapsed;
+        }
+
 
 
 
@@ -2716,12 +2913,6 @@ namespace StudioManager
             RefreshContactOverview();
         }
 
-
-
-
-
-
-
         private void ContactsDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (ContactsDataGrid.SelectedItem is Contact selected)
@@ -2806,9 +2997,6 @@ namespace StudioManager
                 }
             }
         }
-
-
-
 
 
 
