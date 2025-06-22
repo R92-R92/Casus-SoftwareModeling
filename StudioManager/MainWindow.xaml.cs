@@ -796,7 +796,10 @@ namespace StudioManager
                 DetailName.Text = $"Name: {selected.Name}";
                 DetailDescription.Text = $"Description: {selected.Description}";
                 DetailProps.Text = $"Props: {selected.PropsText}";
-                DetailModels.Text = $"Models: {selected.ModelText}";
+
+                DetailConceptModelList.ItemsSource = selected.Models;
+                ConceptLinkedModelsPanel.Visibility = Visibility.Visible;
+
 
                 DetailAddress.Text = selected.Address != null
                     ? $"Location: {(string.IsNullOrWhiteSpace(selected.Address.LocationName) ? $"{selected.Address.Street} {selected.Address.HouseNumber}, {selected.Address.PostalCode} {selected.Address.City}, {selected.Address.Country}" : selected.Address.LocationName)}"
@@ -856,7 +859,9 @@ namespace StudioManager
                 DetailShootAddress.Text = "";
                 DetailDescription.Text = "";
                 DetailProps.Text = "";
-                DetailModels.Text = "";
+                DetailConceptModelList.ItemsSource = null;
+                ConceptLinkedModelsPanel.Visibility = Visibility.Collapsed;
+
                 DetailAddress.Text = "";
                 DetailConceptShootList.ItemsSource = null;
                 ConceptLinkedShootPanel.Visibility = Visibility.Collapsed;
@@ -869,6 +874,29 @@ namespace StudioManager
                 DetailPictureBorder.Visibility = Visibility.Collapsed;
             }
         }
+
+        private void LinkedModel_Click(object sender, MouseButtonEventArgs e)
+        {
+            if (sender is TextBlock tb && tb.DataContext is Contact contact)
+            {
+                HidePanels();
+                ContactsView.Visibility = Visibility.Visible;
+                RefreshContactOverview();
+
+                var matchingContact = (ContactsDataGrid.ItemsSource as IEnumerable<Contact>)?
+                    .FirstOrDefault(c => c.Id == contact.Id);
+
+                if (matchingContact != null)
+                {
+                    ContactsDataGrid.SelectedItem = null;
+                    ContactsDataGrid.Items.Refresh();
+                    ContactsDataGrid.SelectedItem = matchingContact;
+                    ContactsDataGrid.ScrollIntoView(matchingContact);
+                    ContactsDataGrid_SelectionChanged(ContactsDataGrid, null);
+                }
+            }
+        }
+
 
         private void DetailSketchPreviewImage_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
@@ -1650,7 +1678,7 @@ namespace StudioManager
 
 
 
-        // SHOOTS - R
+        // SHOOTS
 
         private void RefreshShootOverview()
         {
@@ -2211,7 +2239,19 @@ namespace StudioManager
 
                 var contract = new DAL().GetContractByShootId(selected.Id);
 
-                DetailShootSignee.Text = "Signee: " + (contract?.Signee?.FullName ?? "–");
+                if (contract?.Signee != null)
+                {
+                    DetailShootSigneeName.Text = contract.Signee.FullName;
+                    DetailShootSigneeName.DataContext = contract.Signee;
+                }
+                else
+                {
+                    DetailShootSigneeName.Text = "–";
+                    DetailShootSigneeName.DataContext = null;
+                }
+
+                ShootSigneePanel.Visibility = Visibility.Visible;
+
                 DetailShootSigned.Text = "Contract Signed: " + (contract?.IsSigned == true ? "Yes" : "No");
                 DetailShootSignedOn.Text = "Signed On: " + (contract?.SignedOn?.ToString("yyyy-MM-dd") ?? "–");
 
@@ -2236,7 +2276,9 @@ namespace StudioManager
             {
                 DetailShootDate.Text = "";
                 DetailShootLocation.Text = "";
-                DetailShootSignee.Text = "";
+                DetailShootSigneeName.Text = "";
+                DetailShootSigneeName.DataContext = null;
+                ShootSigneePanel.Visibility = Visibility.Collapsed;
                 DetailShootSigned.Text = "";
                 DetailShootSignedOn.Text = "";
                 DetailShootContract.Text = "";
@@ -2246,6 +2288,29 @@ namespace StudioManager
                 selectedContractPathForDetail = null;
             }
         }
+
+        private void LinkedSignee_Click(object sender, MouseButtonEventArgs e)
+        {
+            if (sender is TextBlock tb && tb.DataContext is Contact contact)
+            {
+                HidePanels();
+                ContactsView.Visibility = Visibility.Visible;
+                RefreshContactOverview();
+
+                var matchingContact = (ContactsDataGrid.ItemsSource as IEnumerable<Contact>)?
+                    .FirstOrDefault(c => c.Id == contact.Id);
+
+                if (matchingContact != null)
+                {
+                    ContactsDataGrid.SelectedItem = null;
+                    ContactsDataGrid.Items.Refresh();
+                    ContactsDataGrid.SelectedItem = matchingContact;
+                    ContactsDataGrid.ScrollIntoView(matchingContact);
+                    ContactsDataGrid_SelectionChanged(ContactsDataGrid, null);
+                }
+            }
+        }
+
 
         private void DetailShootContract_Click(object sender, MouseButtonEventArgs e)
         {
@@ -2308,7 +2373,7 @@ namespace StudioManager
 
 
 
-        // ADDRESSES - R
+        // ADDRESSES
 
         private void RefreshAddressOverview()
         {
