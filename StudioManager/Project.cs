@@ -37,5 +37,6 @@ namespace StudioManager
         {
             dal.DeleteProject(this.Id);
         }
+
     }
 }

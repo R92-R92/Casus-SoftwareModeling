@@ -42,5 +42,6 @@ namespace StudioManager
         {
             dal.DeleteContract(this.Id);
         }
+
     }
 }
