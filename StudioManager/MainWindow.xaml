@@ -516,7 +516,7 @@
                         </Grid>
 
                         <!-- New Contact Button -->
-                        <Button Grid.Column="1" Content="New Contact" Width="100" HorizontalAlignment="Right"/>
+                        <Button Grid.Column="1" Content="New Contact" Width="100" HorizontalAlignment="Right" Click="NewContactButton_Click"/>
                     </Grid>
 
                     <!-- Contact Overview Table -->
@@ -2048,6 +2048,73 @@
             </Grid>
         </Grid>
 
+
+
+
+
+        <Grid x:Name="NewContactForm" Visibility="Collapsed" Grid.Column="1" Background="#F5F5F5" Margin="10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Row="0" Text="New Contact" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center" Margin="0,20,0,10"/>
+
+            <StackPanel Grid.Row="1" Margin="20">
+
+                <StackPanel Orientation="Horizontal" Margin="0,5">
+                    <TextBlock Text="First Name:" Width="100"/>
+                    <TextBox x:Name="NewContactFirstNameTextBox" Width="200"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Margin="0,5">
+                    <TextBlock Text="Last Name:" Width="100"/>
+                    <TextBox x:Name="NewContactLastNameTextBox" Width="200"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Margin="0,5">
+                    <TextBlock Text="Phone:" Width="100"/>
+                    <TextBox x:Name="NewContactPhoneTextBox" Width="200"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Margin="0,5">
+                    <TextBlock Text="Email:" Width="100"/>
+                    <TextBox x:Name="NewContactEmailTextBox" Width="200"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Margin="0,5">
+                    <TextBlock Text="Social Media:" Width="100"/>
+                    <TextBox x:Name="NewContactSocialTextBox" Width="200"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Margin="0,5">
+                    <TextBlock Text="Role:" Width="100"/>
+                    <ComboBox x:Name="NewContactRoleComboBox" Width="200">
+                        <ComboBoxItem Content="Model" />
+                        <ComboBoxItem Content="Visagist" />
+                    </ComboBox>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Margin="0,5">
+                    <TextBlock Text="Payment:" Width="100"/>
+                    <CheckBox x:Name="NewContactPayCheckBox" VerticalAlignment="Center"/>
+                </StackPanel>
+
+            </StackPanel>
+
+            <Grid Grid.Row="2" Margin="0,10,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Button Content="Create" Width="100" HorizontalAlignment="Left" Grid.Column="0" Margin="110,10"
+                Click="CreateNewContact_Click"/>
+                <Button Content="Cancel" Width="100" HorizontalAlignment="Right" Grid.Column="1" Margin="110,10"
+                Click="CancelNewContact_Click"/>
+            </Grid>
+        </Grid>
 
 
 

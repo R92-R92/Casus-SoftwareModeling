@@ -1231,5 +1231,21 @@ namespace StudioManager
 
             return null;
         }
+
+
+        public bool ContactNameExists(string firstName, string lastName)
+        {
+            using SqlConnection conn = new(connectionString);
+            conn.Open();
+
+            string query = "SELECT COUNT(*) FROM Contact WHERE FirstName = @FirstName AND LastName = @LastName";
+            using SqlCommand cmd = new(query, conn);
+            cmd.Parameters.AddWithValue("@FirstName", firstName);
+            cmd.Parameters.AddWithValue("@LastName", lastName);
+
+            int count = (int)cmd.ExecuteScalar();
+            return count > 0;
+        }
+
     }
 }
