@@ -12,5 +12,6 @@ namespace StudioManager
             : base(0, firstname, lastname, phone, email, socialmedia, picture, "Visagist", false, address)
         {
         }
+
     }
 }

@@ -2362,6 +2362,7 @@
             </Grid>
         </Grid>
 
+        
 
         <!-- Quick Add Contact from Shoot -->
         <Grid x:Name="QuickAddContactFromShootForm" Visibility="Collapsed" Grid.Column="1" Background="#F5F5F5" Margin="10">

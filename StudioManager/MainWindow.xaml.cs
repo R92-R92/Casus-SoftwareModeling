@@ -71,7 +71,6 @@ namespace StudioManager
         private string? quickShootContactReturnToView = null;
 
 
-
         public MainWindow()
         {
             InitializeComponent();

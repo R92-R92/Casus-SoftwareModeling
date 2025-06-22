@@ -52,5 +52,6 @@ namespace StudioManager
         {
             dal.DeleteContact(this.Id);
         }
+
     }
 }

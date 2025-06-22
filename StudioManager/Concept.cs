@@ -60,7 +60,6 @@ namespace StudioManager
 
 
 
-
         
         public string PropsText
         {
