@@ -225,7 +225,7 @@
 
 
                     <!-- Shoot Overview Table -->
-                    <DataGrid x:Name="ShootsDataGrid" Grid.Row="2" AutoGenerateColumns="False" CanUserAddRows="False" HeadersVisibility="Column" RowHeaderWidth="0" Margin="0,0,0,10" IsReadOnly="True">
+                    <DataGrid x:Name="ShootsDataGrid" Grid.Row="2" AutoGenerateColumns="False" CanUserAddRows="False" HeadersVisibility="Column" RowHeaderWidth="0" Margin="0,0,0,10" SelectionChanged="ShootsDataGrid_SelectionChanged" IsReadOnly="True">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Location" Binding="{Binding LocationText}" Width="*"/>
                             <DataGridTextColumn Header="Date" Binding="{Binding Date}" Width="*"/>
@@ -252,14 +252,28 @@
 
                     <!-- Shoot Details -->
                     <Border Grid.Row="4" BorderThickness="1" BorderBrush="Gray" Padding="10" Margin="0,0,0,10">
-                        <StackPanel>
-                            <TextBlock Text="- Date: [Shoot Date]"/>
-                            <TextBlock Text="- Location: [Shoot Location]"/>
-                            <TextBlock Text="- Distance: [Distance in km]"/>
-                            <TextBlock Text="- Upload Contract: [Link or Filename]"/>
-                            <TextBlock Text="- Contract Signed: [Yes/No]"/>
-                            <TextBlock Text="- Linked Concepts: [Concept A, Concept B]"/>
-                        </StackPanel>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="2*"/>
+                                <ColumnDefinition Width="2*"/>
+                                <ColumnDefinition Width="1.5*"/>
+                                <ColumnDefinition Width="1.5*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock x:Name="DetailShootDate" Grid.Row="0" Grid.Column="0" Margin="0,2"/>
+                            <TextBlock x:Name="DetailShootLocation" Grid.Row="0" Grid.Column="1" Margin="10,2"/>
+                            <TextBlock x:Name="DetailShootSignee" Grid.Row="1" Grid.Column="0" Margin="0,2"/>
+                            <TextBlock x:Name="DetailShootSigned" Grid.Row="1" Grid.Column="1" Margin="10,2"/>
+                            <TextBlock x:Name="DetailShootSignedOn" Grid.Row="2" Grid.Column="0" Margin="0,2"/>
+                            <TextBlock x:Name="DetailShootContract" Grid.Row="2" Grid.Column="1" Margin="10,2" Foreground="Blue" TextDecorations="Underline" Cursor="Hand" MouseLeftButtonUp="DetailShootContract_Click"/>
+                            <TextBlock x:Name="DetailShootConcepts" Grid.Row="3" Grid.Column="0" Margin="0,2" Grid.ColumnSpan="2" Foreground="Blue" TextDecorations="Underline" Cursor="Hand" MouseLeftButtonUp="DetailShootConcepts_Click"/>
+                        </Grid>
                     </Border>
                 </Grid>
 
@@ -344,7 +358,7 @@
                             <TextBlock x:Name="DetailModels" Grid.Row="1" Grid.Column="0" Margin="0,2"/>
                             <TextBlock x:Name="DetailAddress" Grid.Row="1" Grid.Column="1" Margin="10,2"/>
                             <TextBlock x:Name="DetailProps" Grid.Row="2" Grid.Column="0" Margin="0,2"/>
-                            <TextBlock x:Name="DetailShoot" Grid.Row="2" Grid.Column="1" Margin="10,2"/>
+                            <TextBlock x:Name="DetailShoot" Grid.Row="2" Grid.Column="1" Margin="10,2" Foreground="Blue" TextDecorations="Underline" Cursor="Hand" MouseLeftButtonUp="DetailConceptShoot_Click"/>
                             <TextBlock x:Name="DetailShootAddress" Grid.Row="3" Grid.Column="0" Margin="0,2"/>
 
 
