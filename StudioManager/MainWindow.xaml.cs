@@ -89,6 +89,7 @@ namespace StudioManager
             NewAddressForm.Visibility = Visibility.Collapsed;
             NewShootForm.Visibility = Visibility.Collapsed;
             EditShootForm.Visibility= Visibility.Collapsed;
+            NewContactForm.Visibility = Visibility.Collapsed;
         }
 
         public void DashboardButton_Click(object sender, RoutedEventArgs e)
@@ -2504,12 +2505,86 @@ namespace StudioManager
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
         // CONTACTS
 
         private void RefreshContactOverview()
         {
             ContactsDataGrid.ItemsSource = new DAL().GetAllContacts();
         }
+
+        private void NewContactButton_Click(object sender, RoutedEventArgs e)
+        {
+            HidePanels();
+
+            NewContactFirstNameTextBox.Text = "";
+            NewContactLastNameTextBox.Text = "";
+            NewContactPhoneTextBox.Text = "";
+            NewContactEmailTextBox.Text = "";
+            NewContactSocialTextBox.Text = "";
+            NewContactRoleComboBox.SelectedIndex = -1;
+            NewContactPayCheckBox.IsChecked = false;
+
+            NewContactForm.Visibility = Visibility.Visible;
+        }
+
+
+
+        private void CreateNewContact_Click(object sender, RoutedEventArgs e)
+        {
+            string firstName = NewContactFirstNameTextBox.Text;
+            string lastName = NewContactLastNameTextBox.Text;
+            string phone = NewContactPhoneTextBox.Text;
+            string email = NewContactEmailTextBox.Text;
+            string social = NewContactSocialTextBox.Text;
+            string role = (NewContactRoleComboBox.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "";
+            bool payment = NewContactPayCheckBox.IsChecked == true;
+
+            if (string.IsNullOrWhiteSpace(firstName) || string.IsNullOrWhiteSpace(lastName) || string.IsNullOrWhiteSpace(role))
+            {
+                MessageBox.Show("Please enter at least a first name, last name, and select a role.");
+                return;
+            }
+
+            if (new DAL().ContactNameExists(firstName, lastName))
+            {
+                MessageBox.Show("A contact with this name already exists.");
+                return;
+            }
+
+
+            Contact newContact = new Contact(0, firstName, lastName, phone, email, social, null, role, payment, null);
+            newContact.Create();
+
+            RefreshContactOverview();
+            HidePanels();
+            ContactsView.Visibility = Visibility.Visible;
+        }
+
+
+        private void CancelNewContact_Click(object sender, RoutedEventArgs e)
+        {
+            HidePanels();
+            ContactsView.Visibility = Visibility.Visible;
+        }
+
+
+
+
+
+
+
 
         // PROJECTS
 
