@@ -271,7 +271,15 @@
                             <TextBlock x:Name="DetailShootSignee" Grid.Row="1" Grid.Column="0" Margin="0,2"/>
                             <TextBlock x:Name="DetailShootSigned" Grid.Row="1" Grid.Column="1" Margin="10,2"/>
                             <TextBlock x:Name="DetailShootSignedOn" Grid.Row="2" Grid.Column="0" Margin="0,2"/>
-                            <TextBlock x:Name="DetailShootContract" Grid.Row="2" Grid.Column="1" Margin="10,2" Foreground="Blue" TextDecorations="Underline" Cursor="Hand" MouseLeftButtonUp="DetailShootContract_Click"/>
+                            <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal" Margin="10,2" x:Name="ShootContractPanel" Visibility="Collapsed">
+                                <TextBlock Text="Contract: " />
+                                <TextBlock x:Name="DetailShootContract"
+                                               Foreground="Blue"
+                                               TextDecorations="Underline"
+                                               Cursor="Hand"
+                                               MouseLeftButtonUp="DetailShootContract_Click" />
+                            </StackPanel>
+
                             <StackPanel x:Name="ShootLinkedConceptsPanel" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" Margin="0,2" Visibility="Collapsed">
                                 <TextBlock Text="Linked Concepts: "/>
                                 <ItemsControl x:Name="DetailShootConceptList" ItemsSource="{Binding}">
