@@ -47,6 +47,5 @@ namespace StudioManager
         {
             dal.DeleteAddress(this.Id);
         }
-
     }
 }

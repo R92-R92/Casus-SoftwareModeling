@@ -42,6 +42,7 @@ namespace StudioManager
 
 
 
+
         public string LocationText => Location != null
             ? (string.IsNullOrWhiteSpace(Location.LocationName)
                 ? $"{Location.Street} {Location.HouseNumber}, {Location.PostalCode} {Location.City}"
