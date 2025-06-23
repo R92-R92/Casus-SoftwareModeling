@@ -129,15 +129,10 @@
       Margin="10">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
-                        <!-- Label -->
                         <RowDefinition Height="Auto"/>
-                        <!-- Search + New Project -->
                         <RowDefinition Height="*"/>
-                        <!-- DataGrid -->
                         <RowDefinition Height="Auto"/>
-                        <!-- Details Label -->
                         <RowDefinition Height="0.6*"/>
-                        <!-- Details Pane -->
                     </Grid.RowDefinitions>
 
                     <!-- 1) Label -->
@@ -186,11 +181,8 @@
             HeadersVisibility="Column"
             RowHeaderWidth="0"
             Margin="0,0,0,10"
+            IsReadOnly="True"
             SelectionChanged="ProjectsDataGrid_SelectionChanged">
-
-
-                    <!-- Project Overview Table -->
-                    <DataGrid x:Name="ProjectsDataGrid" Grid.Row="2" AutoGenerateColumns="False" CanUserAddRows="False" HeadersVisibility="Column" RowHeaderWidth="0" Margin="0,0,0,10" IsReadOnly="True">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Name"
                           Binding="{Binding Name}"
@@ -248,6 +240,7 @@
                     </Border>
                 </Grid>
                 <!-- ── end PROJECTS VIEW ──────────────────────────────────────── -->
+
 
 
 
