@@ -8,9 +8,10 @@ namespace StudioManager
 {
     class Visagist : Contact
     {
-        public Visagist(string firstname, string lastname, string phone, string email, string socialmedia, string picture, Address address) :
-        base(0, firstname, lastname, phone, email, socialmedia, picture, address)
+        public Visagist(string firstname, string lastname, string phone, string email, string socialmedia, string picture, Address address)
+            : base(0, firstname, lastname, phone, email, socialmedia, picture, "Visagist", false, address)
         {
         }
+
     }
 }

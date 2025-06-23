@@ -13,6 +13,8 @@ namespace StudioManager
         public Address? Location { get; set; }
         public List<Concept> Concepts { get; set; } = new List<Concept>();
         public List<Contract> Contracts { get; set; } = new List<Contract>();
+        public string DateText => $"{Date?.ToString("yyyy-MM-dd")}";
+
         DAL dal = new DAL();
 
 
@@ -37,5 +39,18 @@ namespace StudioManager
         {
             dal.DeleteShoot(this.Id);
         }
+
+
+
+        public string LocationText => Location != null
+            ? (string.IsNullOrWhiteSpace(Location.LocationName)
+                ? $"{Location.Street} {Location.HouseNumber}, {Location.PostalCode} {Location.City}"
+                : Location.LocationName)
+            : "–";
+
+        public string ConceptText => Concepts != null && Concepts.Count > 0
+            ? string.Join(", ", Concepts.Select(c => c.Name))
+            : "–";
+
     }
 }

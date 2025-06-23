@@ -24,7 +24,7 @@ namespace StudioManager
             using SqlConnection conn = new(connectionString);
             conn.Open();
 
-            string query = "SELECT Id, Street, HouseNumber, PostalCode, City, Country FROM Address";
+            string query = "SELECT Id, LocationName, IsLocationOnly, Street, HouseNumber, PostalCode, City, Country FROM Address WHERE IsHome = 0";
             using SqlCommand cmd = new(query, conn);
             using SqlDataReader reader = cmd.ExecuteReader();
 
@@ -32,6 +32,8 @@ namespace StudioManager
             {
                 Address address = new(
                     id: reader.GetInt32(0),
+                    locationName: reader["LocationName"]?.ToString(),
+                    isLocationOnly: Convert.ToBoolean(reader["IsLocationOnly"]),
                     street: reader["Street"].ToString(),
                     houseNumber: reader["HouseNumber"]?.ToString(),
                     postalCode: reader["PostalCode"].ToString(),
@@ -46,24 +48,29 @@ namespace StudioManager
         }
 
         // CREATE
-        public void AddAddress(Address address)
+        public int AddAddress(Address address)
         {
             using SqlConnection conn = new(connectionString);
             conn.Open();
 
             string query = @"
-                INSERT INTO Address (Street, HouseNumber, PostalCode, City, Country)
-                VALUES (@Street, @HouseNumber, @PostalCode, @City, @Country)";
+        INSERT INTO Address (LocationName, IsLocationOnly, Street, HouseNumber, PostalCode, City, Country)
+        VALUES (@LocationName, @IsLocationOnly, @Street, @HouseNumber, @PostalCode, @City, @Country);
+        SELECT SCOPE_IDENTITY();";
 
             using SqlCommand cmd = new(query, conn);
+            cmd.Parameters.AddWithValue("@LocationName", (object?)address.LocationName ?? DBNull.Value);
+            cmd.Parameters.AddWithValue("@IsLocationOnly", address.IsLocationOnly);
             cmd.Parameters.AddWithValue("@Street", address.Street);
             cmd.Parameters.AddWithValue("@HouseNumber", address.HouseNumber ?? "");
             cmd.Parameters.AddWithValue("@PostalCode", address.PostalCode);
             cmd.Parameters.AddWithValue("@City", address.City);
             cmd.Parameters.AddWithValue("@Country", address.Country);
 
-            cmd.ExecuteNonQuery();
+            int newId = Convert.ToInt32(cmd.ExecuteScalar());
+            return newId;
         }
+
 
         // UPDATE
         public void UpdateAddress(Address address)
@@ -74,6 +81,8 @@ namespace StudioManager
             string query = @"
                 UPDATE Address SET
                     Street = @Street,
+                    LocationName = @LocationName,
+                    IsLocationOnly = @IsLocationOnly,
                     HouseNumber = @HouseNumber,
                     PostalCode = @PostalCode,
                     City = @City,
@@ -82,6 +91,8 @@ namespace StudioManager
 
             using SqlCommand cmd = new(query, conn);
             cmd.Parameters.AddWithValue("@Id", address.Id);
+            cmd.Parameters.AddWithValue("@LocationName", (object?)address.LocationName ?? DBNull.Value);
+            cmd.Parameters.AddWithValue("@IsLocationOnly", address.IsLocationOnly);
             cmd.Parameters.AddWithValue("@Street", address.Street);
             cmd.Parameters.AddWithValue("@HouseNumber", address.HouseNumber ?? "");
             cmd.Parameters.AddWithValue("@PostalCode", address.PostalCode);
@@ -114,7 +125,7 @@ namespace StudioManager
             using SqlConnection conn = new(connectionString);
             conn.Open();
 
-            string query = "SELECT Id, Name, Description, Sketch, ShootId, Address FROM Concept";
+            string query = "SELECT Id, Name, Description, Sketch, ShootId, AddressId FROM Concept";
             using SqlCommand cmd = new(query, conn);
             using SqlDataReader reader = cmd.ExecuteReader();
 
@@ -126,7 +137,7 @@ namespace StudioManager
                 Concept concept = new(
                     id: conceptId,
                     name: reader["Name"]?.ToString(),
-                    address: reader["Address"]?.ToString(),
+                    address: reader["AddressId"] != DBNull.Value ? GetAddressById((int)reader["AddressId"]) : null,
                     description: reader["Description"]?.ToString(),
                     sketch: reader["Sketch"]?.ToString(),
                     props: GetPropsByConceptId(conceptId),
@@ -151,9 +162,16 @@ namespace StudioManager
             using SqlConnection conn = new(connectionString);
             conn.Open();
 
+            if (concept.Address != null && concept.Address.Id == 0)
+            {
+                int addressId = AddAddress(concept.Address);
+                concept.Address.Id = addressId;
+            }
+
+
             string query = @"
-                INSERT INTO Concept (Name, Description, Sketch, ShootId, Address)
-                VALUES (@Name, @Description, @Sketch, @ShootId, @Address);
+                INSERT INTO Concept (Name, Description, Sketch, ShootId, AddressId)
+                VALUES (@Name, @Description, @Sketch, @ShootId, @AddressId);
                 SELECT SCOPE_IDENTITY();";
 
             using SqlCommand cmd = new(query, conn);
@@ -161,7 +179,8 @@ namespace StudioManager
             cmd.Parameters.AddWithValue("@Description", concept.Description ?? "");
             cmd.Parameters.AddWithValue("@Sketch", concept.Sketch ?? "");
             cmd.Parameters.AddWithValue("@ShootId", concept.Shoot?.Id ?? (object)DBNull.Value);
-            cmd.Parameters.AddWithValue("@Address", concept.Address ?? (object)DBNull.Value);
+            cmd.Parameters.AddWithValue("@AddressId", concept.Address?.Id ?? (object)DBNull.Value);
+
 
             int newId = Convert.ToInt32(cmd.ExecuteScalar());
             concept.Id = newId;
@@ -182,13 +201,19 @@ namespace StudioManager
             using SqlConnection conn = new(connectionString);
             conn.Open();
 
+            if (concept.Address != null && concept.Address.Id == 0)
+            {
+                int addressId = AddAddress(concept.Address);
+                concept.Address.Id = addressId;
+            }
+
             string query = @"
                 UPDATE Concept
                 SET Name = @Name,
                     Description = @Description,
                     Sketch = @Sketch,
                     ShootId = @ShootId,
-                    Address = @Address
+                    AddressId = @AddressId
                 WHERE Id = @Id";
 
             using SqlCommand cmd = new(query, conn);
@@ -197,7 +222,8 @@ namespace StudioManager
             cmd.Parameters.AddWithValue("@Description", concept.Description ?? "");
             cmd.Parameters.AddWithValue("@Sketch", concept.Sketch ?? "");
             cmd.Parameters.AddWithValue("@ShootId", concept.Shoot?.Id ?? (object)DBNull.Value);
-            cmd.Parameters.AddWithValue("@Address", concept.Address ?? (object)DBNull.Value);
+            cmd.Parameters.AddWithValue("@AddressId", concept.Address?.Id ?? (object)DBNull.Value);
+
             cmd.ExecuteNonQuery();
 
             DeleteAllConceptRelations(concept.Id);
@@ -218,11 +244,17 @@ namespace StudioManager
             using SqlConnection conn = new(connectionString);
             conn.Open();
 
+            DeleteAllConceptRelations(conceptId);
+
             string deleteConcept = "DELETE FROM Concept WHERE Id = @ConceptId";
-            using SqlCommand cmd = new(deleteConcept, conn);
-            cmd.Parameters.AddWithValue("@ConceptId", conceptId);
-            cmd.ExecuteNonQuery();
+            using (SqlCommand deleteCmd = new(deleteConcept, conn))
+            {
+                deleteCmd.Parameters.AddWithValue("@ConceptId", conceptId);
+                deleteCmd.ExecuteNonQuery();
+            }
         }
+
+
 
         // CONTACTS
 
@@ -249,8 +281,8 @@ namespace StudioManager
                     email: reader["Email"]?.ToString(),
                     socialMedia: reader["SocialMedia"]?.ToString(),
                     picture: reader["Picture"]?.ToString(),
-                    //payment: (bool)reader["Payment"],
-                    //role: (int)reader["Role"],
+                    role: reader["Role"]?.ToString(),
+                    payment: reader.GetBoolean(9),
                     address: addressId.HasValue ? GetAddressById(addressId.Value) : null!
                 );
 
@@ -278,10 +310,10 @@ namespace StudioManager
             cmd.Parameters.AddWithValue("@Phone", contact.Phone ?? "");
             cmd.Parameters.AddWithValue("@Email", contact.Email ?? "");
             cmd.Parameters.AddWithValue("@SocialMedia", contact.SocialMedia ?? "");
-            //cmd.Parameters.AddWithValue("@Picture", contact.Picture ?? "");
-            //cmd.Parameters.AddWithValue("@Role", contact.Role);
+            cmd.Parameters.AddWithValue("@Picture", contact.Picture ?? "");
+            cmd.Parameters.AddWithValue("@Role", contact.Role);
+            cmd.Parameters.AddWithValue("@Payment", contact.Payment);
             cmd.Parameters.AddWithValue("@AddressId", contact.Address?.Id ?? (object)DBNull.Value);
-            //cmd.Parameters.AddWithValue("@Payment", contact.Payment);
 
             cmd.ExecuteNonQuery();
         }
@@ -312,10 +344,10 @@ namespace StudioManager
             cmd.Parameters.AddWithValue("@Phone", contact.Phone ?? "");
             cmd.Parameters.AddWithValue("@Email", contact.Email ?? "");
             cmd.Parameters.AddWithValue("@SocialMedia", contact.SocialMedia ?? "");
-            //cmd.Parameters.AddWithValue("@Picture", contact.Picture ?? "");
-            //cmd.Parameters.AddWithValue("@Role", contact.Role);
+            cmd.Parameters.AddWithValue("@Picture", contact.Picture ?? "");
+            cmd.Parameters.AddWithValue("@Role", contact.Role);
+            cmd.Parameters.AddWithValue("@Payment", contact.Payment);
             cmd.Parameters.AddWithValue("@AddressId", contact.Address?.Id ?? (object)DBNull.Value);
-            //cmd.Parameters.AddWithValue("@Payment", contact.Payment);
 
             cmd.ExecuteNonQuery();
         }
@@ -356,8 +388,7 @@ namespace StudioManager
                     signee: signeeId.HasValue ? GetContactById(signeeId.Value) : null,
                     isSigned: (bool)reader["IsSigned"],
                     signedOn: reader.IsDBNull(3) ? null : reader.GetDateTime(3),
-                    shoot: shootId.HasValue ? GetShootById(shootId.Value) : null,
-                    payment: (bool)reader["Payment"]
+                    shoot: shootId.HasValue ? GetShootById(shootId.Value) : null
                 );
 
                 contracts.Add(contract);
@@ -383,7 +414,6 @@ namespace StudioManager
             cmd.Parameters.AddWithValue("@SignedOn", contract.SignedOn ?? (object)DBNull.Value);
             cmd.Parameters.AddWithValue("@IsSigned", contract.IsSigned);
             cmd.Parameters.AddWithValue("@ShootId", contract.Shoot?.Id ?? (object)DBNull.Value);
-            cmd.Parameters.AddWithValue("@Payment", contract.Payment);
 
 
             int newId = Convert.ToInt32(cmd.ExecuteScalar());
@@ -403,7 +433,6 @@ namespace StudioManager
                     SignedOn = @SignedOn,
                     IsSigned = @IsSigned,
                     ShootId = @ShootId
-                    Payment = @Payment
                 WHERE Id = @Id";
 
             using SqlCommand cmd = new(query, conn);
@@ -413,7 +442,6 @@ namespace StudioManager
             cmd.Parameters.AddWithValue("@SignedOn", contract.SignedOn ?? (object)DBNull.Value);
             cmd.Parameters.AddWithValue("@IsSigned", contract.IsSigned);
             cmd.Parameters.AddWithValue("@ShootId", contract.Shoot?.Id ?? (object)DBNull.Value);
-            cmd.Parameters.AddWithValue("@Payment", contract.Payment);
 
 
             cmd.ExecuteNonQuery();
@@ -661,6 +689,7 @@ namespace StudioManager
                     location: reader.IsDBNull(2) ? null! : GetAddressById(reader.GetInt32(2))
                 );
 
+                shoot.Concepts = GetConceptsByShootId(shootId);
                 shoots.Add(shoot);
             }
 
@@ -727,7 +756,7 @@ namespace StudioManager
             using SqlConnection conn = new(connectionString);
             conn.Open();
 
-            string query = "SELECT Id, Street, HouseNumber, PostalCode, City, Country FROM Address WHERE IsHome = 1";
+            string query = "SELECT Id, LocationName, IsLocationOnly, Street, HouseNumber, PostalCode, City, Country FROM Address WHERE IsHome = 1";
             using SqlCommand cmd = new(query, conn);
             using SqlDataReader reader = cmd.ExecuteReader();
 
@@ -735,6 +764,8 @@ namespace StudioManager
             {
                 return new Address(
                     id: reader.GetInt32(0),
+                    locationName: reader["LocationName"]?.ToString(),
+                    isLocationOnly: Convert.ToBoolean(reader["IsLocationOnly"]),
                     street: reader["Street"].ToString(),
                     houseNumber: reader["HouseNumber"]?.ToString(),
                     postalCode: reader["PostalCode"].ToString(),
@@ -815,11 +846,10 @@ namespace StudioManager
                     email: reader["Email"]?.ToString(),
                     socialMedia: reader["SocialMedia"]?.ToString(),
                     picture: reader["Picture"]?.ToString(),
-                    //payment: (bool)reader["Payment"],
-                    //role: (int)reader["Role"],
+                    role: reader["Role"]?.ToString(),
+                    payment: reader.GetBoolean(9),
                     address: addressId.HasValue ? GetAddressById(addressId.Value) : null!
                 );
-
             }
 
             return null;
@@ -852,7 +882,7 @@ namespace StudioManager
             using SqlConnection conn = new(connectionString);
             conn.Open();
 
-            string query = "SELECT Id, Street, HouseNumber, PostalCode, City, Country FROM Address WHERE Id = @Id";
+            string query = "SELECT Id, LocationName, IsLocationOnly, Street, HouseNumber, PostalCode, City, Country FROM Address WHERE Id = @Id";
             using SqlCommand cmd = new(query, conn);
             cmd.Parameters.AddWithValue("@Id", id);
 
@@ -861,6 +891,8 @@ namespace StudioManager
             {
                 return new Address(
                     id: reader.GetInt32(0),
+                    locationName: reader["LocationName"]?.ToString(),
+                    isLocationOnly: Convert.ToBoolean(reader["IsLocationOnly"]),
                     street: reader["Street"].ToString(),
                     houseNumber: reader["HouseNumber"]?.ToString(),
                     postalCode: reader["PostalCode"].ToString(),
@@ -878,7 +910,7 @@ namespace StudioManager
             conn.Open();
 
             string query = @"
-                SELECT s.Id, s.Date, a.Id AS AddressId, a.Street, a.HouseNumber, a.PostalCode, a.City, a.Country
+                SELECT s.Id, s.Date, a.Id AS AddressId, a.LocationName, a.IsLocationOnly, a.Street, a.HouseNumber, a.PostalCode, a.City, a.Country
                 FROM Shoot s
                 LEFT JOIN Address a ON s.AddressId = a.Id
                 INNER JOIN Concept c ON s.Id = c.ShootId
@@ -892,11 +924,12 @@ namespace StudioManager
             {
                 Address? address = null;
 
-                // Check of het adres daadwerkelijk bestaat (a.Id is niet null)
                 if (!reader.IsDBNull(reader.GetOrdinal("AddressId")))
                 {
                     address = new Address(
                         id: reader.GetInt32(reader.GetOrdinal("AddressId")),
+                        locationName: reader["LocationName"]?.ToString(),
+                        isLocationOnly: Convert.ToBoolean(reader["IsLocationOnly"]),
                         street: reader["Street"]?.ToString() ?? "",
                         houseNumber: reader["HouseNumber"]?.ToString() ?? "",
                         postalCode: reader["PostalCode"]?.ToString() ?? "",
@@ -975,8 +1008,8 @@ namespace StudioManager
                     email: reader["Email"]?.ToString(),
                     socialMedia: reader["SocialMedia"]?.ToString(),
                     picture: reader["Picture"]?.ToString(),
-                    //payment: (bool)reader["Payment"],
-                    //role: (int)reader["Role"],
+                    role: reader["Role"]?.ToString(),
+                    payment: reader.GetBoolean(7),
                     address: addressId.HasValue ? GetAddressById(addressId.Value) : null!
                 ));
             }
@@ -991,7 +1024,7 @@ namespace StudioManager
             conn.Open();
 
             string query = @"
-                SELECT c.Id,c.Name, c.Description, c.Sketch, c.ShootId, c.Address
+                SELECT c.Id,c.Name, c.Description, c.Sketch, c.ShootId, c.AddressId
                 FROM Concept c
                 INNER JOIN ConceptProject cp ON c.Id = cp.ConceptId
                 WHERE cp.ProjectId = @ProjectId";
@@ -1007,7 +1040,7 @@ namespace StudioManager
                 Concept concept = new(
                     id: conceptId,
                     name: reader["Name"]?.ToString(),
-                    address: reader["Address"]?.ToString(),
+                    address: reader["AddressId"] != DBNull.Value ? GetAddressById((int)reader["AddressId"]) : null,
                     description: reader["Description"]?.ToString(),
                     sketch: reader["Sketch"]?.ToString(),
                     props: GetPropsByConceptId(conceptId),
@@ -1023,6 +1056,40 @@ namespace StudioManager
 
             return concepts;
         }
+
+        private List<Concept> GetConceptsByShootId(int shootId)
+        {
+            List<Concept> concepts = new();
+            using SqlConnection conn = new(connectionString);
+            conn.Open();
+
+            string query = @"
+        SELECT Id, Name, Description, Sketch, AddressId
+        FROM Concept
+        WHERE ShootId = @ShootId";
+
+            using SqlCommand cmd = new(query, conn);
+            cmd.Parameters.AddWithValue("@ShootId", shootId);
+
+            using SqlDataReader reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                Concept concept = new Concept(
+                    id: reader.GetInt32(0),
+                    name: reader["Name"].ToString(),
+                    address: reader["AddressId"] != DBNull.Value ? GetAddressById((int)reader["AddressId"]) : null,
+                    description: reader["Description"]?.ToString(),
+                    sketch: reader["Sketch"]?.ToString(),
+                    props: new List<Prop>(),  
+                    shoot: null
+                );
+
+                concepts.Add(concept);
+            }
+
+            return concepts;
+        }
+
 
         public bool ConceptNameExists(string name)
         {
@@ -1104,6 +1171,8 @@ namespace StudioManager
             cmd.ExecuteNonQuery();
         }
 
+
+
         private void DeleteAllConceptRelations(int conceptId)
         {
             using SqlConnection conn = new(connectionString);
@@ -1131,5 +1200,105 @@ namespace StudioManager
             cmd.Parameters.AddWithValue("@ProjectId", projectId);
             cmd.ExecuteNonQuery();
         }
+
+
+
+
+
+
+
+
+
+        public void UnlinkContactReferences(int contactId)
+        {
+            using SqlConnection conn = new(connectionString);
+            conn.Open();
+
+            string deleteConceptLinks = "DELETE FROM ConceptContact WHERE ContactId = @ContactId";
+            string nullifyContractSignee = "UPDATE Contract SET SigneeContactId = NULL WHERE SigneeContactId = @ContactId";
+
+            foreach (var query in new[] { deleteConceptLinks, nullifyContractSignee })
+            {
+                using SqlCommand cmd = new(query, conn);
+                cmd.Parameters.AddWithValue("@ContactId", contactId);
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+
+
+
+        public void UnlinkAddressReferences(int addressId)
+        {
+            using SqlConnection conn = new(connectionString);
+            conn.Open();
+
+            string[] queries =
+            {
+            "UPDATE Contact SET AddressId = NULL WHERE AddressId = @AddressId",
+            "UPDATE Shoot SET AddressId = NULL WHERE AddressId = @AddressId",
+            "UPDATE Concept SET AddressId = NULL WHERE AddressId = @AddressId"
+        };
+
+            foreach (var query in queries)
+            {
+                using SqlCommand cmd = new(query, conn);
+                cmd.Parameters.AddWithValue("@AddressId", addressId);
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        public Contract? GetContractByShootId(int shootId)
+        {
+            using SqlConnection conn = new(connectionString);
+            conn.Open();
+
+            string query = @"
+        SELECT Id, Body, SigneeContactId, SignedOn, IsSigned, ShootId
+        FROM Contract
+        WHERE ShootId = @ShootId";
+
+            using SqlCommand cmd = new(query, conn);
+            cmd.Parameters.AddWithValue("@ShootId", shootId);
+
+            using SqlDataReader reader = cmd.ExecuteReader();
+            if (reader.Read())
+            {
+                int id = reader.GetInt32(reader.GetOrdinal("Id"));
+                string body = reader["Body"]?.ToString() ?? "";
+                bool isSigned = reader.GetBoolean(reader.GetOrdinal("IsSigned"));
+                DateTime? signedOn = reader.IsDBNull(reader.GetOrdinal("SignedOn"))
+                    ? null
+                    : reader.GetDateTime(reader.GetOrdinal("SignedOn"));
+
+                int? signeeId = reader.IsDBNull(reader.GetOrdinal("SigneeContactId"))
+                    ? null
+                    : reader.GetInt32(reader.GetOrdinal("SigneeContactId"));
+
+                Contact? signee = signeeId.HasValue ? GetContactById(signeeId.Value) : null;
+                Shoot? shoot = GetShootById(shootId);
+
+                return new Contract(id, body, signee, isSigned, signedOn, shoot);
+            }
+
+            return null;
+        }
+
+
+        public bool ContactNameExists(string firstName, string lastName)
+        {
+            using SqlConnection conn = new(connectionString);
+            conn.Open();
+
+            string query = "SELECT COUNT(*) FROM Contact WHERE FirstName = @FirstName AND LastName = @LastName";
+            using SqlCommand cmd = new(query, conn);
+            cmd.Parameters.AddWithValue("@FirstName", firstName);
+            cmd.Parameters.AddWithValue("@LastName", lastName);
+
+            int count = (int)cmd.ExecuteScalar();
+            return count > 0;
+        }
+
+
     }
 }
