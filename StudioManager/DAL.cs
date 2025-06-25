@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Data;
 using Microsoft.Data.SqlClient;
+using static StudioManager.Project;
 
 namespace StudioManager
 {
@@ -468,20 +469,29 @@ namespace StudioManager
             using SqlConnection conn = new(connectionString);
             conn.Open();
 
-            string query = "SELECT Id, Name, Deadline, Notes FROM Project";
+            // include State in SELECT
+            string query = "SELECT Id, Name, Deadline, Notes, State FROM Project";
             using SqlCommand cmd = new(query, conn);
             using SqlDataReader reader = cmd.ExecuteReader();
 
             while (reader.Read())
             {
                 int projectId = reader.GetInt32(0);
-
-                Project project = new(
+                var project = new Project(
                     id: projectId,
-                    name: reader["Name"].ToString(),
-                    deadline: reader.IsDBNull(2) ? DateTime.MinValue : reader.GetDateTime(2),
+                    name: reader["Name"].ToString()!,
+                    deadline: reader.IsDBNull(2)
+                              ? (DateTime?)null
+                              : reader.GetDateTime(2),
                     notes: reader["Notes"]?.ToString()
                 );
+
+                // NEW: parse the State enum
+                string stateText = reader["State"]?.ToString() ?? "Created";
+                if (Enum.TryParse<ProjectState>(stateText, out var st))
+                    project.State = st;
+                else
+                    project.State = ProjectState.Created;
 
                 project.Concepts = GetConceptsByProjectId(projectId);
                 projects.Add(project);
@@ -496,15 +506,20 @@ namespace StudioManager
             using SqlConnection conn = new(connectionString);
             conn.Open();
 
+            // include State in INSERT
             string query = @"
-                INSERT INTO Project (Name, Deadline, Notes)
-                VALUES (@Name, @Deadline, @Notes);
-                SELECT SCOPE_IDENTITY();";
+        INSERT INTO Project (Name, Deadline, Notes, State)
+        VALUES (@Name, @Deadline, @Notes, @State);
+        SELECT SCOPE_IDENTITY();";
 
             using SqlCommand cmd = new(query, conn);
             cmd.Parameters.AddWithValue("@Name", project.Name);
-            cmd.Parameters.AddWithValue("@Deadline", project.Deadline == DateTime.MinValue ? (object)DBNull.Value : project.Deadline);
+            cmd.Parameters.AddWithValue("@Deadline", project.Deadline == DateTime.MinValue
+                                                    ? (object)DBNull.Value
+                                                    : project.Deadline);
             cmd.Parameters.AddWithValue("@Notes", project.Notes ?? "");
+            // New parameter for state
+            cmd.Parameters.AddWithValue("@State", project.State.ToString());
 
             int newId = Convert.ToInt32(cmd.ExecuteScalar());
             project.Id = newId;
@@ -513,31 +528,49 @@ namespace StudioManager
                 AddConceptToProject(newId, concept.Id);
         }
 
-        // UPDATE
         public void UpdateProject(Project project)
         {
-            using SqlConnection conn = new(connectionString);
+            using var conn = new SqlConnection(connectionString);
             conn.Open();
 
-            string query = @"
-                UPDATE Project SET
-                    Name = @Name,
-                    Deadline = @Deadline,
-                    Notes = @Notes
-                WHERE Id = @Id";
+            // 1) Update the Project table
+            const string updateSql = @"
+        UPDATE Project
+        SET Name     = @Name,
+            Deadline = @Deadline,
+            Notes    = @Notes,
+            State    = @State
+        WHERE Id = @Id";
+            using (var cmd = new SqlCommand(updateSql, conn))
+            {
+                cmd.Parameters.AddWithValue("@Name", project.Name);
+                cmd.Parameters.AddWithValue("@Deadline", project.Deadline.HasValue
+                                                        ? (object)project.Deadline.Value
+                                                        : DBNull.Value);
+                cmd.Parameters.AddWithValue("@Notes", project.Notes ?? "");
+                cmd.Parameters.AddWithValue("@State", project.State.ToString());
+                cmd.Parameters.AddWithValue("@Id", project.Id);
+                cmd.ExecuteNonQuery();
+            }
 
-            using SqlCommand cmd = new(query, conn);
-            cmd.Parameters.AddWithValue("@Id", project.Id);
-            cmd.Parameters.AddWithValue("@Name", project.Name);
-            cmd.Parameters.AddWithValue("@Deadline", project.Deadline == DateTime.MinValue ? (object)DBNull.Value : project.Deadline);
-            cmd.Parameters.AddWithValue("@Notes", project.Notes ?? "");
+            // 2) Clear out old concept links
+            const string deleteSql = @"
+    DELETE FROM ConceptProject 
+    WHERE ProjectId = @ProjectId";
+            using (var cmd = new SqlCommand(deleteSql, conn))
+            {
+                cmd.Parameters.AddWithValue("@ProjectId", project.Id);
+                cmd.ExecuteNonQuery();
+            }
 
-            cmd.ExecuteNonQuery();
-
-            DeleteConceptProjectRelation(project.Id);
+            // 3) Re-insert the new set of concept links
             foreach (var concept in project.Concepts)
+            {
                 AddConceptToProject(project.Id, concept.Id);
+            }
         }
+
+
 
         // DELETE
         public void DeleteProject(int projectId)
