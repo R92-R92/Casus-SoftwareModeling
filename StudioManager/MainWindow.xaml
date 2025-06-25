@@ -55,7 +55,7 @@
             <Grid>
 
                 <!-- DASHBOARD VIEW -->
-                <Grid x:Name="DashboardView" Visibility="Visible">
+                <Grid x:Name="DashboardView" Visibility="Collapsed">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="*"/>
@@ -1905,7 +1905,7 @@
 
 
         <!-- ==== STARTUP OVERLAY ==== -->
-        <Border x:Name="StartUpWindow" Visibility="Collapsed" Grid.Column="0" Grid.ColumnSpan="2" Panel.ZIndex="100" Background="#F5F5F5" CornerRadius="10" Margin="10" Padding="10">
+        <Border x:Name="StartUpWindow" Visibility="Visible" Grid.Column="0" Grid.ColumnSpan="2" Panel.ZIndex="100" Background="#F5F5F5" CornerRadius="10" Margin="10" Padding="10">
             <Grid>
                 <!-- je eigen background transparant laten, want de Border voert de styling uit -->
                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Width="400">
