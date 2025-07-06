@@ -612,6 +612,62 @@ namespace StudioManager
             return props;
         }
 
+        public List<Prop> GetAvailableProps()
+        {
+            List<Prop> props = new();
+            using SqlConnection conn = new(connectionString);
+            conn.Open();
+
+            string query = "SELECT Id, Name, Description, IsAvailable FROM Prop";
+            using SqlCommand cmd = new(query, conn);
+            using SqlDataReader reader = cmd.ExecuteReader();
+
+            while (reader.Read())
+            {
+                if (reader.GetBoolean("IsAvailable"))
+                {
+                    Prop prop = new(
+                        id: reader.GetInt32(0),
+                        name: reader["Name"].ToString(),
+                        description: reader["Description"]?.ToString(),
+                        isAvailable: (bool)reader["IsAvailable"]
+                    );
+
+                    props.Add(prop);
+                }
+            }
+
+            return props;
+        }
+
+        public List<Prop> GetUnavailableProps()
+        {
+            List<Prop> props = new();
+            using SqlConnection conn = new(connectionString);
+            conn.Open();
+
+            string query = "SELECT Id, Name, Description, IsAvailable FROM Prop";
+            using SqlCommand cmd = new(query, conn);
+            using SqlDataReader reader = cmd.ExecuteReader();
+
+            while (reader.Read())
+            {
+                if (!reader.GetBoolean("IsAvailable")) 
+                {
+                    Prop prop = new(
+                        id: reader.GetInt32(0),
+                        name: reader["Name"].ToString(),
+                        description: reader["Description"]?.ToString(),
+                        isAvailable: (bool)reader["IsAvailable"]
+                    );
+
+                    props.Add(prop);
+                }
+            }
+
+            return props;
+        }
+
         // CREATE
         public void AddProp(Prop prop)
         {

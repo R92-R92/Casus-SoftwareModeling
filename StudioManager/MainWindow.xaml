@@ -798,6 +798,18 @@
                             <TextBlock x:Name="PropsSearchPlaceholder" Text="Search props..." Foreground="Gray" Margin="5,0,0,0" VerticalAlignment="Center" IsHitTestVisible="False" Visibility="Visible"/>
                         </Grid>
 
+                        <ComboBox Name="AvailabilityFilterComboBox" SelectionChanged="AvailabilityFilterComboBox_SelectionChanged" Margin="10" Width="200" HorizontalAlignment="Center">
+                                   
+                            <ComboBoxItem Content="See all"/>
+                                   
+                            <ComboBoxItem Content="See available"/>
+                                   
+                            <ComboBoxItem Content="See unavailable"/>
+                               
+                        </ComboBox>
+
+
+
                         <!-- New Prop Button -->
                         <Button Grid.Column="1" Content="New Prop" Width="100" HorizontalAlignment="Right" Click="NewPropButton_Click"/>
                     </Grid>
