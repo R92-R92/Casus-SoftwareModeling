@@ -11,6 +11,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Collections.ObjectModel;
 using static StudioManager.Project;
+using System.ComponentModel;
 
 
 namespace StudioManager
@@ -109,37 +110,6 @@ namespace StudioManager
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         public void DashboardButton_Click(object sender, RoutedEventArgs e)
         {
             RefreshConceptOverview();
@@ -234,6 +204,7 @@ namespace StudioManager
             HidePanels();
             PropsView.Visibility = Visibility.Visible;
 
+            PropsDataGrid.ItemsSource = new DAL().GetAllProps();
             PropsDataGrid.SelectedItem = null;
             DetailPropName.Text = "";
             DetailPropDescription.Text = "";
@@ -1732,7 +1703,22 @@ namespace StudioManager
 
         private void RefreshPropOverview()
         {
-            PropsDataGrid.ItemsSource = new DAL().GetAllProps();
+            string selected = (AvailabilityFilterComboBox.SelectedItem as ComboBoxItem)?.Content as string;
+
+            switch (selected)
+            {
+                case "See available":
+                    PropsDataGrid.ItemsSource = new DAL().GetAvailableProps();
+                    break;
+                case "See unavailable":
+                    PropsDataGrid.ItemsSource = new DAL().GetUnavailableProps();
+                    break;
+                case "See all":
+                    PropsDataGrid.ItemsSource = new DAL().GetAllProps();
+                    break;
+                default:
+                    break;
+            }
         }
 
         private void CreateNewProp_Click(object sender, RoutedEventArgs e)
@@ -1760,6 +1746,14 @@ namespace StudioManager
             HidePanels();
             PropsView.Visibility = Visibility.Visible;
         }
+
+        private void AvailabilityFilterComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            RefreshPropOverview();
+
+        }
+
+
 
         private void EditProp_Click(object sender, RoutedEventArgs e)
         {
