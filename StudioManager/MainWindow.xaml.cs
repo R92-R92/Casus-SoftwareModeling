@@ -168,6 +168,32 @@ namespace StudioManager
             ConceptsView.Visibility = Visibility.Visible;
         }
 
+        public void CancelCreateConcept_Click(object sender, RoutedEventArgs e)
+        {
+
+            string name = NewConceptNameTextBox.Text.Trim();
+            string description = NewConceptDescriptionTextBox.Text.Trim();
+
+            if (string.IsNullOrEmpty(description) && string.IsNullOrEmpty(name))
+
+            {
+                ConceptsButton_Click(null, null);
+            }
+            else
+            {
+                MessageBoxResult result = MessageBox.Show(
+                    "Weet je zeker dat je dit formulier wil verwijderen?",
+                    "Bevestiging",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Warning);
+
+                if (result == MessageBoxResult.Yes)
+                {
+                    ConceptsButton_Click(null, null);
+                }
+            }
+        }
+
         private void CancelEditConcept_Click(object sender, RoutedEventArgs e)
         {
             if (editModeHasDeletions)
@@ -212,6 +238,32 @@ namespace StudioManager
             DetailPropName.Text = "";
             DetailPropDescription.Text = "";
             DetailPropAvailable.Text = "";
+        }
+
+        public void CancelCreateProp_Click(object sender, RoutedEventArgs e)
+        {
+
+            string name = NewPropNameTextBox.Text.Trim();
+            string description = NewPropDescriptionTextBox.Text.Trim();
+
+            if (string.IsNullOrEmpty(description) && string.IsNullOrEmpty(name))
+
+            {
+                PropsButton_Click(null, null);
+            }
+            else
+            {
+                MessageBoxResult result = MessageBox.Show(
+                    "Weet je zeker dat je dit formulier wil verwijderen?",
+                    "Bevestiging",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Warning);
+
+                if (result == MessageBoxResult.Yes)
+                {
+                    PropsButton_Click(null, null);
+                }
+            }
         }
 
         private void NewPropButton_Click(object sender, RoutedEventArgs e)
@@ -2838,8 +2890,30 @@ namespace StudioManager
 
         private void CancelNewContact_Click(object sender, RoutedEventArgs e)
         {
-            HidePanels();
-            ContactsView.Visibility = Visibility.Visible;
+
+            string firstname = NewContactFirstNameTextBox.Text.Trim();
+            string lastname = NewContactLastNameTextBox.Text.Trim();
+            string phone = NewContactPhoneTextBox.Text.Trim();
+            string email = NewContactEmailTextBox.Text.Trim();
+
+
+            if (string.IsNullOrEmpty(firstname) && string.IsNullOrEmpty(lastname) && string.IsNullOrEmpty(phone) && string.IsNullOrEmpty(email))
+            {
+                ContactsButton_Click(null, null);
+            }
+            else
+            {
+                MessageBoxResult result = MessageBox.Show(
+                    "Weet je zeker dat je dit formulier wil verwijderen?",
+                    "Bevestiging",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Warning);
+
+                if (result == MessageBoxResult.Yes)
+                {
+                    ContactsButton_Click(null, null);
+                }
+            }
         }
 
         private void EditContact_Click(object sender, RoutedEventArgs e)
@@ -3014,8 +3088,8 @@ namespace StudioManager
         }
         
 
-// Show blank form for a brand-new project
-private void NewProjectButton_Click(object sender, RoutedEventArgs e)
+        // Show blank form for a brand-new project
+        private void NewProjectButton_Click(object sender, RoutedEventArgs e)
         {
             HidePanels();
             NewProjectNameTextBox.Text = "";
@@ -3027,11 +3101,28 @@ private void NewProjectButton_Click(object sender, RoutedEventArgs e)
         // Cancel out of the new‐project form
         private void CancelNewProject_Click(object sender, RoutedEventArgs e)
         {
-            HidePanels();
-            ProjectsView.Visibility = Visibility.Visible;
+
+            string name = NewProjectNameTextBox.Text.Trim();
+
+            if (string.IsNullOrEmpty(name))
+
+            {
+                ProjectsButton_Click(null, null);
+            }
+            else
+            {
+                MessageBoxResult result = MessageBox.Show(
+                    "Weet je zeker dat je dit formulier wil verwijderen?",
+                    "Bevestiging",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Warning);
+
+                if (result == MessageBoxResult.Yes)
+                {
+                    ProjectsButton_Click(null, null);
+                }
+            }
         }
-
-
 
         // Read inputs and save a new project
         private void CreateNewProject_Click(object sender, RoutedEventArgs e)
@@ -3109,7 +3200,6 @@ private void NewProjectButton_Click(object sender, RoutedEventArgs e)
                 available.Add(c);
             }
         }
-
 
         private void SaveEditProject_Click(object sender, RoutedEventArgs e)
         {
