@@ -17,6 +17,9 @@
         </Grid.ColumnDefinitions>
 
         <!-- NAVIGATION -->
+
+
+        <!-- RIGHT SIDE -->
         <Border Background="#F5F5F5" CornerRadius="10" Margin="10" Padding="10" Grid.Column="0">
             <Grid>
                 <Grid.RowDefinitions>
@@ -186,14 +189,14 @@
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Name"
                           Binding="{Binding Name}"
-                          Width="*"/>
+                          Width="*" />
                             <DataGridTextColumn Header="Deadline"
-                          Binding="{Binding Deadline, StringFormat={}{0:yyyy-MM-dd}}"
-                          Width="Auto"/>
+                          Binding="{Binding Deadline, StringFormat=\{0:yyyy-MM-dd\}}"
+                          Width="Auto" />
                             <DataGridTextColumn Header="Notes"
                           Binding="{Binding Notes}"
-                          Width="2*"/>
-                            <DataGridTemplateColumn Header="Edit" Width="Auto">
+                          Width="2*" />
+                            <DataGridTemplateColumn Header="Edit" Width="Auto" >
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <Button Content="Edit"
@@ -203,7 +206,7 @@
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
-                            <DataGridTemplateColumn Header="Delete" Width="Auto">
+                            <DataGridTemplateColumn Header="Delete" Width="Auto" >
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <Button Content="Delete"
@@ -285,7 +288,7 @@
               Width="100"
               HorizontalAlignment="Left"
               Click="CreateNewProject_Click"/>
-                        
+
                         <Button Content="Cancel"
               Width="100"
               HorizontalAlignment="Right"
@@ -644,10 +647,6 @@
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*"/>
                             <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="2*"/>
-                            <DataGridTextColumn Header="Model" Binding="{Binding ModelText}" Width="*"/>
-                            <DataGridTextColumn Header="Props" Binding="{Binding PropsText}" Width="*"/>
-                            <DataGridTextColumn Header="Shoot Address" Binding="{Binding Location}" Width="*"/>
-                            <DataGridTextColumn Header="Shoot Date" Binding="{Binding ShootDateText}" Width="*"/>
                             <DataGridTemplateColumn Header="Edit" Width="Auto">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
@@ -1183,7 +1182,7 @@
                                             <DockPanel Margin="4,2" LastChildFill="False">
                                                 <TextBlock Width="200" VerticalAlignment="Center">
                                                     <TextBlock.Style>
-                                                        <Style TargetType="TextBlock">
+                                                        <Style TargetType="{x:Type TextBlock}">
                                                             <Setter Property="Text" Value="{Binding LocationName}" />
                                                             <Style.Triggers>
                                                                 <DataTrigger Binding="{Binding LocationName}" Value="">
@@ -1345,7 +1344,7 @@
                 <Button Content="Create" Width="100" HorizontalAlignment="Left" Grid.Column="0" Margin="100,0"
                 Click="CreateNewConcept_Click"/>
                 <Button Content="Cancel" Width="100" HorizontalAlignment="Right" Grid.Column="1" Margin="100,0"
-                Click="ConceptsButton_Click"/>
+                Click="CancelCreateConcept_Click"/>
             </Grid>
         </Grid>
 
@@ -1408,7 +1407,7 @@
                                             <DockPanel Margin="4,2" LastChildFill="False">
                                                 <TextBlock Width="200" VerticalAlignment="Center">
                                                     <TextBlock.Style>
-                                                        <Style TargetType="TextBlock">
+                                                        <Style TargetType="{x:Type TextBlock}">
                                                             <Setter Property="Text" Value="{Binding LocationName}" />
                                                             <Style.Triggers>
                                                                 <DataTrigger Binding="{Binding LocationName}" Value="">
@@ -1466,7 +1465,7 @@
 
                 <!-- Models -->
                 <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="1" Margin="10,5,0,5">
-                    <TextBlock Text="Select Models:" Width="120" VerticalAlignment="Top"/>
+                    <TextBlock Text="Select Contacts:" Width="120" VerticalAlignment="Top"/>
                     <StackPanel>
                         <Border BorderBrush="Gray" BorderThickness="1" Background="White" Width="300" Height="150" CornerRadius="5">
                             <ScrollViewer VerticalScrollBarVisibility="Auto">
@@ -1664,7 +1663,7 @@
                                             <DockPanel Margin="4,2" LastChildFill="False">
                                                 <TextBlock Width="200" VerticalAlignment="Center">
                                                     <TextBlock.Style>
-                                                        <Style TargetType="TextBlock">
+                                                        <Style TargetType="{x:Type TextBlock}">
                                                             <Setter Property="Text" Value="{Binding LocationName}" />
                                                             <Style.Triggers>
                                                                 <DataTrigger Binding="{Binding LocationName}" Value="">
@@ -1814,7 +1813,7 @@
                 <Button Content="Create" Width="100" HorizontalAlignment="Left" Grid.Column="0" Margin="100,0"
                 Click="CreateNewProp_Click"/>
                 <Button Content="Cancel" Width="100" HorizontalAlignment="Right" Grid.Column="1" Margin="100,0"
-                Click="PropsButton_Click"/>
+                Click="CancelCreateProp_Click"/>
             </Grid>
         </Grid>
 
@@ -1925,7 +1924,6 @@
                 </StackPanel>
             </Grid>
         </Border>
-        <!-- ==== END STARTUP OVERLAY ==== -->
 
 
 
@@ -2137,7 +2135,7 @@
                                             <DockPanel Margin="4,2" LastChildFill="False">
                                                 <TextBlock Width="200" VerticalAlignment="Center">
                                                     <TextBlock.Style>
-                                                        <Style TargetType="TextBlock">
+                                                        <Style TargetType="{x:Type TextBlock}">
                                                             <Setter Property="Text" Value="{Binding LocationName}" />
                                                             <Style.Triggers>
                                                                 <DataTrigger Binding="{Binding LocationName}" Value="">
@@ -2261,8 +2259,8 @@
         </Grid>
 
 
-        
-        
+
+
 
 
         <!-- EDIT SHOOT -->
@@ -2297,7 +2295,7 @@
                                             <DockPanel Margin="4,2" LastChildFill="False">
                                                 <TextBlock Width="200" VerticalAlignment="Center">
                                                     <TextBlock.Style>
-                                                        <Style TargetType="TextBlock">
+                                                        <Style TargetType="{x:Type TextBlock}">
                                                             <Style.Triggers>
                                                                 <DataTrigger Binding="{Binding IsLocationOnly}" Value="True">
                                                                     <Setter Property="Text" Value="{Binding LocationName}" />
@@ -2661,7 +2659,7 @@
             </Grid>
         </Grid>
 
-        
+
 
         <!-- Quick Add Contact from Shoot -->
         <Grid x:Name="QuickAddContactFromShootForm" Visibility="Collapsed" Grid.Column="1" Background="#F5F5F5" Margin="10">
