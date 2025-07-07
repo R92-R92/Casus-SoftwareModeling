@@ -1868,6 +1868,7 @@ namespace StudioManager
             NewShootSignedOnDatePicker.SelectedDate = null;
             selectedContractPath = null;
             SelectedContractFileNameTextBlock.Text = "No file selected.";
+            FillTimePicker();
 
         }
 
@@ -1925,10 +1926,26 @@ namespace StudioManager
             ShootsView.Visibility = Visibility.Visible;
         }
 
+        private void FillTimePicker()
+        {
+            for (int hour = 0; hour < 24; hour++)
+            {
+                for (int minute = 0; minute < 60; minute += 5)
+                {
+                    string time = new TimeSpan(hour, minute, 0).ToString(@"hh\:mm");
+                    TimeComboBox.Items.Add(time);
+                }
+            }
+
+            TimeComboBox.SelectedIndex = 0;
+        }
+
+
 
         private void CreateNewShoot_Click(object sender, RoutedEventArgs e)
         {
             DateTime? selectedDate = NewShootDatePicker.SelectedDate;
+
             if (selectedDate == null)
             {
                 MessageBox.Show("Please select a date.");
@@ -1940,6 +1957,16 @@ namespace StudioManager
                 MessageBox.Show("Please select a location.");
                 return;
             }
+
+            string selectedTime = TimeComboBox.SelectedItem as string;
+            if (TimeSpan.TryParse(selectedTime, out TimeSpan time))
+            {
+                if (selectedDate.HasValue)
+                {
+                    selectedDate = selectedDate.Value.Date + time;
+                }
+            }
+
 
             Shoot newShoot = new Shoot(0, selectedDate, selectedNewShootAddress);
             newShoot.Create();
