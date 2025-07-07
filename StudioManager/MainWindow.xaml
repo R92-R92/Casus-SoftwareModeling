@@ -7,7 +7,7 @@
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
         mc:Ignorable="d"
-        Title="Milo's Document and Media Assistant / Milo's Digital Management App"
+        Title="Miels Document and Media Assistant / Miels Digital Management App"
         Height="800" Width="1200" WindowStartupLocation="CenterScreen">
 
     <Grid>
