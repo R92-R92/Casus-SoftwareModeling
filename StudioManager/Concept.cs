@@ -87,6 +87,21 @@ namespace StudioManager
                 : $"{Shoot.Location.Street} {Shoot.Location.HouseNumber}, {Shoot.Location.PostalCode} {Shoot.Location.City}")
             : "–";
 
+        public int Progress()
+        {
+
+            int totalFields = 4;
+            int filled = 0;
+
+            if (!string.IsNullOrWhiteSpace(Name)) filled++;
+            if (!string.IsNullOrWhiteSpace(Description)) filled++;
+            if (Shoot != null) filled++;
+            if (Address != null) filled++;
+
+            return (int)((double)filled / totalFields * 100);
+
+        }
+
     }
 
 }

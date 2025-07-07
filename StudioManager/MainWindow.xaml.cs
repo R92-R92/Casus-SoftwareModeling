@@ -109,12 +109,25 @@ namespace StudioManager
         }
 
 
+        public List<Concept> TopThreeConcepts()
+        {
+            List<Concept> top3Concepts = new DAL().GetAllConcepts();
+            top3Concepts = top3Concepts.OrderByDescending(c => c.Models.Count).Take(3).ToList();
+            return top3Concepts;
+        }
+
+        public void BindConceptsToDashboard()
+        {
+            ProgressGrid.DataContext = TopThreeConcepts();
+        }
+
 
         public void DashboardButton_Click(object sender, RoutedEventArgs e)
         {
             RefreshConceptOverview();
             HidePanels();
             DashboardView.Visibility = Visibility.Visible;
+            
         }
 
         public void ProjectsButton_Click(object sender, RoutedEventArgs e)
